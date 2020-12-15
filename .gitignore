@@ -1,0 +1,11 @@
+**/__pycache__
+**/venv*
+**/.venv*
+
+**/.vscode
+**/.DS_Store
+
+.pytest_cache
+**.pyc
+.coverage
+coverage.xml
