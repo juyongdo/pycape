@@ -17,3 +17,6 @@ class Cape:
         Calls /v1/login and passes token_id and secret parsed from token passed to Requester.
         '''
         self.__requester.login()
+
+    def list_projects(self):
+        return []
