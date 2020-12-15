@@ -34,9 +34,8 @@ class Requester:
         json = resp.json()
 
         self.token = base64.from_string(json["token"])
-        return "success"
 
-    def gql_req(self, query: str, variables: Optional[dict]):
+    def _gql_req(self, query: str, variables: Optional[dict]):
         input_json = {"query": query, "variables": {}}
         if variables is not None:
             input_json["variables"] = variables
@@ -49,7 +48,7 @@ class Requester:
         return j["data"]
 
     def list_projects(self):
-        return self.gql_req(
+        return self._gql_req(
             query="""
             query ListProjects {
                 projects {

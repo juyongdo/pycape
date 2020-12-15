@@ -1,66 +1,97 @@
 import pytest
 import responses
+from contextlib import contextmanager
 from cape.cape import Cape
 from cape.exceptions import GQLException
+from cape.network.requester import Requester
+
 
 host = "http://cape.com"
 token = "abc,123"
 
 
+@contextmanager
+def notraising():
+    yield
+
+
 @responses.activate
 @pytest.mark.parametrize(
-    "token,json,status,exception,response",
+    "token,json,status,exception",
     [
-        (token, {"token": "cookie"}, 200, None, "success"),
-        (None, {}, 200, "No token provided", None),
-        ("abc123", {}, 200, "Bad token provided", None),
-        (token, {}, 400, "400 Client Error: Bad Request for url:*", None),
+        (token, {"token": "cookie"}, 200, notraising()),
+        (None, {}, 200, pytest.raises(Exception, match="No token provided")),
+        ("abc123", {}, 200, pytest.raises(Exception, match="Bad token provided")),
+        (
+            token,
+            {},
+            400,
+            pytest.raises(Exception, match="400 Client Error: Bad Request for url:*"),
+        ),
     ],
 )
-def test_login_error(token, json, status, exception, response):
-    with pytest.raises(Exception, match=exception):
+def test_login(token, json, status, exception):
+    with exception:
         resp = responses.add(
             responses.POST, f"{host}/v1/login", json=json, status=status
         )
         c = Cape(endpoint=host, token=token)
-        r = c.login()
-
-        assert r == response
+        c.login()
 
 
 @responses.activate
-def test_list_projects():
-    responses.add(
-        responses.POST,
-        f"{host}/v1/query",
-        json={
-            "data": {
-                "projects": [
-                    {
-                        "id": "abc123",
-                        "label": "my-project",
-                        "name": "my-project",
-                        "description": "we are here to do some data science",
-                    }
-                ]
-            }
-        },
-    )
-    c = Cape(token=token, endpoint=host)
-    projects = c.list_projects()
-
-    assert len(projects) == 1
-    assert projects[0]["id"] == "abc123"
-
-
-@responses.activate
-def test_list_projects_error():
-    with pytest.raises(GQLException, match="An error occurred: .*"):
+@pytest.mark.parametrize(
+    "json,exception",
+    [
+        (
+            {
+                "data": {
+                    "projects": [
+                        {
+                            "id": "abc123",
+                            "label": "my-project",
+                            "name": "my-project",
+                            "description": "we are here to do some data science",
+                        }
+                    ]
+                }
+            },
+            notraising(),
+        ),
+        (
+            {"errors": [{"message": "something went wrong"}]},
+            pytest.raises(GQLException, match="An error occurred: .*"),
+        ),
+    ],
+)
+def test_list_projects(json, exception):
+    with exception:
         responses.add(
-            responses.POST,
-            f"{host}/v1/query",
-            json={"errors": [{"message": "something went wrong"}]},
+            responses.POST, f"{host}/v1/query", json=json,
         )
-
         c = Cape(token=token, endpoint=host)
-        c.list_projects()
+        projects = c.list_projects()
+
+    if exception == notraising():
+        assert len(projects) == 1
+        assert projects[0]["id"] == "abc123"
+
+
+@responses.activate
+@pytest.mark.parametrize(
+    "query,variables,json,exception",
+    [
+        ("", {}, {"data": {}}, notraising()),
+        (
+            "",
+            {},
+            {"errors": []},
+            pytest.raises(GQLException, match="An error occurred: .*"),
+        ),
+    ],
+)
+def test_gql_req(query, variables, json, exception):
+    with exception:
+        resp = responses.add(responses.POST, f"{host}/v1/query", json=json)
+        r = Requester(endpoint=host, token=token)
+        resp = r._gql_req(query=query, variables=variables)
