@@ -18,5 +18,5 @@ bootstrap:
 	pip install -e .
 
 coverage:
-	pytest --cov-report=xml --cov=cape ${CI_FILES}
+	pytest --cov-report=xml --cov=cape tests
 	coverage report
