@@ -25,11 +25,15 @@ class APIToken:
     def __init__(self, token: str):
         self.raw = token
         splits = token.split(",")
-        self.token_id = splits[0]
 
-        token_bytes = bytes(base64.from_string(splits[1]))
-        self.version = token_bytes[0]
-        self.secret = str(Base64(token_bytes[1:]))
+        if len(splits) > 1:
+            self.token_id = splits[0]
+
+            token_bytes = bytes(base64.from_string(splits[1]))
+            self.version = token_bytes[0]
+            self.secret = str(Base64(token_bytes[1:]))
+        else:
+            raise Exception("Bad token provided")
 
 
 def create_api_token(token_id: str, secret: bytes) -> APIToken:

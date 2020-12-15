@@ -4,12 +4,26 @@ from cape.cape import Cape
 from cape.exceptions import GQLException
 
 host = "http://cape.com"
-token = "01EQXZ0FKYNF8MX4MJZPWQ4KTA,Ae-gaS4Ey_Hz9eq_MvGJigiwx4coy8vDmA"
+token = "abc,123"
 
 
 @responses.activate
-def test_login():
-    pass
+@pytest.mark.parametrize(
+    "token,json,expectation",
+    [
+        (None, {}, "No token provided"),
+        ("abc123", {}, "Bad token provided")
+    ]
+)
+def test_login_error(token, json, expectation,):
+    with pytest.raises(Exception, match=expectation):
+        responses.add(
+            responses.POST,
+            f"{host}/v1/login",
+            json=json,
+        )
+        c = Cape(endpoint=host, token=token)
+        c.login()
 
 
 @responses.activate

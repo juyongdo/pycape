@@ -27,9 +27,10 @@ class Requester:
     def login(self):
         resp = self.session.post(
             self.endpoint + "/v1/login",
-            json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
-        )
-
+            json={
+                "token_id": self.api_token.token_id,
+                "secret": self.api_token.secret})
+        resp.raise_for_status()
         json = resp.json()
 
         self.token = base64.from_string(json["token"])
