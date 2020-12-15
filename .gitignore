@@ -1,0 +1,12 @@
+**/.mypy*
+**/__pycache__
+**/venv*
+**/*.egg-info/
+
+**/.vscode
+**/.DS_Store
+
+.pytest_cache
+.coverage
+coverage.xml
+.idea/
