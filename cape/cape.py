@@ -13,9 +13,9 @@ class Cape:
         self.__requester = authenticate(token=token, endpoint=endpoint)
 
     def login(self):
-        '''
+        """
         Calls /v1/login and passes token_id and secret parsed from token passed to Requester.
-        '''
+        """
         self.__requester.login()
 
     def list_projects(self):

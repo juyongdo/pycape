@@ -1,4 +1,3 @@
-
 import os
 import requests
 from typing import Optional
@@ -10,10 +9,9 @@ from cape.exceptions import GQLException
 
 def authenticate(token: str, endpoint: str = None):
     if not token:
-        raise Exception(f"No token provided")
+        raise Exception("No token provided")
 
-    endpoint = endpoint or os.environ.get(
-        "CAPE_COORDINATOR", "http://localhost:8080")
+    endpoint = endpoint or os.environ.get("CAPE_COORDINATOR", "http://localhost:8080")
 
     return Requester(endpoint, token)
 
@@ -29,8 +27,7 @@ class Requester:
     def login(self):
         resp = self.session.post(
             self.endpoint + "/v1/login",
-            json={"token_id": self.api_token.token_id,
-                  "secret": self.api_token.secret},
+            json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
 
         json = resp.json()
@@ -50,7 +47,8 @@ class Requester:
         return j["data"]
 
     def list_projects(self):
-        return self.gql_req(query="""
+        return self.gql_req(
+            query="""
             query ListProjects {
                 projects {
                     id,
@@ -59,4 +57,6 @@ class Requester:
                     description
                 }
             }
-            """, variables=None).get('projects')
+            """,
+            variables=None,
+        ).get("projects")
