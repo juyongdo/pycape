@@ -41,8 +41,12 @@ class Requester:
             input_json["variables"] = variables
 
         r = self.session.post(self.gql_endpoint, json=input_json)
-        r.raise_for_status()
-        j = r.json()
+
+        try:
+            j = r.json()
+        except ValueError:
+            r.raise_for_status()
+
         if "errors" in j:
             raise GQLException(f"An error occurred: {j['errors']}")
         return j["data"]

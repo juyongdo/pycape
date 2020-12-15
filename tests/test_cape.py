@@ -1,6 +1,7 @@
 import pytest
 import responses
 from contextlib import contextmanager
+
 from cape.cape import Cape
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
@@ -79,19 +80,29 @@ def test_list_projects(json, exception):
 
 @responses.activate
 @pytest.mark.parametrize(
-    "query,variables,json,exception",
+    "query,variables,body,status,exception",
     [
-        ("", {}, {"data": {}}, notraising()),
+        ("", {}, '{"data": {}}', 200, notraising()),
         (
             "",
             {},
-            {"errors": []},
+            '{"invalid-json": {"abc": "abc",}}',
+            422,
+            pytest.raises(Exception, match="422 Client Error:*"),
+        ),
+        (
+            "",
+            {},
+            '{"errors": []}',
+            200,
             pytest.raises(GQLException, match="An error occurred: .*"),
         ),
     ],
 )
-def test_gql_req(query, variables, json, exception):
+def test_gql_req(query, variables, body, status, exception):
     with exception:
-        resp = responses.add(responses.POST, f"{host}/v1/query", json=json)
+        resp = responses.add(
+            responses.POST, f"{host}/v1/query", body=body, status=status
+        )
         r = Requester(endpoint=host, token=token)
         resp = r._gql_req(query=query, variables=variables)
