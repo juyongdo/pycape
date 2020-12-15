@@ -1,6 +1,6 @@
 import pytest
 import responses
-from contextlib import contextmanager
+import contextlib
 
 from cape.cape import Cape
 from cape.exceptions import GQLException
@@ -10,7 +10,7 @@ host = "http://cape.com"
 token = "abc,123"
 
 
-@contextmanager
+@contextlib.contextmanager
 def notraising():
     yield
 
@@ -70,6 +70,6 @@ def test_list_projects(json, exception):
         c = Cape(token=token, endpoint=host)
         projects = c.list_projects()
 
-    if exception == notraising():
+    if isinstance(exception, contextlib._GeneratorContextManager):
         assert len(projects) == 1
         assert projects[0]["id"] == "abc123"
