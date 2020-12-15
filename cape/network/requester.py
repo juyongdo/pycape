@@ -34,6 +34,7 @@ class Requester:
         json = resp.json()
 
         self.token = base64.from_string(json["token"])
+        return "success"
 
     def gql_req(self, query: str, variables: Optional[dict]):
         input_json = {"query": query, "variables": {}}

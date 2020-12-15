@@ -9,20 +9,23 @@ token = "abc,123"
 
 @responses.activate
 @pytest.mark.parametrize(
-    "token,json,status,expectation",
+    "token,json,status,exception,response",
     [
-        (None, {}, 200, "No token provided"),
-        ("abc123", {}, 200, "Bad token provided"),
-        (token, {}, 400, "400 Client Error: Bad Request for url:*"),
+        (token, {"token": "cookie"}, 200, None, "success"),
+        (None, {}, 200, "No token provided", None),
+        ("abc123", {}, 200, "Bad token provided", None),
+        (token, {}, 400, "400 Client Error: Bad Request for url:*", None),
     ],
 )
-def test_login_error(
-    token, json, status, expectation,
-):
-    with pytest.raises(Exception, match=expectation):
-        responses.add(responses.POST, f"{host}/v1/login", json=json, status=status)
+def test_login_error(token, json, status, exception, response):
+    with pytest.raises(Exception, match=exception):
+        resp = responses.add(
+            responses.POST, f"{host}/v1/login", json=json, status=status
+        )
         c = Cape(endpoint=host, token=token)
-        c.login()
+        r = c.login()
+
+        assert r == response
 
 
 @responses.activate
