@@ -1,35 +1,23 @@
-import requests
-
-from cape.exceptions import GQLException
+from cape.network.requester import authenticate
 
 
 class Cape:
-    def __init__(self, token: str, endpoint: str = "https://demo.capeprivacy.com"):
-        self.token = token
-        self.endpoint = endpoint
-        self.gql_endpoint = f"{self.endpoint}/v1/query"
+    """
+    This is the main class you instantiate to access the Cape DS API. Token parameter is required for authentication.
+    """
 
-        self.session = requests.session()
+    def __init__(self, token, endpoint=None):
+        """
+        :param token: token (required)
+        """
+        self.__requester = authenticate(token=token, endpoint=endpoint)
 
     def login(self):
-        # TODO(grace)
-        pass
+        """
+        Calls /v1/login and passes token_id and secret parsed from token passed to Requester.
+        """
+        self.__requester.login()
 
     def list_projects(self):
-        query = """
-        query ListProjects {
-            projects {
-                id,
-                name,
-                label,
-                description
-            }
-        }
-        """
-        r = self.session.post(self.gql_endpoint, {"query": query})
-        r.raise_for_status()
-        j = r.json()
-        if "errors" in j:
-            raise GQLException(f"an error occurred: {j['errors']}")
-
-        return j["data"]["projects"]
+        d = self.__requester.list_projects()
+        return d
