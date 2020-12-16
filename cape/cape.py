@@ -19,5 +19,12 @@ class Cape:
         self.__requester.login()
 
     def list_projects(self):
+        """
+        Queries gql api for list of projects
+        """
         d = self.__requester.list_projects()
+        return d
+
+    def add_dataview(self, project_id, dataview):
+        d = self.__requester.add_dataview(project_id, dataview)
         return d

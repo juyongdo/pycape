@@ -3,6 +3,7 @@ import responses
 import contextlib
 
 from cape.cape import Cape
+from cape.api.dataview import DataView
 from cape.exceptions import GQLException
 
 
@@ -73,3 +74,38 @@ def test_list_projects(json, exception):
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert len(projects) == 1
         assert projects[0]["id"] == "abc123"
+
+
+@responses.activate
+@pytest.mark.parametrize(
+    "json,exception",
+    [
+        (
+            {
+                "data": {
+                    "addDataView": {
+                        "id": "abc123",
+                        "name": "my-data",
+                        "location": "s3://my-data.csv",
+                    }
+                }
+            },
+            notraising(),
+        ),
+        (
+            {"errors": [{"message": "something went wrong"}]},
+            pytest.raises(GQLException, match="An error occurred: .*"),
+        ),
+    ],
+)
+def test_add_dataview(json, exception):
+    with exception:
+        responses.add(
+            responses.POST, f"{host}/v1/query", json=json,
+        )
+        c = Cape(token=token, endpoint=host)
+        dv = DataView(name="my-data", uri="s3://my-data.csv")
+        dataview = c.add_dataview(project_id="123", dataview=dv)
+
+    if isinstance(exception, contextlib._GeneratorContextManager):
+        assert isinstance(dataview, DataView)

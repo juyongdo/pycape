@@ -5,6 +5,7 @@ from typing import Optional
 from cape.network.api_token import APIToken
 from cape.network import base64
 from cape.exceptions import GQLException
+from cape.api.dataview import DataView
 
 
 def authenticate(token: str, endpoint: str = None):
@@ -65,3 +66,21 @@ class Requester:
             """,
             variables=None,
         ).get("projects")
+
+    def add_dataview(self, project_id, dv):
+        dv_input = dv.get_input()
+        return DataView(
+            **self._gql_req(
+                query="""
+            mutation addDataView (
+              $project_id: String!, 
+              $data_view_input: DataViewInput!
+            ) {
+              addDataView(project_id: $project_id, data_view_input: $data_view_input) {
+                id
+              }
+            }
+            """,
+                variables={"project_id": project_id, "data_view_input": dv_input},
+            ).get("addDataView")
+        )
