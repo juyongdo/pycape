@@ -73,7 +73,7 @@ class Requester:
             **self._gql_req(
                 query="""
             mutation addDataView (
-              $project_id: String!, 
+              $project_id: String!,
               $data_view_input: DataViewInput!
             ) {
               addDataView(project_id: $project_id, data_view_input: $data_view_input) {

@@ -7,4 +7,3 @@ class TestDataView:
         dv = DataView(id=id)
 
         assert repr(dv) == f"<{dv.__class__.__name__} ID: {id}>"
-

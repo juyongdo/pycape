@@ -12,8 +12,8 @@ class DataView:
         owner_id: str = "",
     ):
         """
-        :param id: id 
-        :param name: name 
+        :param id: id
+        :param name: name
         :param uri: uri
         :param location: location
         :param owner_id: owner_id
