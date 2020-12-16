@@ -109,3 +109,4 @@ def test_add_dataview(json, exception):
 
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert isinstance(dataview, DataView)
+        assert dataview.id == "abc123"
