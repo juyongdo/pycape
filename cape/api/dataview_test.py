@@ -11,7 +11,7 @@ class TestDataView:
 
     @pytest.mark.parametrize(
         "user_id,owner_id,expectation",
-        [("user_1", "user_2", None), ("user_1", "user_1", "s3://my-data.csv"),],
+        [("user_1", "user_2", None), ("user_1", "user_1", "s3://my-data.csv")],
     )
     def test_uri_property(self, user_id, owner_id, expectation):
         dv = DataView(

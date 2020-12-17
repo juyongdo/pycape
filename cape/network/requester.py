@@ -68,7 +68,7 @@ class Requester:
         ).get("projects")
 
     def add_dataview(self, project_id, name, uri, user_id, **kwargs):
-        dv = DataView(name=name, uri=uri, **kwargs)
+        dv = DataView(name=name, uri=uri, user_id=user_id, **kwargs)
         dv_input = dv._get_input()
         return DataView(
             **self._gql_req(
