@@ -20,7 +20,7 @@ def notraising():
 @pytest.mark.parametrize(
     "token,json,status,exception",
     [
-        (token, {"token": "cookie"}, 200, notraising()),
+        (token, {"token": "cookie", "user_id": "user_1"}, 200, notraising()),
         (None, {}, 200, pytest.raises(Exception, match="No token provided")),
         ("abc123", {}, 200, pytest.raises(Exception, match="Bad token provided")),
         (
@@ -104,8 +104,9 @@ def test_add_dataview(json, exception):
             responses.POST, f"{host}/v1/query", json=json,
         )
         c = Cape(token=token, endpoint=host)
-        dv = DataView(name="my-data", uri="s3://my-data.csv")
-        dataview = c.add_dataview(project_id="123", dataview=dv)
+        dataview = c.add_dataview(
+            project_id="123", name="my-data", uri="s3://my-data.csv"
+        )
 
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert isinstance(dataview, DataView)

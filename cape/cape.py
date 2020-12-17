@@ -6,17 +6,19 @@ class Cape:
     This is the main class you instantiate to access the Cape DS API. Token parameter is required for authentication.
     """
 
-    def __init__(self, token, endpoint=None):
+    def __init__(self, token: str = None, endpoint: str = None):
         """
         :param token: token (required)
+        :param endpoint: endpoint
         """
         self.__requester = authenticate(token=token, endpoint=endpoint)
+        self.user_id = None
 
     def login(self):
         """
-        Calls /v1/login and passes token_id and secret parsed from token passed to Requester.
+        Calls /v1/login and passes token_id and secret parsed from api token passed to Requester.
         """
-        self.__requester.login()
+        self.user_id = self.__requester.login()
 
     def list_projects(self):
         """
@@ -25,6 +27,8 @@ class Cape:
         d = self.__requester.list_projects()
         return d
 
-    def add_dataview(self, project_id, dataview):
-        d = self.__requester.add_dataview(project_id, dataview)
+    def add_dataview(self, project_id, name, uri, **kwargs):
+        d = self.__requester.add_dataview(
+            project_id=project_id, name=name, uri=uri, user_id=self.user_id, **kwargs
+        )
         return d
