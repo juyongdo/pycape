@@ -1,5 +1,17 @@
 import pytest
-from dataview import DataView
+import pandas as pd
+import responses
+import contextlib
+from cape.cape import Cape
+
+from IPython import embed
+from cape.api.dataview import DataView
+from tests.fake import fake_csv_dob_date_field, fake_dataframe, FAKE_HOST, FAKE_TOKEN
+
+
+@contextlib.contextmanager
+def notraising():
+    yield
 
 
 class TestDataView:
@@ -9,13 +21,60 @@ class TestDataView:
 
         assert repr(dv) == f"<{dv.__class__.__name__} ID: {id}>"
 
+    @responses.activate
     @pytest.mark.parametrize(
-        "user_id,owner_id,expectation",
-        [("user_1", "user_2", None), ("user_1", "user_1", "s3://my-data.csv")],
+        "owner_id,user_id,expectation",
+        [
+            ("owner_user", "user_user", None),
+            ("main_user", "main_user", "s3://my-data.csv"),
+        ],
     )
-    def test_uri_property(self, user_id, owner_id, expectation):
+    def test_location_property(self, owner_id, user_id, expectation, mocker):
         dv = DataView(
-            name="my-data", user_id=user_id, owner_id=owner_id, uri="s3://my-data.csv"
+            name="my-data", uri="s3://my-data.csv", owner_id=owner_id, user_id=user_id
         )
 
         assert dv.location == expectation
+
+    @pytest.mark.parametrize(
+        "schema,expectation,exception",
+        [
+            (None, type(None), notraising()),
+            (fake_dataframe().dtypes, pd.Series, notraising()),
+            (
+                fake_dataframe(),
+                pd.Series,
+                pytest.raises(Exception, match="Schema is not of type*"),
+            ),
+        ],
+    )
+    def test_schema_property(self, schema, expectation, exception):
+        with exception:
+            dv = DataView(name="my-data", schema=schema, uri="s3://my-data.csv")
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            assert isinstance(dv.schema, expectation)
+
+    @pytest.mark.parametrize(
+        "side_effect,exception",
+        [
+            (None, notraising()),
+            (
+                FileNotFoundError,
+                pytest.raises(Exception, match="Cannot access data resourc"),
+            ),
+        ],
+    )
+    def test_get_schema_from_uri(self, side_effect, exception, mocker):
+        with exception:
+            mocker.patch(
+                "cape.api.dataview.pd.read_csv",
+                side_effect=side_effect,
+                return_value=fake_csv_dob_date_field(),
+            )
+            dv = DataView(name="my-data", uri="s3://my-data.csv")
+            dv.get_schema_from_uri()
+
+            if isinstance(exception, contextlib._GeneratorContextManager):
+                assert dv.schema["dob"].name == "datetime64[ns]"
+

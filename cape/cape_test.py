@@ -5,6 +5,7 @@ import contextlib
 from cape.cape import Cape
 from cape.api.dataview import DataView
 from cape.exceptions import GQLException
+from tests.fake import fake_dataframe
 
 
 host = "http://cape.com"
@@ -98,8 +99,9 @@ def test_list_projects(json, exception):
         ),
     ],
 )
-def test_add_dataview(json, exception):
+def test_add_dataview(json, exception, mocker):
     with exception:
+        mocker.patch("cape.api.dataview.pd.read_csv", return_value=fake_dataframe())
         responses.add(
             responses.POST, f"{host}/v1/query", json=json,
         )

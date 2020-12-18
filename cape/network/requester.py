@@ -69,7 +69,8 @@ class Requester:
 
     def add_dataview(self, project_id, name, uri, user_id, **kwargs):
         dv = DataView(name=name, uri=uri, user_id=user_id, **kwargs)
-        dv_input = dv._get_input()
+        dv.get_schema_from_uri()
+        dv_input = dv.get_input()
         return DataView(
             **self._gql_req(
                 query="""
@@ -79,6 +80,9 @@ class Requester:
             ) {
               addDataView(project_id: $project_id, data_view_input: $data_view_input) {
                 id
+                name
+                location
+                schema
               }
             }
             """,

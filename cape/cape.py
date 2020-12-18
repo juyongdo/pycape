@@ -12,13 +12,13 @@ class Cape:
         :param endpoint: endpoint
         """
         self.__requester = authenticate(token=token, endpoint=endpoint)
-        self.user_id = None
+        self.__user_id = None
 
     def login(self):
         """
         Calls /v1/login and passes token_id and secret parsed from api token passed to Requester.
         """
-        self.user_id = self.__requester.login()
+        self.__user_id = self.__requester.login()
 
     def list_projects(self):
         """
@@ -29,6 +29,6 @@ class Cape:
 
     def add_dataview(self, project_id, name, uri, **kwargs):
         d = self.__requester.add_dataview(
-            project_id=project_id, name=name, uri=uri, user_id=self.user_id, **kwargs
+            project_id=project_id, name=name, uri=uri, user_id=self.__user_id, **kwargs
         )
         return d
