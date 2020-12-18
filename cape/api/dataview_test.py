@@ -2,11 +2,9 @@ import pytest
 import pandas as pd
 import responses
 import contextlib
-from cape.cape import Cape
 
-from IPython import embed
 from cape.api.dataview import DataView
-from tests.fake import fake_csv_dob_date_field, fake_dataframe, FAKE_HOST, FAKE_TOKEN
+from tests.fake import fake_csv_dob_date_field, fake_dataframe
 
 
 @contextlib.contextmanager
@@ -77,4 +75,3 @@ class TestDataView:
 
             if isinstance(exception, contextlib._GeneratorContextManager):
                 assert dv.schema["dob"].name == "datetime64[ns]"
-

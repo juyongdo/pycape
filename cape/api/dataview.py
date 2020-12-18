@@ -1,7 +1,6 @@
 import pandas as pd
 from urllib.error import HTTPError
-from datetime import datetime
-from IPython import embed
+
 from cape.utils import is_date
 
 
@@ -66,7 +65,7 @@ class DataView:
         if isinstance(s, pd.Series):
             self._schema = s.to_dict()
         elif not isinstance(s, type(None)):
-            raise Exception(f"Schema is not of type Series")
+            raise Exception("Schema is not of type pd.Series")
         else:
             self._schema = None
 
@@ -108,4 +107,3 @@ class DataView:
             df[date_col] = pd.to_datetime(df[date_col])
 
         self.schema = df.dtypes
-

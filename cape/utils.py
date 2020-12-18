@@ -1,5 +1,4 @@
 from datetime import datetime
-from IPython import embed
 
 
 def is_date(string: str) -> datetime:
@@ -22,7 +21,7 @@ def is_date(string: str) -> datetime:
         try:
             date = datetime.strptime(string, fmt)
             break
-        except ValueError as err:
+        except ValueError:
             pass
 
     return date
