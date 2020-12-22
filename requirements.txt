@@ -10,4 +10,4 @@ flake8~=3.8.3
 flake8-black~=0.2.0
 isort~=5.1.4
 responses~=0.10.15
-marshmellow~=3.9.1
+marshmellow~=3.9

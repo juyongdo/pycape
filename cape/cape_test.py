@@ -109,3 +109,48 @@ def test_add_dataview(json, exception, mocker):
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert isinstance(dataview, DataView)
         assert dataview.id == "abc123"
+
+
+@responses.activate
+@pytest.mark.parametrize(
+    "json,exception",
+    [
+        (
+            {
+                "data": {
+                    "project": {
+                        "id": "abc123",
+                        "label": "my-project",
+                        "data_views": [
+                            {
+                                "id": "def123",
+                                "name": "my-dataview",
+                                "location": "https",
+                                "schema": [{"name": "col_1", "schemaType": "string"}],
+                            }
+                        ],
+                    }
+                }
+            },
+            notraising(),
+        ),
+        (
+            {"errors": [{"message": "something went wrong"}]},
+            pytest.raises(GQLException, match="An error occurred: .*"),
+        ),
+    ],
+)
+def test_list_dataviews(json, exception, mocker):
+    with exception:
+        mocker.patch("cape.api.dataview.pd.read_csv", return_value=fake_dataframe())
+        responses.add(
+            responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+        )
+        c = Cape(token=FAKE_TOKEN, endpoint=FAKE_HOST)
+        dataviews = c.list_dataviews()
+
+    if isinstance(exception, contextlib._GeneratorContextManager):
+        assert isinstance(dataviews, list)
+        assert dataviews[0]["id"] == "def123"
+        assert isinstance(dataviews[0]["schema"], list)
+        assert dataviews[0]["schema"][0]["name"] == "col_1"

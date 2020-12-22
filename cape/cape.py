@@ -22,7 +22,7 @@ class Cape:
 
     def list_projects(self):
         """
-        Queries gql api for list of projects
+        Add a dataview to a project
         """
         d = self.__requester.list_projects()
         return d
@@ -31,4 +31,11 @@ class Cape:
         d = self.__requester.add_dataview(
             project_id=project_id, name=name, uri=uri, user_id=self.__user_id, **kwargs
         )
+        return d
+
+    def list_dataviews(self):
+        """
+        Queries gql api for list of dataviews
+        """
+        d = self.__requester.list_dataviews()
         return d
