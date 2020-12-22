@@ -1,7 +1,18 @@
+import json
 import pandas as pd
 from urllib.error import HTTPError
+from marshmallow import Schema, fields
 
 from cape.utils import is_date
+
+
+class DataViewSchema(Schema):
+    """
+    Schema to validate the schema field on DataViews
+    """
+
+    name = fields.Str(required=True)
+    schemaType = fields.Str(required=True)
 
 
 class DataView:
@@ -24,7 +35,9 @@ class DataView:
         :param name: name
         :param uri: uri
         :param __location: location
-        :param owner_id: owner_id
+        :param _owner_id: owner_id
+        :param _user_id: _user_id
+        :param schema: schema
         """
         self.id: str = id
         self.name: str = name
@@ -47,27 +60,30 @@ class DataView:
             return self.uri or self.__locaion
 
     @property
-    def schema(self) -> dict:
-        """
-        Return schema as pd.Series
-        """
-        if self._schema:
-            return pd.Series(self._schema)
-        else:
-            return None
+    def schema(self) -> list:
+        if hasattr(self, "_schema"):
+            return self._schema
 
     @schema.setter
     def schema(self, s):
         """
-        Validate that updates to the schema property are of the correct panda type.
-        Converts schema to dictionary to set.
+        Validate that updates to the schema property are lists.
         """
-        if isinstance(s, pd.Series):
-            self._schema = s.to_dict()
-        elif not isinstance(s, type(None)):
-            raise Exception("Schema is not of type pd.Series")
-        else:
-            self._schema = None
+        # Wrap if block in try/except block because panda throws
+        # exception if you check it's truth value:
+        # https://pandas.pydata.org/pandas-docs/version/0.15/gotchas.html
+
+        try:
+            if s and isinstance(s, list):
+                try:
+                    DataViewSchema(many=True).load(s)
+                except Exception as e:
+                    raise Exception(f"Invalid schema list: {e}")
+                self._schema = s
+            elif s and not isinstance(s, list):
+                raise Exception("Schema is not of type list")
+        except Exception as e:
+            raise Exception(f"Schema is not of type list: {e}")
 
     def get_input(self):
         """
@@ -79,8 +95,7 @@ class DataView:
                 "name": self.name,
                 "uri": self.uri,
                 "owner_id": self._owner_id,
-                # TODO: Pass schema to coordinator
-                # "schema": self._schema,
+                "schema": self.schema,
             }.items()
             if v
         }
@@ -106,4 +121,9 @@ class DataView:
         for date_col in date_cols:
             df[date_col] = pd.to_datetime(df[date_col])
 
-        self.schema = df.dtypes
+        self.schema = [
+            {"name": s["name"], "schemaType": s["type"]}
+            for s in json.loads(df.to_json(orient="table"))
+            .get("schema", {})
+            .get("fields")
+        ]

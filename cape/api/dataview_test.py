@@ -1,5 +1,4 @@
 import pytest
-import pandas as pd
 import responses
 import contextlib
 
@@ -38,10 +37,16 @@ class TestDataView:
         "schema,expectation,exception",
         [
             (None, type(None), notraising()),
-            (fake_dataframe().dtypes, pd.Series, notraising()),
+            ([{"name": "col_1", "schemaType": "string"}], list, notraising()),
+            (
+                [{"name": "col_1", "type": "string"}],
+                None,
+                pytest.raises(Exception, match="Invalid schema*"),
+            ),
+            (True, None, pytest.raises(Exception, match="Schema is not of type*"),),
             (
                 fake_dataframe(),
-                pd.Series,
+                None,
                 pytest.raises(Exception, match="Schema is not of type*"),
             ),
         ],
@@ -74,4 +79,6 @@ class TestDataView:
             dv.get_schema_from_uri()
 
             if isinstance(exception, contextlib._GeneratorContextManager):
-                assert dv.schema["dob"].name == "datetime64[ns]"
+                assert [d for d in dv.schema if d["name"] == "dob"][0][
+                    "schemaType"
+                ] == "datetime"
