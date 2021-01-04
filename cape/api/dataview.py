@@ -93,7 +93,8 @@ class DataView:
 
     def get_schema_from_uri(self):
         """
-        Read first line from csv file read from self.uri as dataframe, grab schema from dataframe object, return as list of json:
+        Read first line from csv file read from self.uri as dataframe,
+        grab schema from dataframe object, return as list of json:
         {
           type: "string",
           name: "my_col_name"
