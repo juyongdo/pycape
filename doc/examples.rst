@@ -1,0 +1,2 @@
+.. toctree::
+  examples/DataView
