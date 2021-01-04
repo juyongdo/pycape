@@ -4,10 +4,7 @@ from contextlib import contextmanager
 
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
-
-
-host = "http://cape.com"
-token = "abc,123"
+from tests.fake import FAKE_HOST, FAKE_TOKEN
 
 
 @contextmanager
@@ -38,6 +35,6 @@ def notraising():
 )
 def test_gql_req(query, variables, body, status, exception):
     with exception:
-        responses.add(responses.POST, f"{host}/v1/query", body=body, status=status)
-        r = Requester(endpoint=host, token=token)
+        responses.add(responses.POST, f"{FAKE_HOST}/v1/query", body=body, status=status)
+        r = Requester(endpoint=FAKE_HOST, token=FAKE_TOKEN)
         r._gql_req(query=query, variables=variables)

@@ -5,6 +5,7 @@ from typing import Optional
 from cape.network.api_token import APIToken
 from cape.network import base64
 from cape.exceptions import GQLException
+from cape.api.dataview import DataView
 
 
 def authenticate(token: str, endpoint: str = None):
@@ -29,11 +30,11 @@ class Requester:
             self.endpoint + "/v1/login",
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
-
         resp.raise_for_status()
         json = resp.json()
 
         self.token = base64.from_string(json["token"])
+        return json["user_id"]
 
     def _gql_req(self, query: str, variables: Optional[dict]):
         input_json = {"query": query, "variables": {}}
@@ -65,3 +66,26 @@ class Requester:
             """,
             variables=None,
         ).get("projects")
+
+    def add_dataview(self, project_id, name, uri, user_id, **kwargs):
+        dv = DataView(name=name, uri=uri, user_id=user_id, **kwargs)
+        dv.get_schema_from_uri()
+        dv_input = dv.get_input()
+        return DataView(
+            **self._gql_req(
+                query="""
+            mutation addDataView (
+              $project_id: String!,
+              $data_view_input: DataViewInput!
+            ) {
+              addDataView(project_id: $project_id, data_view_input: $data_view_input) {
+                id
+                name
+                location
+                schema
+              }
+            }
+            """,
+                variables={"project_id": project_id, "data_view_input": dv_input},
+            ).get("addDataView")
+        )
