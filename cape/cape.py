@@ -41,3 +41,15 @@ class Cape:
             project_id=project_id, name=name, uri=uri, user_id=self.__user_id
         )
         return d
+
+    def list_dataviews(self):
+        """
+        Queries gql for list of dataviews by project
+        :calls: `query project`
+        :param project_id: string
+        :param name: string
+        :param uri: string
+        :rtype: list
+        """
+        d = self.__requester.list_dataviews()
+        return d

@@ -74,7 +74,7 @@ class Requester:
         return DataView(
             **self._gql_req(
                 query="""
-            mutation addDataView (
+            mutation AddDataView (
               $project_id: String!,
               $data_view_input: DataViewInput!
             ) {
@@ -88,4 +88,27 @@ class Requester:
             """,
                 variables={"project_id": project_id, "data_view_input": dv_input},
             ).get("addDataView")
+        )
+
+    def list_dataviews(self):
+        return (
+            self._gql_req(
+                query="""
+            query ListDataViews(id: ID!) {
+                project(id: $id) {
+                    id,
+                    label,
+                    data_views {
+                      id,
+                      name,
+                      location,
+                      schema { name, schemaType }
+                    }
+                }
+            }
+            """,
+                variables=None,
+            )
+            .get("project", {})
+            .get("data_views")
         )

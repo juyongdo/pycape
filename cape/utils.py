@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def is_date(string: str) -> datetime:
+def filter_date(string: str) -> datetime:
     acceptable_fmts = (
         "%Y",
         "%Y-%m-%d",

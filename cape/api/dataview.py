@@ -3,7 +3,7 @@ import pandas as pd
 from urllib.error import HTTPError
 from marshmallow import Schema, fields
 
-from cape.utils import is_date
+from cape.utils import filter_date
 
 
 class DataView:
@@ -107,7 +107,7 @@ class DataView:
             date_cols = []
 
             for i, d in enumerate(row_1):
-                if isinstance(d, str) and is_date(d):
+                if isinstance(d, str) and filter_date(d):
                     date_cols.append(columns[i])
 
             return date_cols
