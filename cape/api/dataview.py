@@ -6,15 +6,6 @@ from marshmallow import Schema, fields
 from cape.utils import filter_date
 
 
-class DataViewSchema(Schema):
-    """
-    Schema to validate the schema field on DataViews
-    """
-
-    name = fields.Str(required=True)
-    schemaType = fields.Str(required=True)
-
-
 class DataView:
     """
     Dataview objects keep track of the business logic around datasets. Dataviews can be added to projects.
@@ -101,6 +92,15 @@ class DataView:
         }
 
     def get_schema_from_uri(self):
+        """
+        Read first line from csv file read from self.uri as dataframe,
+        grab schema from dataframe object, return as list of json:
+        {
+          type: "string",
+          name: "my_col_name"
+        }
+        """
+
         def _get_date_cols(dataframe: pd.DataFrame) -> list:
             columns = df.columns
             row_1 = df.iloc[0].values
@@ -127,3 +127,12 @@ class DataView:
             .get("schema", {})
             .get("fields")
         ]
+
+
+class DataViewSchema(Schema):
+    """
+    Schema to validate the schema field on DataViews
+    """
+
+    name = fields.Str(required=True)
+    schemaType = fields.Str(required=True)
