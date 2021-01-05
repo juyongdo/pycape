@@ -96,8 +96,6 @@ class Requester:
                 query="""
             query ListDataViews(id: ID!) {
                 project(id: $id) {
-                    id,
-                    label,
                     data_views {
                       id,
                       name,
