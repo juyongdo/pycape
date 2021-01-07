@@ -82,7 +82,7 @@ class Requester:
                 id
                 name
                 location
-                schema
+                schema { name, schema_type }
               }
             }
             """,
@@ -100,7 +100,7 @@ class Requester:
                       id,
                       name,
                       location,
-                      schema { name, schemaType }
+                      schema { name, schema_type }
                     }
                 }
             }

@@ -126,7 +126,7 @@ def test_add_dataview(json, exception, mocker):
                                 "id": "def123",
                                 "name": "my-dataview",
                                 "location": "https",
-                                "schema": [{"name": "col_1", "schemaType": "string"}],
+                                "schema": [{"name": "col_1", "schema_type": "string"}],
                             }
                         ],
                     }

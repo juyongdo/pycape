@@ -122,7 +122,7 @@ class DataView:
             df[date_col] = pd.to_datetime(df[date_col])
 
         self.schema = [
-            {"name": s["name"], "schemaType": s["type"]}
+            {"name": s["name"], "schema_type": s["type"]}
             for s in json.loads(df.to_json(orient="table"))
             .get("schema", {})
             .get("fields")
@@ -135,4 +135,4 @@ class DataViewSchema(Schema):
     """
 
     name = fields.Str(required=True)
-    schemaType = fields.Str(required=True)
+    schema_type = fields.Str(required=True)
