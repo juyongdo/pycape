@@ -29,7 +29,7 @@ class Cape:
         d = self.__requester.list_projects()
         return d
 
-    def add_dataview(self, project_id, name, uri):
+    def add_dataview(self, project_id: str = None, name: str = None, uri: str = None):
         """
         :calls: `mutation addDataView`
         :param project_id: string
@@ -52,4 +52,16 @@ class Cape:
         :rtype: list
         """
         d = self.__requester.list_dataviews()
+        return d
+
+    def get_dataview(self, project_id, **kwargs):
+        """
+        Queries gql for a dataview in a project
+        :calls: `query project`
+        :param project_id: string
+        :param id: string
+        :param uri: string
+        :rtype: :class:`cape.api.dataview.dataview`
+        """
+        d = self.__requester.get_dataview(project_id=project_id, **kwargs)
         return d

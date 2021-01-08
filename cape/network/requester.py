@@ -110,3 +110,30 @@ class Requester:
             .get("project", {})
             .get("data_views")
         )
+
+    def get_dataview(self, project_id, **kwargs):
+        if not kwargs.get("id") and not kwargs.get("uri"):
+            raise Exception("Required identifier id or uri not specified.")
+        return (
+            self._gql_req(
+                query="""
+            query GetDataView(id: String, project_id: String, uri: String) {
+                project(id: $project_id) {
+                    data_views(id: $id, uri: $uri) {
+                      id,
+                      name,
+                      location,
+                      schema { name, schema_type }
+                    }
+                }
+            }
+            """,
+                variables={
+                    "project_id": project_id,
+                    "id": kwargs.get("id"),
+                    "uri": kwargs.get("uri"),
+                },
+            )
+            .get("project", {})
+            .get("data_views")
+        )
