@@ -37,7 +37,7 @@ class TestDataView:
         "schema,expectation,exception",
         [
             (None, type(None), notraising()),
-            ([{"name": "col_1", "schema_type": "string"}], list, notraising()),
+            ([{"name": "col_1", "schema_type": "string"}], dict, notraising()),
             (
                 [{"name": "col_1", "type": "string"}],
                 None,
@@ -79,6 +79,4 @@ class TestDataView:
             dv.get_schema_from_uri()
 
             if isinstance(exception, contextlib._GeneratorContextManager):
-                assert [d for d in dv.schema if d["name"] == "dob"][0][
-                    "schema_type"
-                ] == "datetime"
+                assert dv.schema["dob"] == "datetime"
