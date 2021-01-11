@@ -122,7 +122,7 @@ class DataView:
             df[date_col] = pd.to_datetime(df[date_col])
 
         # Pandas to_json function converts dataframe object to json
-        # in doing so it transforms some df datatypes into json-like datatypes
+        # in doing so it transforms df datatypes into json-like datatypes
         # ---
         # dtypes object -> string
         # dtypes int64 -> integer
