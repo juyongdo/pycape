@@ -94,7 +94,7 @@ class Requester:
         return (
             self._gql_req(
                 query="""
-            query ListDataViews(id: ID!) {
+            query ListDataViews($id: ID!) {
                 project(id: $id) {
                     data_views {
                       id,
@@ -117,7 +117,7 @@ class Requester:
         return (
             self._gql_req(
                 query="""
-            query GetDataView(id: String, project_id: String, uri: String) {
+            query GetDataView($id: String, $project_id: String, $uri: String) {
                 project(id: $project_id) {
                     data_views(id: $id, uri: $uri) {
                       id,

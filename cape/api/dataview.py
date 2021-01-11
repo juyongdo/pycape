@@ -51,9 +51,9 @@ class DataView:
             return self.uri or self.__locaion
 
     @property
-    def schema(self) -> list:
+    def schema(self) -> dict:
         if hasattr(self, "_schema"):
-            return self._schema
+            return {s.get("name"): s.get("schema_type") for s in self._schema}
 
     @schema.setter
     def schema(self, s):
