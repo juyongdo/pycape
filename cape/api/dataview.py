@@ -51,9 +51,9 @@ class DataView:
             return self.uri or self.__locaion
 
     @property
-    def schema(self) -> list:
+    def schema(self) -> dict:
         if hasattr(self, "_schema"):
-            return self._schema
+            return {s.get("name"): s.get("schema_type") for s in self._schema}
 
     @schema.setter
     def schema(self, s):
@@ -120,6 +120,15 @@ class DataView:
         date_cols = _get_date_cols(df)
         for date_col in date_cols:
             df[date_col] = pd.to_datetime(df[date_col])
+
+        # Pandas to_json function converts dataframe object to json
+        # in doing so it transforms df datatypes into json-like datatypes
+        # ---
+        # dtypes object -> string
+        # dtypes int64 -> integer
+        # dtypes float64 -> number
+        # dtypes datetime64[ns] -> datetime
+        # dtypes category -> any
 
         self.schema = [
             {"name": s["name"], "schema_type": s["type"]}
