@@ -121,6 +121,15 @@ class DataView:
         for date_col in date_cols:
             df[date_col] = pd.to_datetime(df[date_col])
 
+        # Pandas to_json function converts dataframe object to json
+        # in doing so it transforms some df datatypes into json-like datatypes
+        # ---
+        # dtypes object -> string
+        # dtypes int64 -> integer
+        # dtypes float64 -> number
+        # dtypes datetime64[ns] -> datetime
+        # dtypes category -> any
+
         self.schema = [
             {"name": s["name"], "schema_type": s["type"]}
             for s in json.loads(df.to_json(orient="table"))
