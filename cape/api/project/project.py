@@ -1,10 +1,4 @@
-import json
-import pandas as pd
-from urllib.error import HTTPError
-from marshmallow import Schema, fields
-from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
-from IPython import embed
 
 
 class Project:

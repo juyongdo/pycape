@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
-from tests.fake import FAKE_HOST, FAKE_TOKEN
+from tests.fake import FAKE_HOST
 
 
 @contextmanager
