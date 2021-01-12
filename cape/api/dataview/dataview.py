@@ -6,7 +6,6 @@ from marshmallow import Schema, fields
 
 from cape.utils import filter_date
 
-
 class DataView:
     """
     Dataview objects keep track of the business logic around datasets. Dataviews can be added to projects.
@@ -18,38 +17,37 @@ class DataView:
         name: str = None,
         uri: str = None,
         location: str = None,
-        owner_id: str = None,
-        user_id: str = None,
+        owner: dict = None,
         schema: dict = None,
+        user: str = None,
     ):
         """
         :param id: id
         :param name: name
         :param uri: uri
-        :param __location: location
-        :param _owner_id: owner_id
-        :param _user_id: _user_id
+        :param _location: location
+        :param _owner: _owner
         :param schema: schema
         """
         self.id: str = id
         self.name: str = name
         self.uri: str = uri
-        self.__location: str = location
-        self._owner_id: str = owner_id
-        self._user_id: str = user_id
+        self._location: str = location
+        self._owner: str = owner
         self.schema: pd.Series = schema
+        self._user: str = user
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} ID: {self.id}>"
+        return f"<{self.__class__.__name__} (ID: {self.id}, Location: {self.location})>"
 
     @property
     def location(self) -> str:
         """
         Protect location property by validating authorized user is the owner of the DataView
         """
-        # TODO: make _user_id and _owner_id only settable upon initilization
-        if self._user_id and self._owner_id and self._user_id == self._owner_id:
-            return self.uri or self.__locaion
+        # TODO: make _user and _owner only settable upon initilization
+        if self._user and self._owner and self._user == self._owner["id"]:
+            return self.uri or self._location
 
     @property
     def schema(self) -> dict:

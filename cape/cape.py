@@ -12,13 +12,14 @@ class Cape:
         :param endpoint: endpoint
         """
         self.__requester = Requester(endpoint=endpoint)
+        self.__user_id = None
 
     def login(self, token: str):
         """
         :calls: `POST /v1/login`
         :param token: token
         """
-        self.__requester.login(token=token)
+        self.__user_id = self.__requester.login(token=token)
 
     def list_projects(self):
         """
@@ -26,7 +27,10 @@ class Cape:
         :rtype: [:class:`cape.api.project.project`]
         """
         projects = self.__requester.list_projects()
-        return [Project(requester=self.__requester, **p) for p in projects]
+        return [
+            Project(requester=self.__requester, user=self.__user_id, **p)
+            for p in projects
+        ]
 
     def get_project(self, id: str):
         """
@@ -34,4 +38,4 @@ class Cape:
         :rtype: :class:`cape.api.project.project`
         """
         project = self.__requester.get_project(id=id)
-        return Project(requester=self.__requester, **project)
+        return Project(requester=self.__requester, user=self.__user_id, **project)
