@@ -89,7 +89,7 @@ class Requester:
                 id
                 name
                 location
-                owner { 
+                owner {
                   ... on User {
                     id
                   }
@@ -114,7 +114,7 @@ class Requester:
                       id,
                       name,
                       location,
-                      owner { 
+                      owner {
                         ... on User {
                           id
                         }
@@ -145,7 +145,7 @@ class Requester:
                       id,
                       name,
                       location,
-                      owner { 
+                      owner {
                         ... on User {
                           id
                         }
@@ -178,10 +178,10 @@ class Requester:
                 }
             }
             """,
-            variables={"project_id": project_id, "task_type": task_type,},
+            variables={"project_id": project_id, "task_type": task_type},
         ).get("createTask", {})
-    
-     def assign_job_roles(self, job_id, job_roles_input):
+
+    def assign_job_roles(self, job_id, job_roles_input):
         return self._gql_req(
             query="""
             mutation AssignTaskRoles($task_id: String!, $task_roles_input: TaskRolesInput!) {
@@ -191,7 +191,7 @@ class Requester:
                 }
             }
             """,
-            variables={"task_id": task_id, "task_roles_input": task_roles_input,},
+            variables={"task_id": job_id, "task_roles_input": job_roles_input},
         ).get("assignTaskRoles", {})
 
     def submit_job(self, job_id):
@@ -206,6 +206,5 @@ class Requester:
                 }
             }
             """,
-            variables={"task_id": task_id,},
+            variables={"task_id": job_id},
         ).get("initializeSession", {})
-

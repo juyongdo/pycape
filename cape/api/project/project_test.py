@@ -19,7 +19,7 @@ class TestProject:
         id = "abc123"
         name = "my project"
         label = "my-project"
-        p = Project(requester=None, id=id, name=name, label=label)
+        p = Project(requester=None, user_id=None, id=id, name=name, label=label)
 
         assert (
             repr(p) == f"<{p.__class__.__name__} (id={id}, name={name}, label={label})>"
@@ -57,7 +57,11 @@ class TestProject:
             )
             r = Requester(endpoint=FAKE_HOST)
             my_project = Project(
-                requester=r, id="123", name="my project", label="my project"
+                requester=r,
+                user_id=None,
+                id="123",
+                name="my project",
+                label="my project",
             )
             my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
             dataview = my_project.add_dataview(dataview=my_data_view)
@@ -107,7 +111,11 @@ class TestProject:
             )
             r = Requester(endpoint=FAKE_HOST)
             my_project = Project(
-                requester=r, id="123", name="my project", label="my project"
+                requester=r,
+                user_id=None,
+                id="123",
+                name="my project",
+                label="my project",
             )
 
             dataviews = my_project.list_dataviews()
@@ -188,7 +196,11 @@ class TestProject:
             )
             r = Requester(endpoint=FAKE_HOST)
             my_project = Project(
-                requester=r, id="123", name="my project", label="my project"
+                requester=r,
+                user_id=None,
+                id="123",
+                name="my project",
+                label="my project",
             )
             dataviews = my_project.get_dataview(**args)
 

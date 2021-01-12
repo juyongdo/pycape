@@ -28,7 +28,7 @@ class Cape:
         """
         projects = self.__requester.list_projects()
         return [
-            Project(requester=self.__requester, user=self.__user_id, **p)
+            Project(requester=self.__requester, user_id=self.__user_id, **p)
             for p in projects
         ]
 
@@ -38,4 +38,4 @@ class Cape:
         :rtype: :class:`cape.api.project.project`
         """
         project = self.__requester.get_project(id=id)
-        return Project(requester=self.__requester, user=self.__user_id, **project)
+        return Project(requester=self.__requester, user_id=self.__user_id, **project)

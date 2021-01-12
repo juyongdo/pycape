@@ -19,8 +19,9 @@ class DataView:
         uri: str = None,
         location: str = None,
         owner: dict = None,
+        owner_id: str = None,
+        user_id: str = None,
         schema: dict = None,
-        user: str = None,
     ):
         """
         :param id: id
@@ -34,11 +35,9 @@ class DataView:
         self.name: str = name
         self.uri: str = uri
         self._location: str = location
-        self._owner: str = owner
-        self._owner_id: str = owner_id
+        self._owner_id: str = owner.get("id") if owner else owner_id
         self._user_id: str = user_id
         self.schema: pd.Series = schema
-        self._user: str = user
 
     def __repr__(self):
         return f"<{self.__class__.__name__} (id={self.id})>"
@@ -49,7 +48,7 @@ class DataView:
         Protect location property by validating authorized user is the owner of the DataView
         """
         # TODO: make _user and _owner only settable upon initilization
-        if self._user and self._owner and self._user == self._owner["id"]:
+        if self._user_id and self._owner_id and self._user_id == self._owner_id:
             return self.uri or self._location
 
     @property
