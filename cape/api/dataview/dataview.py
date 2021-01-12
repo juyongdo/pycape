@@ -34,13 +34,13 @@ class DataView:
         self.id: str = id
         self.name: str = name
         self.uri: str = uri
-        self.__location: str = location
+        self._location: str = location
         self._owner_id: str = owner_id
         self._user_id: str = user_id
         self.schema: pd.Series = schema
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} ID: {self.id}>"
+        return f"<{self.__class__.__name__} (id={self.id})>"
 
     @property
     def location(self) -> str:
@@ -49,7 +49,7 @@ class DataView:
         """
         # TODO: make _user_id and _owner_id only settable upon initilization
         if self._user_id and self._owner_id and self._user_id == self._owner_id:
-            return self.uri or self.__locaion
+            return self.uri or self._locaion
 
     @property
     def schema(self) -> dict:
@@ -79,9 +79,11 @@ class DataView:
 
     def get_input(self):
         """
-        Format dict for gql type DataTypeInput
+        Format dict for gql type DataViewInput
         """
-        self._get_schema_from_uri()
+        if not hasattr(self, "_schema"):
+            self._get_schema_from_uri()
+
         return {
             k: v
             for k, v in {

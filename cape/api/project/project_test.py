@@ -59,7 +59,8 @@ class TestProject:
             my_project = Project(
                 requester=r, id="123", name="my project", label="my project"
             )
-            dataview = my_project.add_dataview(name="my-data", uri="s3://my-data.csv")
+            my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
+            dataview = my_project.add_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(dataview, DataView)
