@@ -6,6 +6,7 @@ from marshmallow import Schema, fields
 
 from cape.utils import filter_date
 
+
 class DataView:
     """
     Dataview objects keep track of the business logic around datasets. Dataviews can be added to projects.
@@ -34,11 +35,13 @@ class DataView:
         self.uri: str = uri
         self._location: str = location
         self._owner: str = owner
+        self._owner_id: str = owner_id
+        self._user_id: str = user_id
         self.schema: pd.Series = schema
         self._user: str = user
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} (ID: {self.id}, Location: {self.location})>"
+        return f"<{self.__class__.__name__} (id={self.id})>"
 
     @property
     def location(self) -> str:
@@ -77,9 +80,11 @@ class DataView:
 
     def get_input(self):
         """
-        Format dict for gql type DataTypeInput
+        Format dict for gql type DataViewInput
         """
-        self._get_schema_from_uri()
+        if not hasattr(self, "_schema"):
+            self._get_schema_from_uri()
+
         return {
             k: v
             for k, v in {

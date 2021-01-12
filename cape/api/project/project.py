@@ -1,12 +1,4 @@
-import json
-import pandas as pd
-
-from urllib.error import HTTPError
-from marshmallow import Schema, fields
-
-from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
-from cape.api.job.job import Job, VerticalLinearRegressionJob
 
 
 class Project:
@@ -39,6 +31,7 @@ class Project:
     def __repr__(self):
         return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, label={self.label})>"
 
+<<<<<<< HEAD
     def add_dataview(self, name: str, uri: str, owner_id: str = None):
         """
         :calls: `mutation addDataView`
@@ -54,6 +47,8 @@ class Project:
         )
         return DataView(user=self._user, **data_view)
 
+=======
+>>>>>>> e52486a598af76bfc21855e4a23936d493731365
     def list_dataviews(self):
         """
         :calls: `query project`
@@ -76,6 +71,7 @@ class Project:
         """
         data_view = self._requester.get_dataview(project_id=self.id, id=id, uri=uri)
 
+<<<<<<< HEAD
         return DataView(user=self._user, **data_view[0]) if data_view else None
 
     def create_job(self, job: Job):
@@ -88,3 +84,21 @@ class Project:
 
         # TODO: create mapping between job name and class type to invoke here
         return VerticalLinearRegressionJob(requester=self._requester, **job)
+=======
+        return DataView(**data_view[0]) if data_view else None
+
+    def add_dataview(self, dataview: DataView):
+        """
+        :calls: `mutation addDataView`
+        :param project_id: string
+        :param name: string
+        :param uri: string
+        :rtype: :class:`cape.api.dataview.dataview`
+        """
+        # TODO: make get_input compatible with DataViews that have been constructed with schemas
+        data_view_input = dataview.get_input()
+        data_view = self._requester.add_dataview(
+            project_id=self.id, data_view_input=data_view_input
+        )
+        return DataView(**data_view)
+>>>>>>> e52486a598af76bfc21855e4a23936d493731365

@@ -16,7 +16,7 @@ class TestDataView:
         id = "abc123"
         dv = DataView(id=id)
 
-        assert repr(dv) == f"<{dv.__class__.__name__} ID: {id}>"
+        assert repr(dv) == f"<{dv.__class__.__name__} (id={id})>"
 
     @responses.activate
     @pytest.mark.parametrize(
