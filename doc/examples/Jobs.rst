@@ -6,14 +6,15 @@ Create a job
 
 .. code-block:: python
 
-    >>> c = Cape("abc,123", endpoint="http://cape.com")
-    >>> c.login()
+    >>> c = Cape()
+    >>> my_project = c.get_project(id="project_123")
     >>>
-    >>> dataview_1 = cape.get_dataview('s3://my-data.csv')
-    >>> dataview_2 = cape.get_dataview('s3://my-data-2.csv')
+    >>> dataview_1 = my_project.get_dataview(uri="s3://my-data.csv")
+    >>> dataview_2 = my_project.get_dataview(uri="s3://my-data.csv")
+    >>>
     >>> schema = dataview_2.schema
     >>> print(schema)
-    >>> {'transaction_date': 'datetime', 'transaction_amount': 'float'}
+    >>> {'transaction_date': 'datetime', 'transaction_amount': 'number'}
     >>>
     >>> job = VerticalLinearRegressionJob(
         x_train=dataview_1['transaction_amount'],
@@ -21,4 +22,4 @@ Create a job
         metrics=['r-squared', 'rmse']
     )
     >>>
-    >>> c.create_job(project_id="01ET5KHHY11RSVQE20ZEWKQVYC", job=job)
+    >>> my_project.create_job(job=job)
