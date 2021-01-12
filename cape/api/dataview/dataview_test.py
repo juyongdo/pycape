@@ -2,7 +2,7 @@ import pytest
 import responses
 import contextlib
 
-from cape.api.dataview import DataView
+from cape.api.dataview.dataview import DataView
 from tests.fake import fake_csv_dob_date_field, fake_dataframe
 
 
@@ -16,7 +16,7 @@ class TestDataView:
         id = "abc123"
         dv = DataView(id=id)
 
-        assert repr(dv) == f"<{dv.__class__.__name__} ID: {id}>"
+        assert repr(dv) == f"<{dv.__class__.__name__} (id={id})>"
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -71,12 +71,12 @@ class TestDataView:
     def test_get_schema_from_uri(self, side_effect, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.pd.read_csv",
+                "cape.api.dataview.dataview.pd.read_csv",
                 side_effect=side_effect,
                 return_value=fake_csv_dob_date_field(),
             )
             dv = DataView(name="my-data", uri="s3://my-data.csv")
-            dv.get_schema_from_uri()
+            dv._get_schema_from_uri()
 
             if isinstance(exception, contextlib._GeneratorContextManager):
                 assert dv.schema["dob"] == "datetime"

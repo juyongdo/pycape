@@ -5,27 +5,23 @@ from typing import Optional
 from cape.network.api_token import APIToken
 from cape.network import base64
 from cape.exceptions import GQLException
-from cape.api.dataview import DataView
-
-
-def authenticate(token: str, endpoint: str = None):
-    if not token:
-        raise Exception("No token provided")
-
-    endpoint = endpoint or os.environ.get("CAPE_COORDINATOR", "http://localhost:8080")
-
-    return Requester(endpoint, token)
 
 
 class Requester:
-    def __init__(self, endpoint: str, token: str):
-        self.endpoint = endpoint
+    def __init__(self, endpoint: str = None):
+        self.endpoint = endpoint or os.environ.get(
+            "CAPE_COORDINATOR", "http://localhost:8080"
+        )
         self.gql_endpoint = self.endpoint + "/v1/query"
-        self.api_token = APIToken(token)
         self.session = requests.Session()
-        self.token = ""
 
-    def login(self):
+    def login(self, token: str):
+        if not token:
+            raise Exception("No token provided")
+
+        self.token = token
+        self.api_token = APIToken(self.token)
+
         resp = self.session.post(
             self.endpoint + "/v1/login",
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
@@ -67,13 +63,24 @@ class Requester:
             variables=None,
         ).get("projects")
 
-    def add_dataview(self, project_id, name, uri, user_id, **kwargs):
-        dv = DataView(name=name, uri=uri, user_id=user_id, **kwargs)
-        dv.get_schema_from_uri()
-        dv_input = dv.get_input()
-        return DataView(
-            **self._gql_req(
-                query="""
+    def get_project(self, id: str):
+        return self._gql_req(
+            query="""
+            query GetProject($id: String!) {
+                project(id: $id) {
+                    id,
+                    name,
+                    label,
+                    description
+                }
+            }
+            """,
+            variables={"id": id},
+        ).get("project")
+
+    def add_dataview(self, project_id: str, data_view_input: dict):
+        return self._gql_req(
+            query="""
             mutation AddDataView (
               $project_id: String!,
               $data_view_input: DataViewInput!
@@ -86,15 +93,14 @@ class Requester:
               }
             }
             """,
-                variables={"project_id": project_id, "data_view_input": dv_input},
-            ).get("addDataView")
-        )
+            variables={"project_id": project_id, "data_view_input": data_view_input},
+        ).get("addDataView")
 
-    def list_dataviews(self):
+    def list_dataviews(self, project_id: str):
         return (
             self._gql_req(
                 query="""
-            query ListDataViews($id: ID!) {
+            query ListDataViews($id: String!) {
                 project(id: $id) {
                     data_views {
                       id,
@@ -105,7 +111,7 @@ class Requester:
                 }
             }
             """,
-                variables=None,
+                variables={"id": project_id},
             )
             .get("project", {})
             .get("data_views")
