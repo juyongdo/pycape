@@ -3,7 +3,9 @@ import responses
 import contextlib
 
 from cape.cape import Cape
-from cape.api.dataview import DataView
+from cape.network.requester import Requester
+from cape.api.dataview.dataview import DataView
+from cape.api.project.project import Project
 from cape.exceptions import GQLException
 from tests.fake import fake_dataframe, FAKE_HOST, FAKE_TOKEN
 
@@ -31,8 +33,8 @@ def notraising():
 def test_login(token, json, status, exception):
     with exception:
         responses.add(responses.POST, f"{FAKE_HOST}/v1/login", json=json, status=status)
-        c = Cape(endpoint=FAKE_HOST, token=token)
-        c.login()
+        c = Cape(endpoint=FAKE_HOST)
+        c.login(token=token)
 
 
 @responses.activate
@@ -65,12 +67,13 @@ def test_list_projects(json, exception):
         responses.add(
             responses.POST, f"{FAKE_HOST}/v1/query", json=json,
         )
-        c = Cape(token=FAKE_TOKEN, endpoint=FAKE_HOST)
+        c = Cape(endpoint=FAKE_HOST)
         projects = c.list_projects()
 
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert len(projects) == 1
-        assert projects[0]["id"] == "abc123"
+        assert isinstance(projects[0], Project)
+        assert projects[0].id == "abc123"
 
 
 @responses.activate
@@ -97,14 +100,17 @@ def test_list_projects(json, exception):
 )
 def test_add_dataview(json, exception, mocker):
     with exception:
-        mocker.patch("cape.api.dataview.pd.read_csv", return_value=fake_dataframe())
+        mocker.patch(
+            "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+        )
         responses.add(
             responses.POST, f"{FAKE_HOST}/v1/query", json=json,
         )
-        c = Cape(token=FAKE_TOKEN, endpoint=FAKE_HOST)
-        dataview = c.add_dataview(
-            project_id="123", name="my-data", uri="s3://my-data.csv"
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, id="123", name="my project", label="my project"
         )
+        dataview = my_project.add_dataview(name="my-data", uri="s3://my-data.csv")
 
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert isinstance(dataview, DataView)
@@ -142,18 +148,24 @@ def test_add_dataview(json, exception, mocker):
 )
 def test_list_dataviews(json, exception, mocker):
     with exception:
-        mocker.patch("cape.api.dataview.pd.read_csv", return_value=fake_dataframe())
+        mocker.patch(
+            "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+        )
         responses.add(
             responses.POST, f"{FAKE_HOST}/v1/query", json=json,
         )
-        c = Cape(token=FAKE_TOKEN, endpoint=FAKE_HOST)
-        dataviews = c.list_dataviews()
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, id="123", name="my project", label="my project"
+        )
+
+        dataviews = my_project.list_dataviews()
 
     if isinstance(exception, contextlib._GeneratorContextManager):
         assert isinstance(dataviews, list)
-        assert dataviews[0]["id"] == "def123"
-        assert isinstance(dataviews[0]["schema"], list)
-        assert dataviews[0]["schema"][0]["name"] == "col_1"
+        assert dataviews[0].id == "def123"
+        assert isinstance(dataviews[0].schema, dict)
+        assert dataviews[0].schema["col_1"] == "string"
 
 
 @responses.activate
@@ -161,7 +173,7 @@ def test_list_dataviews(json, exception, mocker):
     "args,json,exception",
     [
         (
-            {"project_id": "project_123", "id": "dataview_123"},
+            {"id": "dataview_123"},
             {
                 "data": {
                     "project": {
@@ -181,7 +193,7 @@ def test_list_dataviews(json, exception, mocker):
             notraising(),
         ),
         (
-            {"project_id": "project_123", "uri": "https"},
+            {"uri": "https"},
             {
                 "data": {
                     "project": {
@@ -201,12 +213,12 @@ def test_list_dataviews(json, exception, mocker):
             notraising(),
         ),
         (
-            {"project_id": "project_123", "id": "dataview_123"},
+            {"id": "dataview_123"},
             {"errors": [{"message": "something went wrong"}]},
             pytest.raises(GQLException, match="An error occurred: .*"),
         ),
         (
-            {"project_id": "project_123"},
+            {},
             {"errors": [{"message": "something went wrong"}]},
             pytest.raises(Exception, match="Required identifier*"),
         ),
@@ -214,16 +226,20 @@ def test_list_dataviews(json, exception, mocker):
 )
 def test_get_dataview(args, json, exception, mocker):
     with exception:
-        mocker.patch("cape.api.dataview.pd.read_csv", return_value=fake_dataframe())
+        mocker.patch(
+            "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+        )
         responses.add(
             responses.POST, f"{FAKE_HOST}/v1/query", json=json,
         )
-        c = Cape(token=FAKE_TOKEN, endpoint=FAKE_HOST)
-        dataviews = c.get_dataview(**args)
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, id="123", name="my project", label="my project"
+        )
+        dataviews = my_project.get_dataview(**args)
 
     if isinstance(exception, contextlib._GeneratorContextManager):
-        assert isinstance(dataviews, list)
-        assert len(dataviews) == 1
-        assert dataviews[0]["id"] == "dataview_123"
-        assert isinstance(dataviews[0]["schema"], list)
-        assert dataviews[0]["schema"][0]["name"] == "col_1"
+        assert isinstance(dataviews, DataView)
+        assert dataviews.id == "dataview_123"
+        assert isinstance(dataviews.schema, dict)
+        assert dataviews.schema["col_1"] == "string"

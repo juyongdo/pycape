@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+
 from urllib.error import HTTPError
 from marshmallow import Schema, fields
 
@@ -80,18 +81,19 @@ class DataView:
         """
         Format dict for gql type DataTypeInput
         """
+        self._get_schema_from_uri()
         return {
             k: v
             for k, v in {
                 "name": self.name,
                 "uri": self.uri,
                 "owner_id": self._owner_id,
-                "schema": self.schema,
+                "schema": self._schema,
             }.items()
             if v
         }
 
-    def get_schema_from_uri(self):
+    def _get_schema_from_uri(self):
         """
         Read first line from csv file read from self.uri as dataframe,
         grab schema from dataframe object, return as list of json:
@@ -130,7 +132,7 @@ class DataView:
         # dtypes datetime64[ns] -> datetime
         # dtypes category -> any
 
-        self.schema = [
+        self._schema = [
             {"name": s["name"], "schema_type": s["type"]}
             for s in json.loads(df.to_json(orient="table"))
             .get("schema", {})

@@ -36,5 +36,5 @@ def notraising():
 def test_gql_req(query, variables, body, status, exception):
     with exception:
         responses.add(responses.POST, f"{FAKE_HOST}/v1/query", body=body, status=status)
-        r = Requester(endpoint=FAKE_HOST, token=FAKE_TOKEN)
+        r = Requester(endpoint=FAKE_HOST)
         r._gql_req(query=query, variables=variables)
