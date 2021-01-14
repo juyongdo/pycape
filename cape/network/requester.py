@@ -168,7 +168,7 @@ class Requester:
             .get("data_views")
         )
 
-    def create_job(self, project_id, task_type, task_config):
+    def create_job(self, project_id, job_type, task_config):
         return self._gql_req(
             query="""
             mutation CreateTask($project_id: String!, $task_type: TaskType!, $task_config: TaskConfigInput) {
@@ -180,7 +180,7 @@ class Requester:
             """,
             variables={
                 "project_id": project_id,
-                "task_type": task_type,
+                "task_type": job_type,
                 "task_config": task_config,
             },
         ).get("createTask", {})

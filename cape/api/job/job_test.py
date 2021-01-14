@@ -4,10 +4,9 @@ import contextlib
 
 from cape.network.requester import Requester
 from cape.api.job.job import Job
-from cape.api.job.multiplication_job import MultiplicationJob
 from cape.api.project.project import Project
 from cape.exceptions import GQLException
-from tests.fake import fake_dataframe, FAKE_HOST
+from tests.fake import FAKE_HOST
 
 
 @contextlib.contextmanager
