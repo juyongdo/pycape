@@ -7,11 +7,10 @@ class Job:
     Job objects keep track of tasks/jobs that will be/have been submitted to cape workers
     """
 
-    def __init__(self, job_type: str, id: str = None, **kwargs):
+    def __init__(self, **kwargs):
         self._requester = kwargs.get("requester")
-        self.job_type = job_type
-        self.id = id
-
+        # self.job_type = job_type or kwargs.get("job_type")
+        # self.id = id
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
