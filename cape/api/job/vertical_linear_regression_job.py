@@ -2,7 +2,7 @@ from cape.api.job.job import Job
 
 
 class VerticalLinearRegressionJob(Job):
-    name = "LINEAR_REGRESSION"
+    job_type = "LINEAR_REGRESSION"
     id = None
     x_train_dataview = None
     x_train_data_cols = None
@@ -22,7 +22,7 @@ class VerticalLinearRegressionJob(Job):
     def assign_job_roles(self, model_owner, data_provider):
         job_roles = {
             "task_id": self.id,
-            "task_type": self.name,
+            "task_type": self.job_type,
             "model_owner": model_owner,
             "data_provider": data_provider,
         }
@@ -30,4 +30,5 @@ class VerticalLinearRegressionJob(Job):
         return self(requester=self._requester, **job)
 
     def submit_job(self):
-        return super().submit_job(job_id=self.id)
+        job = super().submit_job()
+        return self.__class__(requester=self._requester, **job)

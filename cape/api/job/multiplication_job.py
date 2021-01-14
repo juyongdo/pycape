@@ -2,7 +2,7 @@ from cape.api.job.job import Job
 
 
 class MultiplicationJob(Job):
-    name = "MULTIPLICATION"
+    job_type = "MULTIPLICATION"
     id = None
     computation = None
     project = None
@@ -14,7 +14,7 @@ class MultiplicationJob(Job):
     def assign_job_roles(self, job_roles_input: dict):
         job_roles = {
             "task_id": self.id,
-            "task_type": self.name,
+            "task_type": self.job_type,
             "inputter0": job_roles_input.get("inputter0"),
             "inputter1": job_roles_input.get("inputter1"),
         }
@@ -22,5 +22,5 @@ class MultiplicationJob(Job):
         return self.__class__(requester=self._requester, **job)
 
     def submit_job(self):
-        job = super().submit_job(job_id=self.id)
+        job = super().submit_job()
         return self.__class__(requester=self._requester, **job)
