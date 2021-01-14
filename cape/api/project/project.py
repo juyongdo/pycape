@@ -1,7 +1,6 @@
 from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
-from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
 
 
 class Project:
@@ -79,7 +78,7 @@ class Project:
         :param job: :class:`cape.api.job.job`
         :rtype: :class:`cape.api.job.job`
         """
-        job = self._requester.create_job(project_id=self.id, task_type=job.name)
-
-        # TODO: create mapping between job name and class type to invoke here
-        return VerticalLinearRegressionJob(requester=self._requester, **job)
+        created_job = job.__class__(requester=self._requester).create_job(
+            project_id=self.id
+        )
+        return job.__class__(requester=self._requester, **created_job)
