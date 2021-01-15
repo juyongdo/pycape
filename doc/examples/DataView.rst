@@ -46,4 +46,4 @@ Add a data view to a project
     >>> 
     >>> data_view = DataView(name="m-data", uri="s3://my-data.csv")
     >>> my_project.add_dataview(data_view)
-    <DataView (id=abc123)>
+    <DataView (id=abc123)>  

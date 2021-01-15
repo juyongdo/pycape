@@ -89,6 +89,14 @@ class Requester:
                 id
                 name
                 location
+                owner {
+                  ... on User {
+                    id
+                  }
+                  ... on Organization {
+                    id
+                  }
+                },
                 schema { name, schema_type }
               }
             }
@@ -106,6 +114,14 @@ class Requester:
                       id,
                       name,
                       location,
+                      owner {
+                        ... on User {
+                          id
+                        }
+                        ... on Organization {
+                          id
+                        }
+                      },
                       schema { name, schema_type }
                     }
                 }
@@ -129,6 +145,14 @@ class Requester:
                       id,
                       name,
                       location,
+                      owner {
+                        ... on User {
+                          id
+                        }
+                        ... on Organization {
+                          id
+                        }
+                      },
                       schema { name, schema_type }
                     }
                 }
@@ -143,3 +167,47 @@ class Requester:
             .get("project", {})
             .get("data_views")
         )
+
+    def create_job(self, project_id, job_type, task_config):
+        return self._gql_req(
+            query="""
+            mutation CreateTask($project_id: String!, $task_type: TaskType!, $task_config: TaskConfigInput) {
+                createTask(project_id: $project_id, task_type: $task_type, task_config: $task_config) {
+                  id
+                  computation
+                }
+            }
+            """,
+            variables={
+                "project_id": project_id,
+                "task_type": job_type,
+                "task_config": task_config,
+            },
+        ).get("createTask", {})
+
+    def assign_job_roles(self, job_id, job_roles_input):
+        return self._gql_req(
+            query="""
+            mutation AssignTaskRoles($task_id: String!, $task_roles: TaskRolesInput!) {
+                assignTaskRoles(task_id: $task_id, task_roles: $task_roles) {
+                  id
+                }
+            }
+            """,
+            variables={"task_id": job_id, "task_roles": job_roles_input},
+        ).get("assignTaskRoles", {})
+
+    def submit_job(self, job_id):
+        return self._gql_req(
+            query="""
+            mutation InitializeSession($task_id: String!) {
+                initializeSession(task_id: $task_id) {
+                  id
+                  status {
+                    runtime
+                  }
+                }
+            }
+            """,
+            variables={"task_id": job_id},
+        ).get("initializeSession", {})

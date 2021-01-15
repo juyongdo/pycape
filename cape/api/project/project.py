@@ -1,4 +1,6 @@
+from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
+from cape.api.job.job import Job
 
 
 class Project:
@@ -8,7 +10,8 @@ class Project:
 
     def __init__(
         self,
-        requester,
+        requester: Requester,
+        user_id: str,
         id: str = None,
         name: str = None,
         label: str = None,
@@ -20,7 +23,8 @@ class Project:
         :param label: label
         :param description: description
         """
-        self._requester = requester
+        self._requester: Requester = requester
+        self._user_id: str = user_id
         self.id: str = id
         self.name: str = name
         self.label: str = label
@@ -31,7 +35,6 @@ class Project:
 
     def list_dataviews(self):
         """
-        Queries gql for list of dataviews by project
         :calls: `query project`
         :param project_id: string
         :param name: string
@@ -40,20 +43,19 @@ class Project:
         """
 
         data_views = self._requester.list_dataviews(project_id=self.id)
-        return [DataView(**d) for d in data_views]
+        return [DataView(user_id=self._user_id, **d) for d in data_views]
 
     def get_dataview(self, id: str = None, uri: str = None):
         """
-        Queries gql for list of dataviews by project
         :calls: `query project`
         :param project_id: string
-        :param name: string
+        :param id: string
         :param uri: string
-        :rtype: [:class:`cape.api.dataview.dataview`]
+        :rtype: :class:`cape.api.dataview.dataview`
         """
         data_view = self._requester.get_dataview(project_id=self.id, id=id, uri=uri)
 
-        return DataView(**data_view[0]) if data_view else None
+        return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
     def add_dataview(self, dataview: DataView):
         """
@@ -68,4 +70,17 @@ class Project:
         data_view = self._requester.add_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
-        return DataView(**data_view)
+        return DataView(user_id=self._user_id, **data_view)
+
+    def create_job(self, job: Job):
+        """
+        :calls: `mutation createTask`
+        :param job: :class:`cape.api.job.job`
+        :rtype: :class:`cape.api.job.job`
+        """
+
+        job_instance = {k: v for k, v in job.__dict__.items()}
+        created_job = job.__class__(**job_instance).create_job(project_id=self.id)
+        return job.__class__(
+            job_type=job.job_type, requester=self._requester, **created_job
+        )
