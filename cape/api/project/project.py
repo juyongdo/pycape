@@ -80,7 +80,10 @@ class Project:
         """
 
         job_instance = {k: v for k, v in job.__dict__.items()}
-        created_job = job.__class__(**job_instance).create_job(project_id=self.id)
+
+        created_job = job.__class__(
+            **job_instance, requester=self._requester,
+        ).create_job(project_id=self.id)
         return job.__class__(
-            job_type=job.job_type, requester=self._requester, **created_job
+            job_type=job.job_type, **created_job, requester=self._requester,
         )

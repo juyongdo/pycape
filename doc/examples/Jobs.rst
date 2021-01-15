@@ -43,12 +43,7 @@ Assign Job Roles
     >>> 
     >>> my_mult_job = my_project.get_job(id="abc123")
     >>> 
-    >>> my_mult_job.assign_job_roles(
-        job_roles_input={
-            "inputter0": "01EW15MK0H8C1CBAVJWP35S6A5",
-            "inputter1": "01EW15MRW28QAPAMA16DKQEF4W",
-        }
-    ) 
+    >>> my_mult_job.assign_job_roles(inputter0="01EW15MK0H8C1CBAVJWP35S6A5", inputter1="01EW15MRW28QAPAMA16DKQEF4W") 
     <MultiplicationJob (id=abc123)> 
 
 
