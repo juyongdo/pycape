@@ -1,5 +1,6 @@
 import json
 from cape.vars import JOB_TYPES
+from cape.network.requester import Requester
 
 
 class Job:
@@ -7,12 +8,12 @@ class Job:
     Job objects keep track of tasks/jobs that will be/have been submitted to cape workers
     """
 
-    def __init__(self, **kwargs):
-        self._requester = kwargs.get("requester")
-        # self.job_type = job_type or kwargs.get("job_type")
-        # self.id = id
+    def __init__(self, requester: Requester = None, **kwargs):
         for k, v in kwargs.items():
             self.__dict__[k] = v
+
+        if requester:
+            self._requester = requester
 
         if not self.job_type:
             raise Exception("Jobs cannot be initialized without a job type")
