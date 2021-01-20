@@ -32,7 +32,7 @@ class Cape:
             for p in projects
         ]
 
-    def get_project(self, id: str):
+    def get_project(self, id: str) -> Project:
         """
         :calls: `query project`
         :rtype: :class:`cape.api.project.project`
