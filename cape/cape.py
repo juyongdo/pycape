@@ -1,5 +1,5 @@
-from cape.network.requester import Requester
 from cape.api.project import Project
+from cape.network.requester import Requester
 
 
 class Cape:

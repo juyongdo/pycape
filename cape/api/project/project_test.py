@@ -1,12 +1,14 @@
-import pytest
-import responses
 import contextlib
 
-from cape.network.requester import Requester
+import pytest
+import responses
+
 from cape.api.dataview.dataview import DataView
 from cape.api.project.project import Project
 from cape.exceptions import GQLException
-from tests.fake import fake_dataframe, FAKE_HOST
+from cape.network.requester import Requester
+from tests.fake import FAKE_HOST
+from tests.fake import fake_dataframe
 
 
 @contextlib.contextmanager

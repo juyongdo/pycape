@@ -1,6 +1,7 @@
+from contextlib import contextmanager
+
 import pytest
 import responses
-from contextlib import contextmanager
 
 from cape.exceptions import GQLException
 from cape.network.requester import Requester

@@ -1,9 +1,9 @@
 from typing import Dict
 
-from cape.api.organization.organization import Organization
-from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
+from cape.api.organization.organization import Organization
+from cape.network.requester import Requester
 
 
 class Project:
@@ -36,10 +36,14 @@ class Project:
         self.description: str = description
 
         if organizations is not None:
-            self.organizations: [Organization] = list(map(lambda org_json: Organization(**org_json), organizations))
+            self.organizations: [Organization] = list(
+                map(lambda org_json: Organization(**org_json), organizations)
+            )
 
         if data_views is not None:
-            self.dataviews: [DataView] = list(map(lambda dv_json: DataView(**dv_json), data_views))
+            self.dataviews: [DataView] = list(
+                map(lambda dv_json: DataView(**dv_json), data_views)
+            )
 
     def __repr__(self):
         return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, label={self.label})>"
