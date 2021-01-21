@@ -1,5 +1,7 @@
 class Organization:
-
+    """
+    Organization represents an organization in Cape.
+    """
     def __init__(
             self,
             id: str = None,
