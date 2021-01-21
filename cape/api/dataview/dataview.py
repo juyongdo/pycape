@@ -1,8 +1,9 @@
 import json
-import pandas as pd
-
 from urllib.error import HTTPError
-from marshmallow import Schema, fields
+
+import pandas as pd
+from marshmallow import Schema
+from marshmallow import fields
 
 from cape.utils import filter_date
 
@@ -40,7 +41,7 @@ class DataView:
         self.schema: pd.Series = schema
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} (id={self.id})>"
+        return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, location={self._location})>"
 
     @property
     def location(self) -> str:

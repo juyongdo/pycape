@@ -1,9 +1,11 @@
-import pytest
-import responses
 import contextlib
 
+import pytest
+import responses
+
 from cape.api.dataview.dataview import DataView
-from tests.fake import fake_csv_dob_date_field, fake_dataframe
+from tests.fake import fake_csv_dob_date_field
+from tests.fake import fake_dataframe
 
 
 @contextlib.contextmanager
@@ -14,9 +16,14 @@ def notraising():
 class TestDataView:
     def test__repr__(self):
         id = "abc123"
-        dv = DataView(id=id)
+        name = "hey"
+        location = "cool.com"
+        dv = DataView(id=id, name=name, location=location)
 
-        assert repr(dv) == f"<{dv.__class__.__name__} (id={id})>"
+        expect = (
+            f"<{dv.__class__.__name__} (id={id}, name={name}, location={location})>"
+        )
+        assert repr(dv) == expect
 
     @responses.activate
     @pytest.mark.parametrize(
