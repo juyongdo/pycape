@@ -20,9 +20,7 @@ class TestDataView:
         location = "cool.com"
         dv = DataView(id=id, name=name, location=location)
 
-        expect = (
-            f"<{dv.__class__.__name__} (id={id}, name={name}, location={location})>"
-        )
+        expect = f"<{dv.__class__.__name__} (id={id}, name={name}, location={None})>"
         assert repr(dv) == expect
 
     @responses.activate
@@ -44,13 +42,19 @@ class TestDataView:
         "schema,expectation,exception",
         [
             (None, type(None), notraising()),
+            (fake_dataframe().dtypes, dict, notraising()),
             ([{"name": "col_1", "schema_type": "string"}], dict, notraising()),
+            (
+                fake_dataframe()["col1"],
+                None,
+                pytest.raises(Exception, match="Invalid schema*"),
+            ),
             (
                 [{"name": "col_1", "type": "string"}],
                 None,
                 pytest.raises(Exception, match="Invalid schema*"),
             ),
-            (True, None, pytest.raises(Exception, match="Schema is not of type*"),),
+            (True, None, pytest.raises(Exception, match="Schema is not of type*")),
             (
                 fake_dataframe(),
                 None,
