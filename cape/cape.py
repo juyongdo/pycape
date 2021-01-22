@@ -1,5 +1,5 @@
-from cape.network.requester import Requester
 from cape.api.project import Project
+from cape.network.requester import Requester
 
 
 class Cape:
@@ -32,7 +32,7 @@ class Cape:
             for p in projects
         ]
 
-    def get_project(self, id: str):
+    def get_project(self, id: str) -> Project:
         """
         :calls: `query project`
         :rtype: :class:`cape.api.project.project`

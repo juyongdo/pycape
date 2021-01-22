@@ -1,6 +1,7 @@
 import json
-from cape.vars import JOB_TYPES
+
 from cape.network.requester import Requester
+from cape.vars import JOB_TYPES
 
 
 class Job:

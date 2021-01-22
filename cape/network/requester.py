@@ -1,10 +1,11 @@
 import os
-import requests
 from typing import Optional
 
-from cape.network.api_token import APIToken
-from cape.network import base64
+import requests
+
 from cape.exceptions import GQLException
+from cape.network import base64
+from cape.network.api_token import APIToken
 
 
 class Requester:
@@ -68,10 +69,21 @@ class Requester:
             query="""
             query GetProject($id: String!) {
                 project(id: $id) {
-                    id,
-                    name,
-                    label,
+                    id
+                    name
+                    label
                     description
+
+                    organizations {
+                        id
+                        name
+                    }
+
+                    data_views {
+                        id
+                        name
+                        location
+                    }
                 }
             }
             """,
@@ -174,7 +186,6 @@ class Requester:
             mutation CreateTask($project_id: String!, $task_type: TaskType!, $task_config: TaskConfigInput) {
                 createTask(project_id: $project_id, task_type: $task_type, task_config: $task_config) {
                   id
-                  computation
                 }
             }
             """,
