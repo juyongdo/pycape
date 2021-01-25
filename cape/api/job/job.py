@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from cape.network.requester import Requester
 from cape.vars import JOB_TYPES
@@ -8,6 +9,9 @@ class Job:
     """
     Job objects keep track of tasks/jobs that will be/have been submitted to cape workers
     """
+
+    job_type: Optional[str]
+    id: Optional[str]
 
     def __init__(self, requester: Requester = None, **kwargs):
         for k, v in kwargs.items():
