@@ -14,9 +14,14 @@ def notraising():
 class TestDataView:
     def test__repr__(self):
         id = "abc123"
-        dv = DataView(id=id)
+        name = "my-dataview"
+        location = "s3://my-data.csv"
+        dv = DataView(id=id, name=name, location=location)
 
-        assert repr(dv) == f"<{dv.__class__.__name__} (id={id})>"
+        assert (
+            repr(dv)
+            == f"<{dv.__class__.__name__} (id={id}, name={name}, location=None)>"
+        )
 
     @responses.activate
     @pytest.mark.parametrize(

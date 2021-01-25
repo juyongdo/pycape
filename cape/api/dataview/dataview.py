@@ -40,7 +40,7 @@ class DataView:
         self.schema: pd.Series = schema
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, location={self._location})>"
+        return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, location={self.location})>"
 
     @property
     def location(self) -> str:

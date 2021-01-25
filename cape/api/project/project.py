@@ -19,6 +19,7 @@ class Project:
         name: str = None,
         label: str = None,
         description: str = None,
+        owner: str = None,
         organizations: [Dict] = None,
         data_views: [Dict] = None,
     ):
@@ -36,13 +37,31 @@ class Project:
         self.description: str = description
 
         if organizations is not None:
-            self.organizations: [Organization] = list(map(lambda org_json: Organization(**org_json), organizations))
+            self.organizations: [Organization] = list(
+                map(lambda org_json: Organization(**org_json), organizations)
+            )
 
         if data_views is not None:
-            self.dataviews: [DataView] = list(map(lambda dv_json: DataView(**dv_json), data_views))
+            self.dataviews: [DataView] = list(
+                map(lambda dv_json: DataView(**dv_json), data_views)
+            )
 
     def __repr__(self):
         return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, label={self.label})>"
+
+    def add_org(self, org_id: str):
+        """
+        :calls: `mutation addProjectOrganization`
+        :param project_id: string
+        :param org_id: string
+        :rtype: [:class:`cape.api.project.Project`]
+        """
+        project_org = self._requester.add_project_org(project_id=self.id, org_id=org_id)
+        return Project(
+            requester=self._requester,
+            user_id=self._user_id,
+            **project_org.get("Project"),
+        )
 
     def list_dataviews(self):
         """

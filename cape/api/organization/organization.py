@@ -1,9 +1,6 @@
 class Organization:
-
     def __init__(
-            self,
-            id: str = None,
-            name: str = None,
+        self, id: str = None, name: str = None,
     ):
         """
         :param id: str

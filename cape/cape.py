@@ -32,10 +32,23 @@ class Cape:
             for p in projects
         ]
 
-    def get_project(self, id: str) -> Project:
+    def get_project(self, id: str = None, label: str = None) -> Project:
         """
         :calls: `query project`
         :rtype: :class:`cape.api.project.project`
         """
-        project = self.__requester.get_project(id=id)
+        project = self.__requester.get_project(id=id, label=label)
+        return Project(requester=self.__requester, user_id=self.__user_id, **project)
+
+    def create_project(self, name: str, owner: str, description: str = None):
+        """
+        :calls: `mutation createProject`
+        :param name: string
+        :param owner: string
+        :param description: string
+        :rtype: [:class:`cape.api.project.Project`]
+        """
+        project = self.__requester.create_project(
+            name=name, owner=owner, description=description
+        )
         return Project(requester=self.__requester, user_id=self.__user_id, **project)

@@ -79,28 +79,79 @@ class TestCape:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "id,json,exception",
+        "id,label,json,exception",
         [
             (
                 "project_123",
+                None,
+                {"data": {"project": {"id": "project_123", "label": "my-project"}}},
+                notraising(),
+            ),
+            (
+                None,
+                "my-project",
                 {"data": {"project": {"id": "project_123", "label": "my-project"}}},
                 notraising(),
             ),
             (
                 "project_123",
+                None,
                 {"errors": [{"message": "something went wrong"}]},
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_get_project(self, id, json, exception, mocker):
+    def test_get_project(self, id, label, json, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             c = Cape(endpoint=FAKE_HOST)
-            project = c.get_project(id=id)
+            project = c.get_project(id=id, label=label)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(project, Project)
-            assert project.id == id
+            assert project.id == json.get("data", {}).get("project", {}).get("id")
+            assert project.label == json.get("data", {}).get("project", {}).get("label")
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "args,json,exception",
+        [
+            (
+                {
+                    "name": "my-project",
+                    "owner": "owner_123",
+                    "description": "Test org desc.",
+                },
+                {
+                    "data": {
+                        "createProject": {
+                            "id": "new_project_123",
+                            "name": "my-project",
+                            "owner": "owner_123",
+                        }
+                    }
+                },
+                notraising(),
+            ),
+            (
+                {"name": "my-project", "owner": "owner_123"},
+                {"errors": [{"message": "something went wrong"}]},
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_create_project(self, args, json, exception, mocker):
+        with exception:
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            c = Cape(endpoint=FAKE_HOST)
+            project = c.create_project(**args)
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            assert isinstance(project, Project)
+
+            assert project.id == json.get("data", {}).get("createProject", {}).get("id")
+            assert project.name == args.get("name")

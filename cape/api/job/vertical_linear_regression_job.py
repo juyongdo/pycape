@@ -30,5 +30,5 @@ class VerticalLinearRegressionJob(Job):
         return self.__class__(requester=self._requester, **job)
 
     def submit_job(self):
-        job = super().submit_job()
-        return self.__class__(requester=self._requester, **job)
+        session = super().submit_job()
+        return self.__class__(requester=self._requester, **session.get("task"))
