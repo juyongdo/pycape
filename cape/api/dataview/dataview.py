@@ -1,8 +1,9 @@
 import json
-import pandas as pd
-
 from urllib.error import HTTPError
-from marshmallow import Schema, fields
+
+import pandas as pd
+from marshmallow import Schema
+from marshmallow import fields
 
 from cape.utils import filter_date
 

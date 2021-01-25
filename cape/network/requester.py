@@ -1,10 +1,11 @@
 import os
-import requests
 from typing import Optional
 
-from cape.network.api_token import APIToken
-from cape.network import base64
+import requests
+
 from cape.exceptions import GQLException
+from cape.network import base64
+from cape.network.api_token import APIToken
 
 
 class Requester:

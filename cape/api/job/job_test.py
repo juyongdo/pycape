@@ -1,14 +1,15 @@
-import pytest
-import responses
 import contextlib
 
-from cape.network.requester import Requester
-from cape.api.job.job import Job
-from cape.api.job import VerticalLinearRegressionJob
-from cape.api.project.project import Project
+import pytest
+import responses
+
 from cape.api.dataview.dataview import DataView
+from cape.api.job import VerticalLinearRegressionJob
+from cape.api.job.job import Job
+from cape.api.project.project import Project
 from cape.exceptions import GQLException
 from cape.vars import JOB_TYPE_LR
+from cape.network.requester import Requester
 from tests.fake import FAKE_HOST
 
 

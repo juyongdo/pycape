@@ -2,8 +2,8 @@ from cape.api.dataview import DataView
 from cape.api.job import VerticalLinearRegressionJob
 from cape.cape import Cape
 
-token='01EVEN9FEQ1JRWQAR3RWBZAW30,AVh_gbocf8fq6zbROB-j-5ybHRCM1bovLg'
-project_id='01EWG92FW5TKPGCG0WSPBAXRZC'
+token='01EWK4XSCBNXV2V125R5VARZWJ,AWTFgsAy_cbZeO6ZvuYEuPv4BH4k0Q7eKA'
+project_id='01EWK49HDBWKKXPZD2KHSP1EVW'
 
 
 def list_projects():
@@ -82,6 +82,6 @@ def make_job():
 
 if __name__ == '__main__':
     # list_projects()
-    get_project()
-    # setup_project()
+    # get_project()
+    setup_project()
     make_job()

@@ -1,9 +1,9 @@
 from typing import Dict
 
-from cape.api.organization.organization import Organization
-from cape.network.requester import Requester
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
+from cape.api.organization.organization import Organization
+from cape.network.requester import Requester
 
 
 class Project:

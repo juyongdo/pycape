@@ -1,11 +1,13 @@
-import pytest
-import responses
 import contextlib
 
-from cape.cape import Cape
+import pytest
+import responses
+
 from cape.api.project.project import Project
+from cape.cape import Cape
 from cape.exceptions import GQLException
-from tests.fake import FAKE_HOST, FAKE_TOKEN
+from tests.fake import FAKE_HOST
+from tests.fake import FAKE_TOKEN
 
 
 @contextlib.contextmanager
