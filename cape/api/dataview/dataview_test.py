@@ -20,9 +20,7 @@ class TestDataView:
         location = "cool.com"
         dv = DataView(id=id, name=name, location=location)
 
-        expect = (
-            f"<{dv.__class__.__name__} (id={id}, name={name}, location={location})>"
-        )
+        expect = f"<{dv.__class__.__name__} (id={id}, name={name}, location={None})>"
         assert repr(dv) == expect
 
     @responses.activate
@@ -44,13 +42,19 @@ class TestDataView:
         "schema,expectation,exception",
         [
             (None, type(None), notraising()),
+            (fake_dataframe().dtypes, dict, notraising()),
             ([{"name": "col_1", "schema_type": "string"}], dict, notraising()),
+            (
+                fake_dataframe()["col1"],
+                None,
+                pytest.raises(Exception, match="Invalid schema*"),
+            ),
             (
                 [{"name": "col_1", "type": "string"}],
                 None,
                 pytest.raises(Exception, match="Invalid schema*"),
             ),
-            (True, None, pytest.raises(Exception, match="Schema is not of type*"),),
+            (True, None, pytest.raises(Exception, match="Schema is not of type*")),
             (
                 fake_dataframe(),
                 None,
@@ -83,7 +87,9 @@ class TestDataView:
                 return_value=fake_csv_dob_date_field(),
             )
             dv = DataView(name="my-data", uri="s3://my-data.csv")
-            dv._get_schema_from_uri()
+            schema = dv._get_schema_from_uri()
 
             if isinstance(exception, contextlib._GeneratorContextManager):
-                assert dv.schema["dob"] == "datetime"
+                assert [s for s in schema if s.get("name") == "dob"][0].get(
+                    "schema_type"
+                ) == "datetime"
