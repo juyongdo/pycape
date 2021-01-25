@@ -1,13 +1,22 @@
+import argparse
+import os
+
 from cape.api.dataview import DataView
 from cape.api.job import VerticalLinearRegressionJob
 from cape.cape import Cape
 
-token='01EWK4XSCBNXV2V125R5VARZWJ,AWTFgsAy_cbZeO6ZvuYEuPv4BH4k0Q7eKA'
-project_id='01EWK49HDBWKKXPZD2KHSP1EVW'
+parser = argparse.ArgumentParser(description="Seed Computation Session")
+parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))
+parser.add_argument("--project", default=os.environ.get("CAPE_PROJECT"))
+parser.add_argument("--coordinator", default=os.environ.get("CAPE_COORDINATOR"))
+args = parser.parse_args()
 
+token = args.token
+project_id = args.project
+coordinator_url = args.coordinator
 
 def list_projects():
-    c = Cape(endpoint='http://localhost:8080')
+    c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     print('projects')
     for p in c.list_projects():
@@ -15,7 +24,7 @@ def list_projects():
 
 
 def get_project():
-    c = Cape(endpoint='http://localhost:8080')
+    c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     project = c.get_project(id=project_id)
     print(project)
@@ -29,7 +38,7 @@ def get_project():
 
 
 def setup_project():
-    c = Cape(endpoint='http://localhost:8080')
+    c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     print('projects')
     for p in c.list_projects():
@@ -43,8 +52,8 @@ def setup_project():
     print('orgs', project.organizations)
 
     org_dv = {
-        'cpp': 'https://storage.googleapis.com/worker-data/x_data.csv',
-        'cts': 'https://storage.googleapis.com/worker-data/y_data.csv',
+        project.organizations[0].name: 'https://storage.googleapis.com/worker-data/x_data.csv',
+        project.organizations[1].name: 'https://storage.googleapis.com/worker-data/y_data.csv',
     }
 
     for org in project.organizations:
@@ -54,7 +63,7 @@ def setup_project():
 
 
 def make_job():
-    c = Cape(endpoint='http://localhost:8080')
+    c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     project = c.get_project(id=project_id)
     print(project)

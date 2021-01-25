@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional, List
 
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
@@ -20,8 +20,8 @@ class Project:
         label: str = None,
         description: str = None,
         owner: str = None,
-        organizations: [Dict] = None,
-        data_views: [Dict] = None,
+        organizations: List[Dict] = None,
+        data_views: List[Dict] = None,
     ):
         """
         :param id: id
@@ -31,18 +31,22 @@ class Project:
         """
         self._requester: Requester = requester
         self._user_id: str = user_id
-        self.id: str = id
-        self.name: str = name
-        self.label: str = label
-        self.description: str = description
+
+        if id is None:
+            raise Exception("Projects cannot be initialized without an id")
+
+        self.id = id
+        self.name: Optional[str] = name
+        self.label: Optional[str] = label
+        self.description: Optional[str] = description
 
         if organizations is not None:
-            self.organizations: [Organization] = list(
+            self.organizations: List[Organization] = list(
                 map(lambda org_json: Organization(**org_json), organizations)
             )
 
         if data_views is not None:
-            self.dataviews: [DataView] = list(
+            self.dataviews: List[DataView] = list(
                 map(lambda dv_json: DataView(**dv_json), data_views)
             )
 
