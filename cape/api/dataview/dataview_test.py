@@ -87,7 +87,9 @@ class TestDataView:
                 return_value=fake_csv_dob_date_field(),
             )
             dv = DataView(name="my-data", uri="s3://my-data.csv")
-            dv._get_schema_from_uri()
+            schema = dv._get_schema_from_uri()
 
             if isinstance(exception, contextlib._GeneratorContextManager):
-                assert dv.schema["dob"] == "datetime"
+                assert [s for s in schema if s.get("name") == "dob"][0].get(
+                    "schema_type"
+                ) == "datetime"

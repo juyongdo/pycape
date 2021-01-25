@@ -95,7 +95,8 @@ class DataView:
         Format dict for gql type DataViewInput
         """
         if not hasattr(self, "_schema"):
-            self._get_schema_from_uri()
+            schema = self._get_schema_from_uri()
+            self._schema = schema
 
         return {
             k: v
@@ -108,7 +109,11 @@ class DataView:
             if v
         }
 
-    def convert_pd_objects_json(self, pd_obj: pd.Series):
+    def convert_pd_objects_json(self, pd_obj: pd.Series) -> list:
+        """
+        Accepts a pandas dataframe.dtype, converts this pandas schema to a dictionary of JSON-like
+        data types defined by the PANDAS_TO_JSON_DATATYPES. Returns converted schema list.
+        """
         json_obj = pd_obj.apply(lambda x: x.name).to_dict()
         schema = [{"name": k, "schema_type": v} for k, v in json_obj.items()]
 
@@ -117,7 +122,7 @@ class DataView:
 
         return schema
 
-    def _get_schema_from_uri(self):
+    def _get_schema_from_uri(self) -> list:
         """
         Read first line from csv file read from self.uri as dataframe,
         grab schema from dataframe object, return as list of json:
@@ -128,6 +133,9 @@ class DataView:
         """
 
         def _get_date_cols(dataframe: pd.DataFrame) -> list:
+            """
+            Get list of column names that are of datetime data types
+            """
             columns = df.columns
             row_1 = df.iloc[0].values
             date_cols = []
@@ -156,7 +164,7 @@ class DataView:
         # dtypes datetime64[ns] -> datetime
         # dtypes category -> any
 
-        self._schema = [
+        return [
             {"name": s["name"], "schema_type": s["type"]}
             for s in json.loads(df.to_json(orient="table"))
             .get("schema", {})
