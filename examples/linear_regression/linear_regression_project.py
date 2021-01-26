@@ -5,10 +5,12 @@ from cape.api.dataview import DataView
 from cape.api.job import VerticalLinearRegressionJob
 from cape.cape import Cape
 
-parser = argparse.ArgumentParser(description="Seed Computation Session")
+parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")
 parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))
-parser.add_argument("--project", default=os.environ.get("CAPE_PROJECT"))
+parser.add_argument("--project", default=os.environ.get("CAPE_PROJECT"), help="The project ID to create a job on")
 parser.add_argument("--coordinator", default=os.environ.get("CAPE_COORDINATOR"))
+parser.add_argument("--skip-setup", action="store_true", help="Skips projects setup i.e. adding dataviews")
+parser.add_argument("--show-projects", action="store_true", help="Prints projects you are in exits")
 args = parser.parse_args()
 
 token = args.token
@@ -57,8 +59,10 @@ def setup_project():
     }
 
     for org in project.organizations:
-        # print('orgID', org.id)
-        dv = DataView(name=f"{org.name}-data", owner_id=org.id, uri=org_dv[org.name])
+        try:
+            dv = DataView(name=f"{org.name}-data", owner_id=org.id, uri=org_dv[org.name])
+        except KeyError:
+            continue
         print(project.add_dataview(dv))
 
 
@@ -80,6 +84,8 @@ def make_job():
         x_train_data_cols=['col1'],
         y_train_dataview=project.dataviews[1],
         y_train_data_cols=['col1'],
+        # the cape org
+        third_party_org_id=project.organizations[2].id,
     )
 
     job = project.create_job(job=job)
@@ -90,7 +96,11 @@ def make_job():
 
 
 if __name__ == '__main__':
-    # list_projects()
-    # get_project()
-    setup_project()
+    if args.show_projects:
+        list_projects()
+        exit()
+
+    if not args.skip_setup:
+        setup_project()
+
     make_job()
