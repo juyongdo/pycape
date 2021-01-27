@@ -1,6 +1,8 @@
 import argparse
 import os
 
+import pandas as pd
+
 from cape.api.dataview import DataView
 from cape.api.job import VerticalLinearRegressionJob
 from cape.cape import Cape
@@ -54,13 +56,15 @@ def setup_project():
     print('orgs', project.organizations)
 
     org_dv = {
-        project.organizations[0].name: 'https://storage.googleapis.com/worker-data/x_data.csv',
-        project.organizations[1].name: 'https://storage.googleapis.com/worker-data/y_data.csv',
+        project.organizations[0].name: 'x_data',
+        project.organizations[1].name: 'y_data',
     }
+
+    df = pd.DataFrame({"x": [1.0, 2.0], "y": [1.0, 2.0]})
 
     for org in project.organizations:
         try:
-            dv = DataView(name=f"{org.name}-data", owner_id=org.id, uri=org_dv[org.name])
+            dv = DataView(name=f"{org.name}-data", owner_id=org.id, uri=org_dv[org.name], schema=df.dtypes)
         except KeyError:
             continue
         print(project.add_dataview(dv))
