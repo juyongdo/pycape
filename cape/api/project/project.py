@@ -19,6 +19,7 @@ class Project:
         name: str = None,
         label: str = None,
         description: str = None,
+        owner: str = None,
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
     ):
@@ -51,6 +52,20 @@ class Project:
 
     def __repr__(self):
         return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, label={self.label})>"
+
+    def add_org(self, org_id: str):
+        """
+        :calls: `mutation addProjectOrganization`
+        :param project_id: string
+        :param org_id: string
+        :rtype: [:class:`cape.api.project.Project`]
+        """
+        project_org = self._requester.add_project_org(project_id=self.id, org_id=org_id)
+        return Project(
+            requester=self._requester,
+            user_id=self._user_id,
+            **project_org.get("Project"),
+        )
 
     def list_dataviews(self):
         """

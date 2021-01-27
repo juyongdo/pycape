@@ -64,21 +64,19 @@ class Requester:
             variables=None,
         ).get("projects")
 
-    def get_project(self, id: str):
+    def get_project(self, id: str = None, label: str = None):
         return self._gql_req(
             query="""
-            query GetProject($id: String!) {
-                project(id: $id) {
+            query GetProject($id: String, $label: Label) {
+                project(id: $id, label: $label) {
                     id
                     name
                     label
                     description
-
                     organizations {
                         id
                         name
                     }
-
                     data_views {
                         id
                         name
@@ -87,8 +85,51 @@ class Requester:
                 }
             }
             """,
-            variables={"id": id},
+            variables={"id": id, "label": label},
         ).get("project")
+
+    def create_project(self, name: str, owner: str, description: str):
+        return self._gql_req(
+            query="""
+            mutation CreateProject (
+              $name: ProjectDisplayName!,
+              $description: ProjectDescription!,
+              $owner: String
+            ) {
+              createProject(
+                    project: {
+                    name: $name,
+                    Description: $description,
+                    owner: $owner
+                    }
+                ) {
+                id
+                name
+                owner {
+                  ... on Organization {
+                    id
+                  }
+                }
+              }
+            }
+            """,
+            variables={"name": name, "owner": owner, "description": description},
+        ).get("createProject")
+
+    def add_project_org(self, project_id: str, org_id: str):
+        return self._gql_req(
+            query="""
+            mutation AddProjectOrganization (
+              $project_id: String!,
+              $organization_id: String!,
+            ) {
+              addProjectOrganization(project_id: $project_id, organization_id: $organization_id) {
+                Project { id }
+              }
+            }
+            """,
+            variables={"project_id": project_id, "organization_id": org_id},
+        ).get("addProjectOrganization")
 
     def add_dataview(self, project_id: str, data_view_input: dict):
         return self._gql_req(
@@ -196,18 +237,6 @@ class Requester:
             },
         ).get("createTask", {})
 
-    def assign_job_roles(self, job_id, job_roles_input):
-        return self._gql_req(
-            query="""
-            mutation AssignTaskRoles($task_id: String!, $task_roles: TaskRolesInput!) {
-                assignTaskRoles(task_id: $task_id, task_roles: $task_roles) {
-                  id
-                }
-            }
-            """,
-            variables={"task_id": job_id, "task_roles": job_roles_input},
-        ).get("assignTaskRoles", {})
-
     def submit_job(self, job_id):
         return self._gql_req(
             query="""
@@ -216,6 +245,9 @@ class Requester:
                   id
                   status {
                     runtime
+                  }
+                  task {
+                    id
                   }
                 }
             }

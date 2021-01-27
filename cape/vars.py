@@ -1,10 +1,6 @@
-JOB_TYPE_MULT = "MULTIPLICATION"
 JOB_TYPE_LR = "LINEAR_REGRESSION"
 
-JOB_TYPES = [
-    JOB_TYPE_MULT,
-    JOB_TYPE_LR,
-]
+JOB_TYPES = [JOB_TYPE_LR]
 
 # Mapping of pandas datatypes to json datatypes
 # dtypes object -> string
