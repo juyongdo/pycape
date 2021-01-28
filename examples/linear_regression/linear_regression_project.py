@@ -88,8 +88,6 @@ def make_job():
         x_train_data_cols=['col1'],
         y_train_dataview=project.dataviews[1],
         y_train_data_cols=['col1'],
-        # the cape org
-        third_party_org_id=project.organizations[2].id,
     )
 
     job = project.create_job(job=job)
