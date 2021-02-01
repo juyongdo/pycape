@@ -1,4 +1,6 @@
+import sys
 from typing import Dict, Optional, List
+from tabulate import tabulate
 
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
@@ -13,7 +15,6 @@ class Project:
 
     def __init__(
         self,
-        requester: Requester,
         user_id: str,
         id: str = None,
         name: str = None,
@@ -22,6 +23,7 @@ class Project:
         owner: str = None,
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
+        requester: Requester = None,
     ):
         """
         :param id: id
@@ -51,7 +53,7 @@ class Project:
             )
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, label={self.label})>"
+        return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
 
     def add_org(self, org_id: str):
         """
@@ -67,7 +69,7 @@ class Project:
             **project_org.get("Project"),
         )
 
-    def list_dataviews(self):
+    def list_dataviews(self, out=sys.stdout):
         """
         :calls: `query project`
         :param project_id: string
@@ -77,7 +79,18 @@ class Project:
         """
 
         data_views = self._requester.list_dataviews(project_id=self.id)
-        return [DataView(user_id=self._user_id, **d) for d in data_views]
+        get_data_view_values = [
+            DataView(user_id=self._user_id, **d) for d in data_views
+        ]
+        format_data_views = {
+            "DATAVIEW ID": [x.id for x in get_data_view_values],
+            "NAME": [x.name for x in get_data_view_values],
+            "LOCATION": [
+                x.location for x in get_data_view_values if x._validate_owner()
+            ],
+            "SCHEMA": [x.schema for x in get_data_view_values],
+        }
+        return out.write(tabulate(format_data_views, headers="keys"))
 
     def get_dataview(self, id: str = None, uri: str = None):
         """

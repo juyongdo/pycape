@@ -1,3 +1,5 @@
+import sys
+from tabulate import tabulate
 from cape.api.project import Project
 from cape.network.requester import Requester
 
@@ -21,16 +23,19 @@ class Cape:
         """
         self.__user_id = self.__requester.login(token=token)
 
-    def list_projects(self):
+    def list_projects(self, out=sys.stdout):
         """
         :calls: `query projects`
-        :rtype: [:class:`cape.api.project.project`]
+        :rtype: string
         """
         projects = self.__requester.list_projects()
-        return [
-            Project(requester=self.__requester, user_id=self.__user_id, **p)
-            for p in projects
-        ]
+        get_project_values = [Project(user_id=self.__user_id, **p) for p in projects]
+        format_projects = {
+            "PROJECT ID": [x.id for x in get_project_values],
+            "NAME": [x.name for x in get_project_values],
+            "LABEL": [x.label for x in get_project_values],
+        }
+        return out.write(tabulate(format_projects, headers="keys"))
 
     def get_project(self, id: str = None, label: str = None) -> Project:
         """

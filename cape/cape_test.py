@@ -2,6 +2,7 @@ import contextlib
 
 import pytest
 import responses
+from io import StringIO
 
 from cape.api.project.project import Project
 from cape.cape import Cape
@@ -72,12 +73,16 @@ class TestCape:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             c = Cape(endpoint=FAKE_HOST)
-            projects = c.list_projects()
+            out = StringIO()
+            c.list_projects(out=out)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert len(projects) == 1
-            assert isinstance(projects[0], Project)
-            assert projects[0].id == "abc123"
+            output = out.getvalue().strip()
+            assert output == (
+                "PROJECT ID    NAME        LABEL"
+                "\n------------  ----------  ----------\n"
+                "abc123        my-project  my-project"
+            )
 
     @responses.activate
     @pytest.mark.parametrize(

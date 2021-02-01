@@ -2,6 +2,7 @@ import contextlib
 
 import pytest
 import responses
+from io import StringIO
 
 from cape.api.dataview.dataview import DataView
 from cape.api.project.project import Project
@@ -23,9 +24,7 @@ class TestProject:
         label = "my-project"
         p = Project(requester=None, user_id=None, id=id, name=name, label=label)
 
-        assert (
-            repr(p) == f"<{p.__class__.__name__} (id={id}, name={name}, label={label})>"
-        )
+        assert repr(p) == f"{p.__class__.__name__}(id={id}, name={name}, label={label})"
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -119,14 +118,16 @@ class TestProject:
                 name="my project",
                 label="my project",
             )
-
-            dataviews = my_project.list_dataviews()
+            out = StringIO()
+            my_project.list_dataviews(out=out)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(dataviews, list)
-            assert dataviews[0].id == "def123"
-            assert isinstance(dataviews[0].schema, dict)
-            assert dataviews[0].schema["col_1"] == "string"
+            output = out.getvalue().strip()
+            assert output == (
+                "DATAVIEW ID    NAME         LOCATION    SCHEMA"
+                "\n-------------  -----------  ----------  -------------------\n"
+                "def123         my-dataview              {'col_1': 'string'}"
+            )
 
     @responses.activate
     @pytest.mark.parametrize(
