@@ -1,7 +1,6 @@
 import json
 import pandas as pd
 from marshmallow import Schema, fields
-
 from urllib.error import HTTPError
 
 from cape.utils import filter_date
@@ -41,15 +40,14 @@ class DataView:
         self.schema: pd.Series = schema
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} (id={self.id}, name={self.name}, location={self.location})>"
+        return f"{self.__class__.__name__}(id={self.id}, name={self.name}, location={self.location})"
 
     @property
     def location(self) -> str:
         """
         Protect location property by validating authorized user is the owner of the DataView
         """
-        # TODO: make _user and _owner only settable upon initilization
-        if self._user_id and self._owner_id and self._user_id == self._owner_id:
+        if self._validate_owner():
             return self.uri or self._location
 
     @property
@@ -89,6 +87,14 @@ class DataView:
                 return
 
         raise Exception("Schema is not of type pd.Series")
+
+    def _validate_owner(self):
+        """
+        Validating authorized user is the owner of the DataView
+        """
+        if self._user_id and self._owner_id and self._user_id == self._owner_id:
+            return True
+        return False
 
     def get_input(self):
         """

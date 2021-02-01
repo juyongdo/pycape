@@ -21,7 +21,7 @@ class TestDataView:
         dv = DataView(id=id, name=name, location=location)
         # expect None for location, since this location is only shown when DataView
         # has been instantiated with user_id and matching owner_id
-        expect = f"<{dv.__class__.__name__} (id={id}, name={name}, location={None})>"
+        expect = f"{dv.__class__.__name__}(id={id}, name={name}, location={None})"
         assert repr(dv) == expect
 
     @responses.activate

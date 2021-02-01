@@ -24,7 +24,7 @@ class TestJob:
 
         j = Job(id=id, job_type=JOB_TYPE_LR)
 
-        assert repr(j) == f"<{j.__class__.__name__} (id={id}, job_type={JOB_TYPE_LR})>"
+        assert repr(j) == f"{j.__class__.__name__}(id={id}, job_type={JOB_TYPE_LR})"
 
     @responses.activate
     @pytest.mark.parametrize(
