@@ -97,13 +97,6 @@ class TestJob:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             r = Requester(endpoint=FAKE_HOST)
-            my_project = Project(
-                requester=r,
-                user_id=None,
-                id="123",
-                name="my project",
-                label="my project",
-            )
 
             my_job = VerticalLinearRegressionJob(
                 id="abc_123", project_id="123", requester=r
@@ -143,13 +136,6 @@ class TestJob:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             r = Requester(endpoint=FAKE_HOST)
-            my_project = Project(
-                requester=r,
-                user_id=None,
-                id="123",
-                name="my project",
-                label="my project",
-            )
 
             my_job = VerticalLinearRegressionJob(
                 id="abc_123", project_id="123", requester=r
