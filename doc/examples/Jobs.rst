@@ -26,5 +26,5 @@ Submit a job
         y_train_dataview=dataview_2,
         y_train_data_cols=['transaction_date', 'proprietary_transaction_amount]
     )
-    >>> my_lr_job.submit_job() 
+    >>> my_project.submit_job(job=lr_job)
     VerticalLinearRegressionJob(id=abc123)
