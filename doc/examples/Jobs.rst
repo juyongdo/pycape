@@ -28,3 +28,15 @@ Submit a job
     )
     >>> my_project.submit_job(job=lr_job)
     VerticalLinearRegressionJob(id=abc123)
+
+
+Get a Job
+---------
+
+.. code-block:: python
+
+    >>> c = Cape()
+    >>> my_project = c.get_project(id="project_123")
+    >>>
+    >>> my_project.get_job(id="abc123")
+    VerticalLinearRegressionJob(id=abc123)

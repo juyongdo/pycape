@@ -4,8 +4,10 @@ from tabulate import tabulate
 
 from cape.api.dataview.dataview import DataView
 from cape.api.job.job import Job
+from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from cape.api.organization.organization import Organization
 from cape.network.requester import Requester
+from cape.vars import JOB_TYPE_LR
 
 
 class Project:
@@ -54,6 +56,11 @@ class Project:
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
+
+    @staticmethod
+    def _get_job_class(job_type):
+        job_type_map = {JOB_TYPE_LR: VerticalLinearRegressionJob}
+        return job_type_map.get(job_type)
 
     def add_org(self, org_id: str):
         """
@@ -135,7 +142,7 @@ class Project:
             job_type=job.job_type, **created_job, requester=self._requester,
         )
 
-    def submit_job(self, job) -> Job:
+    def submit_job(self, job: Job) -> Job:
         created_job = self._create_job(job)
 
         submitted_job = created_job._submit_job()
@@ -145,4 +152,17 @@ class Project:
             project_id=self.id,
             **submitted_job,
             requester=self._requester,
+        )
+
+    def get_job(self, id: str) -> Job:
+        job = self._requester.get_job(
+            project_id=self.id, job_id=id, return_params="task { type }"
+        )
+
+        job_type = job.get("task", {}).get("type")
+
+        job_class = self._get_job_class(job_type=job_type)
+
+        return job_class(
+            job_type=job_type, project_id=self.id, **job, requester=self._requester,
         )

@@ -6,8 +6,10 @@ from io import StringIO
 
 from cape.api.dataview.dataview import DataView
 from cape.api.project.project import Project
+from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
+from cape.vars import JOB_TYPE_LR
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
@@ -212,3 +214,47 @@ class TestProject:
             assert dataviews.id == "dataview_123"
             assert isinstance(dataviews.schema, dict)
             assert dataviews.schema["col_1"] == "string"
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "id,json,exception",
+        [
+            (
+                "job_123",
+                {
+                    "data": {
+                        "project": {
+                            "job": {"id": "job_123", "task": {"type": JOB_TYPE_LR}}
+                        }
+                    }
+                },
+                notraising(),
+            ),
+            (
+                "job_123",
+                {"errors": [{"message": "something went wrong"}]},
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_get_job(self, id, json, exception, mocker):
+        with exception:
+            mocker.patch(
+                "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+            )
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            r = Requester(endpoint=FAKE_HOST)
+            my_project = Project(
+                requester=r,
+                user_id=None,
+                id="123",
+                name="my project",
+                label="my-project",
+            )
+            job = my_project.get_job(id=id)
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            assert isinstance(job, VerticalLinearRegressionJob)
+            assert job.id == id

@@ -1,8 +1,9 @@
 from cape.api.job.job import Job
+from cape.vars import JOB_TYPE_LR
 
 
 class VerticalLinearRegressionJob(Job):
-    job_type = "LINEAR_REGRESSION"
+    job_type = JOB_TYPE_LR
     id = None
     x_train_dataview = None
     x_train_data_cols = None
