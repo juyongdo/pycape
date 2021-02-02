@@ -119,7 +119,7 @@ class Project:
         )
         return DataView(user_id=self._user_id, **data_view)
 
-    def create_job(self, job: Job) -> Job:
+    def _create_job(self, job: Job) -> Job:
         """
         :calls: `mutation createTask`
         :param job: :class:`cape.api.job.job`
@@ -133,4 +133,16 @@ class Project:
         ).create_job(project_id=self.id)
         return job.__class__(
             job_type=job.job_type, **created_job, requester=self._requester,
+        )
+
+    def submit_job(self, job) -> Job:
+        created_job = self._create_job(job)
+
+        submitted_job = created_job._submit_job()
+
+        return job.__class__(
+            job_type=job.job_type,
+            project_id=self.id,
+            **submitted_job,
+            requester=self._requester,
         )
