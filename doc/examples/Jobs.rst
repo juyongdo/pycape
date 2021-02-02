@@ -1,7 +1,7 @@
 Jobs
 ==========
 
-Create a job
+Submit a job
 ------------
 
 .. code-block:: python
@@ -26,31 +26,5 @@ Create a job
         y_train_dataview=dataview_2,
         y_train_data_cols=['transaction_date', 'proprietary_transaction_amount]
     )
-
-
-Assign Job Roles
-----------------
-
-.. code-block:: python
-
-    >>> c = Cape()
-    >>> my_project = c.get_project(id="project_123")
-    >>> 
-    >>> my_lr_job = my_project.get_job(id="abc123")
-    >>> 
-    >>> my_lr_job.assign_job_roles(model_owner="01EW15MK0H8C1CBAVJWP35S6A5", data_provider="01EW15MRW28QAPAMA16DKQEF4W") 
-    <VerticalLinearRegressionJob (id=abc123)> 
-
-
-Submit Job
-----------
-
-.. code-block:: python
-
-    >>> c = Cape()
-    >>> my_project = c.get_project(id="project_123")
-    >>> 
-    >>> my_lr_job = my_project.get_job(id="abc123")
-    >>> 
     >>> my_lr_job.submit_job() 
-    <VerticalLinearRegressionJob (id=abc123)> 
+    VerticalLinearRegressionJob(id=abc123)
