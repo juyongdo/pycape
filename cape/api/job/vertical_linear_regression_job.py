@@ -19,16 +19,8 @@ class VerticalLinearRegressionJob(Job):
         }
         return super().create_job(project_id=project_id, task_config=task_config)
 
-    def assign_job_roles(self, model_owner: str, data_provider: str):
-        job_roles = {
-            "task_id": self.id,
-            "task_type": self.job_type,
-            "model_owner": model_owner,
-            "data_provider": data_provider,
-        }
-        job = super().assign_job_roles(job_roles_input=job_roles)
-        return self.__class__(requester=self._requester, **job)
+    def _submit_job(self):
+        return super()._submit_job()
 
-    def submit_job(self):
-        session = super().submit_job()
-        return self.__class__(requester=self._requester, **session.get("task"))
+    def get_status(self):
+        return super().get_status()

@@ -11,11 +11,10 @@ Get list of data views for a project
     >>> my_project = c.get_project(id="project_123")
     >>>
     >>> my_project.list_dataviews()
-    [
-        <DataView (id=01EVS2NE325SETZKF1MJEVXK00)>,
-        <DataView (id=01EVSKC1BZW9B5QGH7KHDW8RQ3)>,
-        <DataView (id=01EVSWX4ZY5QE9PSN8GNJBMAWN)>
-    ]
+    DATAVIEW ID                 NAME    LOCATION                                   SCHEMA
+    --------------------------  ------  -----------------------------------------  ------------------------------------------------------------------------------------
+    01EXFR6K4D2HN7B24DGAKP8D6Y  y-data  https://storage.googleapis.com/y_data.csv  {'transaction_date': 'datetime', 'state': 'string', 'transaction_amount': 'integer'}
+    01EXFJKQRN3TQ5EQXJAQ9EPCQ6  x-data                                             {'transaction_date': 'datetime', 'state': 'string', 'transaction_amount': 'integer'}
 
 
 Get a data view
@@ -28,11 +27,11 @@ Get a data view
     >>>
     >>> # get by id
     >>> my_project.get_dataview(id="abc123")
-    <DataView (id=abc123)>
+    DataView(id=abc123)
     >>>
     >>> # get by uri
     >>> my_project.get_dataview(uri="abc123")
-    <DataView (id=abc123)>
+    DataView(id=abc123)
 
 
 
@@ -46,7 +45,7 @@ Add a data view to a project
     >>> 
     >>> data_view = DataView(name="m-data", uri="s3://my-data.csv")
     >>> my_project.add_dataview(data_view)
-    <DataView (id=abc123)>  
+    DataView(id=abc123)
     >>>
     >>> # pass your own schema to your DataView
     >>> # DataViews can be instatiated with a pandas series of type pd.Series

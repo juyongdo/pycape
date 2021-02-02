@@ -35,10 +35,11 @@ class Job:
             task_config=json.dumps(task_config) if task_config else None,
         )
 
-    def assign_job_roles(self, job_roles_input):
-        return self._requester.assign_job_roles(
-            job_id=self.id, job_roles_input=json.dumps(job_roles_input)
-        )
-
-    def submit_job(self):
+    def _submit_job(self):
         return self._requester.submit_job(job_id=self.id)
+
+    def get_status(self):
+        job = self._requester.get_job(
+            project_id=self.project_id, job_id=self.id, return_params="status { code }"
+        )
+        return job.get("status", {}).get("code")

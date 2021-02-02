@@ -243,14 +243,27 @@ class Requester:
             mutation InitializeSession($task_id: String!) {
                 initializeSession(task_id: $task_id) {
                   id
-                  status {
-                    runtime
-                  }
-                  task {
-                    id
-                  }
                 }
             }
             """,
             variables={"task_id": job_id},
         ).get("initializeSession", {})
+
+    def get_job(self, project_id, job_id, return_params):
+        return (
+            self._gql_req(
+                query=f"""
+            query GetJob($project_id: String! $job_id: String!) {{
+                project(id: $project_id) {{
+                  job(id: $job_id) {{
+                    id
+                    {return_params}
+                  }}
+                }}
+            }}
+            """,
+                variables={"project_id": project_id, "job_id": job_id},
+            )
+            .get("project", {})
+            .get("job")
+        )
