@@ -1,15 +1,15 @@
 from cape.api.job.job import Job
-from cape.vars import JOB_TYPE_LR
+from cape.vars import JOB_TYPE_LR, JOB_STATUS_CREATED
 
 
 class VerticalLinearRegressionJob(Job):
     job_type = JOB_TYPE_LR
     id = None
+    status = {"code": JOB_STATUS_CREATED}
     x_train_dataview = None
     x_train_data_cols = None
     y_train_dataview = None
     y_train_data_cols = None
-    computation = None
 
     def create_job(self, project_id: str):
         task_config = {

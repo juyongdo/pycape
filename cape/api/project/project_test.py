@@ -224,7 +224,11 @@ class TestProject:
                 {
                     "data": {
                         "project": {
-                            "job": {"id": "job_123", "task": {"type": JOB_TYPE_LR}}
+                            "job": {
+                                "id": "job_123",
+                                "status": {"code": "Initialized"},
+                                "task": {"type": JOB_TYPE_LR},
+                            }
                         }
                     }
                 },
@@ -258,3 +262,4 @@ class TestProject:
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(job, VerticalLinearRegressionJob)
             assert job.id == id
+            assert job.status == {"code": "Initialized"}

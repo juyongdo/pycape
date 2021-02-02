@@ -26,7 +26,7 @@ class Job:
             raise Exception("Job initialized with invalid job type")
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type})"
+        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status.get('code')})"
 
     def create_job(self, project_id: str, task_config: dict = None) -> dict:
         return self._requester.create_job(

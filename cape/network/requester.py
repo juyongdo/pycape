@@ -243,6 +243,7 @@ class Requester:
             mutation InitializeSession($task_id: String!) {
                 initializeSession(task_id: $task_id) {
                   id
+                  status { code }
                 }
             }
             """,

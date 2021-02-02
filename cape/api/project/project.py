@@ -156,7 +156,7 @@ class Project:
 
     def get_job(self, id: str) -> Job:
         job = self._requester.get_job(
-            project_id=self.id, job_id=id, return_params="task { type }"
+            project_id=self.id, job_id=id, return_params="status { code } task { type }"
         )
 
         job_type = job.get("task", {}).get("type")
@@ -164,5 +164,5 @@ class Project:
         job_class = self._get_job_class(job_type=job_type)
 
         return job_class(
-            job_type=job_type, project_id=self.id, **job, requester=self._requester,
+            job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
