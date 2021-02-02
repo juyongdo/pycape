@@ -28,18 +28,27 @@ class Job:
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type})"
 
-    def create_job(self, project_id: str, task_config: dict = None):
+    def create_job(self, project_id: str, task_config: dict = None) -> dict:
         return self._requester.create_job(
             project_id=project_id,
             job_type=self.job_type,
             task_config=json.dumps(task_config) if task_config else None,
         )
 
-    def _submit_job(self):
+    def _submit_job(self) -> dict:
         return self._requester.submit_job(job_id=self.id)
 
-    def get_status(self):
+    def get_status(self) -> str:
         job = self._requester.get_job(
             project_id=self.project_id, job_id=self.id, return_params="status { code }"
         )
         return job.get("status", {}).get("code")
+
+    def get_results(self):
+        job_metrics = self._requester.get_job(
+            project_id=self.project_id,
+            job_id=self.id,
+            return_params="model_metrics { name value }",
+        )
+        # TODO: return model weights
+        return None, job_metrics.get("model_metrics", {})
