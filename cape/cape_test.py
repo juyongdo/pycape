@@ -1,5 +1,5 @@
 import contextlib
-
+import os
 import pytest
 import responses
 from io import StringIO
@@ -35,12 +35,18 @@ class TestCape:
         ],
     )
     def test_login(self, token, json, status, exception):
+        os.environ["CAPE_TOKEN"] = ""
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/login", json=json, status=status
             )
             c = Cape(endpoint=FAKE_HOST)
-            c.login(token=token)
+            out = StringIO()
+            c.login(token=token, out=out)
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            output = out.getvalue().strip()
+            assert output == "Login successful"
 
     @responses.activate
     @pytest.mark.parametrize(
