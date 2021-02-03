@@ -223,6 +223,18 @@ class Requester:
             .get("data_views")
         )
 
+    def remove_dataview(self, id):
+        return self._gql_req(
+            query="""
+                mutation RemoveDataView($id: String!) {
+                    removeDataView(id: $id) {
+                        id
+                    }
+                }
+                """,
+            variables={"id": id},
+        ).get("removeDataView", {})
+
     def create_job(self, project_id, job_type, task_config):
         return self._gql_req(
             query="""

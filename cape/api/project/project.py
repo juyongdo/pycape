@@ -155,6 +155,11 @@ class Project:
         )
 
     def get_job(self, id: str) -> Job:
+        """
+        :calls: `query project.job`
+        :param id: string
+        :rtype: :class:`cape.api.job.Job`
+        """
         job = self._requester.get_job(
             project_id=self.id, job_id=id, return_params="status { code } task { type }"
         )
@@ -166,3 +171,12 @@ class Project:
         return job_class(
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
+
+    def remove_dataview(self, id: str, out=sys.stdout) -> str:
+        """
+        :calls: `mutation removeDataView`
+        :param id: string
+        :rtype: string
+        """
+        self.__requester.remove_dataview(id=id)
+        return out.write(f"DataView ({id}) deleted" + "\n")
