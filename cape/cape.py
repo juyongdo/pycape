@@ -13,6 +13,7 @@ class Cape:
         """
         :param endpoint: endpoint
         """
+        print('cape endpoint', endpoint)
         self.__requester = Requester(endpoint=endpoint)
         self.__user_id = None
 
@@ -21,6 +22,7 @@ class Cape:
         :calls: `POST /v1/login`
         :param token: token
         """
+        print('token', token)
         self.__user_id = self.__requester.login(token=token)
 
     def list_projects(self, out=sys.stdout):

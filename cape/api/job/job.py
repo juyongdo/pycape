@@ -1,4 +1,8 @@
 import json
+import tempfile
+
+import boto3
+import numpy as np
 from typing import Optional
 
 from cape.network.requester import Requester
@@ -45,10 +49,25 @@ class Job:
         return job.get("status", {}).get("code")
 
     def get_results(self):
-        job_metrics = self._requester.get_job(
-            project_id=self.project_id,
-            job_id=self.id,
-            return_params="model_metrics { name value }",
-        )
-        # TODO: return model weights
-        return None, job_metrics.get("model_metrics", {})
+        # job_metrics = self._requester.get_job(
+        #     project_id=self.project_id,
+        #     job_id=self.id,
+        #     return_params="model_metrics { name value }",
+        # )
+        # # TODO: return model weights
+        # return None, job_metrics.get("model_metrics", {})
+
+        b = boto3.resource("s3").Bucket('cape-worker')
+        mse_tmp = tempfile.NamedTemporaryFile()
+        rsquared_tmp = tempfile.NamedTemporaryFile()
+        weights_tmp = tempfile.NamedTemporaryFile()
+        b.download_file(f'{self.id}/mse_result', mse_tmp.name)
+        b.download_file(f'{self.id}/r_squared_result', rsquared_tmp.name)
+        b.download_file(f'{self.id}/regression_weights', weights_tmp.name)
+
+        return np.loadtxt(weights_tmp.name), {
+            "mse_result": np.loadtxt(mse_tmp.name),
+            "r_squared_result": np.loadtxt(rsquared_tmp.name)
+        }
+
+
