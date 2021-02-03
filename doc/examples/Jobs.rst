@@ -21,10 +21,8 @@ Submit a job
     >>> 
     >>> # define linear regression job
     >>> lr_job = VerticalLinearRegressionJob(
-        x_train_dataview=dataview_1,
-        x_train_data_cols=['transaction_amount]
-        y_train_dataview=dataview_2,
-        y_train_data_cols=['transaction_date', 'proprietary_transaction_amount]
+        x_train_dataview=dataview_1["transaction_amount"],
+        y_train_dataview=dataview_2["transaction_date', "proprietary_transaction_amount"],
     )
     >>> my_project.submit_job(job=lr_job)
     VerticalLinearRegressionJob(id=abc123)
