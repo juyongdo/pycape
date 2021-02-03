@@ -44,7 +44,10 @@ class DataView:
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, location={self.location})"
 
     def __getitem__(self, cols):
-        self._cols = [c for c in cols]
+        if isinstance(cols, str):
+            self._cols = [cols]
+        elif isinstance(cols, tuple):
+            self._cols = [c for c in cols]
         return self
 
     @property
