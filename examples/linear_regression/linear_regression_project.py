@@ -79,10 +79,8 @@ def make_job():
         print(f'\t{dv}')
 
     job = VerticalLinearRegressionJob(
-        x_train_dataview=project.dataviews[0],
-        x_train_data_cols=['col1'],
-        y_train_dataview=project.dataviews[1],
-        y_train_data_cols=['col1'],
+        x_train_dataview=project.dataviews[0]['col1'],
+        y_train_dataview=project.dataviews[1]['col1'],
     )
 
     print(f'\nSubmitted job {project.submit_job(job)} to run')
