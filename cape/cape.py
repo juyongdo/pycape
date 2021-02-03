@@ -16,12 +16,13 @@ class Cape:
         self.__requester = Requester(endpoint=endpoint)
         self.__user_id = None
 
-    def login(self, token: str):
+    def login(self, token: str = None, out=sys.stdout):
         """
         :calls: `POST /v1/login`
         :param token: token
         """
         self.__user_id = self.__requester.login(token=token)
+        return out.write("Login successful\n")
 
     def list_projects(self, out=sys.stdout):
         """
@@ -35,7 +36,7 @@ class Cape:
             "NAME": [x.name for x in get_project_values],
             "LABEL": [x.label for x in get_project_values],
         }
-        return out.write(tabulate(format_projects, headers="keys"))
+        return out.write(tabulate(format_projects, headers="keys") + "\n")
 
     def get_project(self, id: str = None, label: str = None) -> Project:
         """

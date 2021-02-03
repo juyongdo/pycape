@@ -97,7 +97,7 @@ class Project:
             ],
             "SCHEMA": [x.schema for x in get_data_view_values],
         }
-        return out.write(tabulate(format_data_views, headers="keys"))
+        return out.write(tabulate(format_data_views, headers="keys") + "\n")
 
     def get_dataview(self, id: str = None, uri: str = None):
         """

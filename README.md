@@ -14,19 +14,35 @@ Initialize a virtual environment. Install dependecies by running:
 $ make bootstrap
 ```
 
-### Running locally against Coordinator Container
+### Local Development
 
-Set the Coordinator URL by exporting the `CAPE_COORDINATOR` environment variable:
+You'll need a user token to authenticate requests to the Coordinator API. Generate a new user token via the UI (demo.capeprivacy.com)
+
+Set the Coordinator URL by exporting the `CAPE_COORDINATOR` environment variable, and your user token by exporting the `CAPE_TOKEN` environment variable:
 ```sh
 $ export CAPE_COORDINATOR=https://demo.capeprivacy.com
+$ export CAPE_TOKEN=abc,123
 ```
 
-You'll need a user token to authenticate requests to the Coordinator API. Generate a new user token via the UI (demo.capeprivacy.com) and pass it to the `login` method defined on the main `Cape` class:
+### Quick Tutorial
+To access projects, create a `Cape` instance:
 ```
 from cape import Cape
 
 c = Cape()
-c.login(token='token_string_123')
+c.login()
+
+c.list_projects()
+```
+
+Get an instance your created `Project` in order conduct project-level level actions such as  creating `DataViews` and submitting `Jobs`: 
+```
+from cape.api.dataview import DataView
+
+c.get_project(id="project_123")
+
+data_view = DataView(name="my-data", uri="s3://my-data.csv")
+my_project.add_dataview(data_view)
 ```
 
 ### Running Tests
