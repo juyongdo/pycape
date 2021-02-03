@@ -44,7 +44,6 @@ def get_project():
 def setup_project():
     c = Cape(endpoint=coordinator_url)
     c.login(token=token)
-    print('projects')
 
     project = c.get_project(id=project_id)
     print('linear-regression-project')
