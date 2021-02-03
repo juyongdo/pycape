@@ -24,6 +24,19 @@ class TestDataView:
         expect = f"{dv.__class__.__name__}(id={id}, name={name}, location={None})"
         assert repr(dv) == expect
 
+    def test__get_item__(self):
+        dv_1 = DataView(name="my-data", uri="s3://my-data.csv")
+        dv_with_col = dv_1["col_1"]
+
+        dv_2 = DataView(name="my-data", uri="s3://my-data.csv")
+        dv_with_cols = dv_2["col_1", "col_2"]
+
+        assert isinstance(dv_with_col, DataView)
+        assert dv_with_col._cols == ["col_1"]
+
+        assert isinstance(dv_with_cols, DataView)
+        assert dv_with_cols._cols == ["col_1", "col_2"]
+
     @responses.activate
     @pytest.mark.parametrize(
         "owner_id,user_id,expectation",

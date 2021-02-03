@@ -38,9 +38,17 @@ class DataView:
         self._owner_id: str = owner.get("id") if owner else owner_id
         self._user_id: str = user_id
         self.schema: pd.Series = schema
+        self._cols = None
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, location={self.location})"
+
+    def __getitem__(self, cols):
+        if isinstance(cols, str):
+            self._cols = [cols]
+        elif isinstance(cols, tuple):
+            self._cols = [c for c in cols]
+        return self
 
     @property
     def location(self) -> str:
