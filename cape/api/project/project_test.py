@@ -268,11 +268,7 @@ class TestProject:
     @pytest.mark.parametrize(
         "id,json,exception",
         [
-            (
-                "job_123",
-                {"data": {"removeDataView": {"id": "job_123",}}},
-                notraising(),
-            ),
+            ("job_123", {"data": {"removeDataView": {"id": "job_123"}}}, notraising(),),
             (
                 "job_123",
                 {"errors": [{"message": "something went wrong"}]},
@@ -295,7 +291,7 @@ class TestProject:
             )
             out = StringIO()
             my_project.remove_dataview(id=id, out=out)
-            
+
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
             assert isinstance(output, str)
