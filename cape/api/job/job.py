@@ -73,12 +73,18 @@ class Job:
         if location is None or location == "":
             return None, metrics
 
+        # pull the bucket info if the regression weights were stored on s3
+        # location will look like s3://my-bucket/<job_id>
         p = urlparse(location)
         if p.scheme != "s3":
             raise Exception(f"only s3 locations supported, got {p.scheme}")
 
+        # tell boto3 we are pulling from s3, p.netloc will be the bucket
         b = boto3.resource(p.scheme).Bucket(p.netloc)
         weights_tmp = tempfile.NamedTemporaryFile()
+
+        # save the weights for this job in a temp file
         b.download_file(f"{self.id}/regression_weights", weights_tmp.name)
 
+        # return the weights (decoded to np) & metrics
         return np.loadtxt(weights_tmp.name), metrics
