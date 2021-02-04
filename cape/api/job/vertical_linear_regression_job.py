@@ -1,5 +1,6 @@
 from cape.api.job.job import Job
-from cape.vars import JOB_TYPE_LR, JOB_STATUS_CREATED
+from cape.vars import JOB_STATUS_CREATED
+from cape.vars import JOB_TYPE_LR
 
 
 class VerticalLinearRegressionJob(Job):

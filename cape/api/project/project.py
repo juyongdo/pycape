@@ -1,5 +1,8 @@
 import sys
-from typing import Dict, Optional, List
+from typing import Dict
+from typing import List
+from typing import Optional
+
 from tabulate import tabulate
 
 from cape.api.dataview.dataview import DataView
