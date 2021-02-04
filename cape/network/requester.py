@@ -16,7 +16,9 @@ class Requester:
         self.gql_endpoint = self.endpoint + "/v1/query"
         self.session = requests.Session()
 
-    def login(self, token: str):
+    def login(self, token: str = None):
+        token = token or os.environ.get("CAPE_TOKEN")
+
         if not token:
             raise Exception("No token provided")
 

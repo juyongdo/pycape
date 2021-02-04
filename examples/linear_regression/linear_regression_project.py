@@ -44,11 +44,6 @@ def get_project():
 def setup_project():
     c = Cape(endpoint=coordinator_url)
     c.login(token=token)
-    print('projects')
-    # for p in c.list_projects():
-    #     print(f'\t{p}')
-
-    print()
 
     project = c.get_project(id=project_id)
     print('linear-regression-project')
@@ -84,18 +79,11 @@ def make_job():
         print(f'\t{dv}')
 
     job = VerticalLinearRegressionJob(
-        x_train_dataview=project.dataviews[0],
-        x_train_data_cols=['col1'],
-        y_train_dataview=project.dataviews[1],
-        y_train_data_cols=['col1'],
+        x_train_dataview=project.dataviews[0]['col1'],
+        y_train_dataview=project.dataviews[1]['col1'],
     )
 
-    job = project.submit_job(job=job)
-    print('\nCreated Job')
-    print(f'\t{job}')
-
-    # print(f'\nSubmitted job {job.submit_job()} to run')
-#
+    print(f'\nSubmitted job {project.submit_job(job)} to run')
 
 if __name__ == '__main__':
     if args.show_projects:

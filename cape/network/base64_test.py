@@ -1,5 +1,12 @@
 from cape.network.base64 import Base64
 from cape.network.base64 import from_string
+import pytest
+import contextlib
+
+
+@contextlib.contextmanager
+def notraising():
+    yield
 
 
 def test_base64():
@@ -7,8 +14,16 @@ def test_base64():
     assert "aGV5dGhlcmU" == str(b64)
 
 
-def test_from_string():
-    s = "ABCD"
-    b64 = from_string(s)
+@pytest.mark.parametrize(
+    "string,exception",
+    [
+        ("ABCD", notraising(),),
+        ("ABCDE", pytest.raises(Exception, match="Bad token provided: *"),),
+    ],
+)
+def test_from_string(string, exception):
+    with exception:
+        b64 = from_string(string)
 
-    assert s == str(b64)
+    if isinstance(exception, contextlib._GeneratorContextManager):
+        assert string == str(b64)

@@ -30,16 +30,58 @@ class TestJob:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "json,dataview_x,dataview_y,dataview_col_x,dataview_col_y,exception",
         [
-            ({"data": {"initializeSession": {"id": "session_123"}}}, notraising()),
+            (
+                {"data": {"initializeSession": {"id": "session_123"}}},
+                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                "123",
+                "123",
+                notraising(),
+            ),
+            (
+                {"data": {"initializeSession": {"id": "session_123"}}},
+                DataView(name="my-data", uri="s3://my-data.csv"),
+                DataView(name="my-data_1", uri="s3://my-data-2.csv"),
+                "123",
+                "123",
+                pytest.raises(
+                    Exception,
+                    match="DataView Missing Properties: X DataView ID, Y DataView ID",
+                ),
+            ),
+            (
+                {"data": {"initializeSession": {"id": "session_123"}}},
+                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                None,
+                None,
+                pytest.raises(
+                    Exception,
+                    match="DataView Missing Properties: X DataView columns, Y DataView columns",
+                ),
+            ),
             (
                 {"errors": [{"message": "something went wrong"}]},
+                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                "123",
+                "123",
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_submit_lr_job(self, json, exception, mocker):
+    def test_submit_lr_job(
+        self,
+        json,
+        dataview_x,
+        dataview_y,
+        dataview_col_x,
+        dataview_col_y,
+        exception,
+        mocker,
+    ):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -52,16 +94,10 @@ class TestJob:
                 name="my project",
                 label="my project",
             )
-            my_data_view_1 = DataView(id="dv_1", name="my-data", uri="s3://my-data.csv")
-            my_data_view_2 = DataView(
-                id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"
-            )
 
             task_config = {
-                "x_train_dataview": my_data_view_1,
-                "x_train_data_cols": ["123"],
-                "y_train_dataview": my_data_view_2,
-                "y_train_data_cols": ["123"],
+                "x_train_dataview": dataview_x[dataview_col_x],
+                "y_train_dataview": dataview_y[dataview_col_y],
             }
             my_job = VerticalLinearRegressionJob(**task_config)
 

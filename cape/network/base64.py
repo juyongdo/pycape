@@ -1,6 +1,7 @@
 from base64 import urlsafe_b64decode
 from base64 import urlsafe_b64encode
 from typing import Union
+import binascii
 
 
 # This implements a similar wrapped as network has in golang.
@@ -28,5 +29,8 @@ class Base64:
 # Returns a Base64 object from the base64 encoded string.
 # Adds padding when decoding so that it doesn't error.
 def from_string(s: str) -> Base64:
-    b = urlsafe_b64decode(bytes(s, "utf-8") + b"==")
+    try:
+        b = urlsafe_b64decode(bytes(s, "utf-8") + b"==")
+    except binascii.Error as err:
+        raise Exception(f"Bad token provided: {err}")
     return Base64(b)
