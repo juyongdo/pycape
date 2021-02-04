@@ -82,4 +82,3 @@ class Job:
         b.download_file(f"{self.id}/regression_weights", weights_tmp.name)
 
         return np.loadtxt(weights_tmp.name), metrics
-        # return None, metrics
