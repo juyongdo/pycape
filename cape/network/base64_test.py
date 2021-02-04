@@ -1,7 +1,9 @@
+import contextlib
+
+import pytest
+
 from cape.network.base64 import Base64
 from cape.network.base64 import from_string
-import pytest
-import contextlib
 
 
 @contextlib.contextmanager

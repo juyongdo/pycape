@@ -23,7 +23,7 @@ if __name__ == '__main__':
     c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     project = c.get_project(id=project_id)
-    j = project.get_job('01EXJHW3WSR6002R8BVW8DVZCX')
+    j = project.get_job('01EXQ7BYNJXRYDTA6A928GX3NB')
     weights, metrics = j.get_results()
     print('weights', weights)
     print('metrics', metrics)

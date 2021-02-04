@@ -1,5 +1,7 @@
 import sys
+
 from tabulate import tabulate
+
 from cape.api.project import Project
 from cape.network.requester import Requester
 
@@ -13,7 +15,7 @@ class Cape:
         """
         :param endpoint: endpoint
         """
-        print('cape endpoint', endpoint)
+        print("cape endpoint", endpoint)
         self.__requester = Requester(endpoint=endpoint)
         self.__user_id = None
 
@@ -22,7 +24,7 @@ class Cape:
         :calls: `POST /v1/login`
         :param token: token
         """
-        print('token', token)
+        print("token", token)
         self.__user_id = self.__requester.login(token=token)
         return out.write("Login successful\n")
 

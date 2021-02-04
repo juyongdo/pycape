@@ -7,8 +7,9 @@ from cape.api.dataview.dataview import DataView
 from cape.api.job import VerticalLinearRegressionJob
 from cape.api.job.job import Job
 from cape.api.project.project import Project
-from cape.vars import JOB_TYPE_LR, JOB_STATUS_CREATED
 from cape.network.requester import Requester
+from cape.vars import JOB_STATUS_CREATED
+from cape.vars import JOB_TYPE_LR
 from tests.fake import FAKE_HOST
 
 
@@ -22,11 +23,8 @@ class TestJob:
         id = "abc123"
 
         j = Job(id=id, job_type=JOB_TYPE_LR, status={"code": JOB_STATUS_CREATED})
-
-        assert (
-            repr(j)
-            == f"{j.__class__.__name__}(id={id}, job_type={JOB_TYPE_LR}, status={JOB_STATUS_CREATED})"
-        )
+        r = f"{j.__class__.__name__}(id={id}, job_type={JOB_TYPE_LR}, status={JOB_STATUS_CREATED})"
+        assert repr(j) == r
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -180,5 +178,5 @@ class TestJob:
             weights, metrics = my_job.get_results()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(metrics, list)
-            assert metrics[0].get("name") == "r_squared"
+            assert isinstance(metrics, dict)
+            assert metrics["r_squared"] == [0.1]

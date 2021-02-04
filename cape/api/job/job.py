@@ -1,9 +1,10 @@
 import json
 import tempfile
+from typing import Optional
+from urllib.parse import urlparse
 
 import boto3
 import numpy as np
-from typing import Optional
 
 from cape.network.requester import Requester
 from cape.vars import JOB_TYPES
@@ -49,25 +50,36 @@ class Job:
         return job.get("status", {}).get("code")
 
     def get_results(self):
-        # job_metrics = self._requester.get_job(
-        #     project_id=self.project_id,
-        #     job_id=self.id,
-        #     return_params="model_metrics { name value }",
-        # )
-        # # TODO: return model weights
-        # return None, job_metrics.get("model_metrics", {})
+        job_results = self._requester.get_job(
+            project_id=self.project_id,
+            job_id=self.id,
+            return_params="model_metrics { name value }\nmodel_location",
+        )
 
-        b = boto3.resource("s3").Bucket('cape-worker')
-        mse_tmp = tempfile.NamedTemporaryFile()
-        rsquared_tmp = tempfile.NamedTemporaryFile()
+        # gql returns metrics in key/value pairs within an array
+        # e.g. [{"name": "mse_result", "value": [1.0]}, {"name": "r_squared", "value": [1.0]]
+        # here we map to a more pythonic key, value
+        # {
+        #   "mse_result": [1.0],
+        #   "r_squared": [1.0],
+        # }
+
+        gqlMetrics = job_results.get("model_metrics", [])
+        metrics = {}
+        for m in gqlMetrics:
+            metrics[m["name"]] = m["value"]
+
+        location = job_results.get("model_location", None)
+        if location is None or location == "":
+            return None, metrics
+
+        p = urlparse(location)
+        if p.scheme != "s3":
+            raise Exception(f"only s3 locations supported, got {p.scheme}")
+
+        b = boto3.resource(p.scheme).Bucket(p.netloc)
         weights_tmp = tempfile.NamedTemporaryFile()
-        b.download_file(f'{self.id}/mse_result', mse_tmp.name)
-        b.download_file(f'{self.id}/r_squared_result', rsquared_tmp.name)
-        b.download_file(f'{self.id}/regression_weights', weights_tmp.name)
+        b.download_file(f"{self.id}/regression_weights", weights_tmp.name)
 
-        return np.loadtxt(weights_tmp.name), {
-            "mse_result": np.loadtxt(mse_tmp.name),
-            "r_squared_result": np.loadtxt(rsquared_tmp.name)
-        }
-
-
+        return np.loadtxt(weights_tmp.name), metrics
+        # return None, metrics

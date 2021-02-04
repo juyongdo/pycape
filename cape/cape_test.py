@@ -1,8 +1,9 @@
 import contextlib
 import os
+from io import StringIO
+
 import pytest
 import responses
-from io import StringIO
 
 from cape.api.project.project import Project
 from cape.cape import Cape

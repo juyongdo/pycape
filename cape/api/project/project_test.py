@@ -1,12 +1,12 @@
 import contextlib
+from io import StringIO
 
 import pytest
 import responses
-from io import StringIO
 
 from cape.api.dataview.dataview import DataView
-from cape.api.project.project import Project
 from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from cape.api.project.project import Project
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
 from cape.vars import JOB_TYPE_LR

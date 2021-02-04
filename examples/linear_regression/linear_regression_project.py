@@ -85,6 +85,7 @@ def make_job():
 
     print(f'\nSubmitted job {project.submit_job(job)} to run')
 
+
 if __name__ == '__main__':
     if args.show_projects:
         list_projects()
