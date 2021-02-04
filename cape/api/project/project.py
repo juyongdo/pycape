@@ -143,6 +143,11 @@ class Project:
         )
 
     def submit_job(self, job: Job) -> Job:
+        """
+        :calls: `query project.job`
+        :param id: string
+        :rtype: :class:`cape.api.job.Job`
+        """
         created_job = self._create_job(job)
 
         submitted_job = created_job._submit_job()
@@ -178,5 +183,5 @@ class Project:
         :param id: string
         :rtype: string
         """
-        self.__requester.remove_dataview(id=id)
+        self._requester.remove_dataview(id=id)
         return out.write(f"DataView ({id}) deleted" + "\n")

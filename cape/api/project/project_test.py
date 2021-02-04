@@ -263,3 +263,40 @@ class TestProject:
             assert isinstance(job, VerticalLinearRegressionJob)
             assert job.id == id
             assert job.status == {"code": "Initialized"}
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "id,json,exception",
+        [
+            (
+                "job_123",
+                {"data": {"removeDataView": {"id": "job_123",}}},
+                notraising(),
+            ),
+            (
+                "job_123",
+                {"errors": [{"message": "something went wrong"}]},
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_remove_dataview(self, id, json, exception, mocker):
+        with exception:
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            r = Requester(endpoint=FAKE_HOST)
+            my_project = Project(
+                requester=r,
+                user_id=None,
+                id="123",
+                name="my project",
+                label="my-project",
+            )
+            out = StringIO()
+            my_project.remove_dataview(id=id, out=out)
+            
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            output = out.getvalue().strip()
+            assert isinstance(output, str)
+            assert output == "DataView (job_123) deleted"
