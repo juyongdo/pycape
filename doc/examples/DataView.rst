@@ -9,7 +9,7 @@ Get list of data views for a project
 
     >>> c = Cape()
     >>> my_project = c.get_project(id="project_123")
-    >>>
+    
     >>> my_project.list_dataviews()
     DATAVIEW ID                 NAME    LOCATION                                   SCHEMA
     --------------------------  ------  -----------------------------------------  ------------------------------------------------------------------------------------
@@ -24,11 +24,11 @@ Get a data view
 
     >>> c = Cape()
     >>> my_project = c.get_project(id="project_123")
-    >>>
+    
     >>> # get by id
     >>> my_project.get_dataview(id="abc123")
     DataView(id=abc123)
-    >>>
+    
     >>> # get by uri
     >>> my_project.get_dataview(uri="abc123")
     DataView(id=abc123)
@@ -36,17 +36,17 @@ Get a data view
 
 
 Add a data view to a project
----------------------------
+----------------------------
 
 .. code-block:: python
 
     >>> c = Cape()
     >>> my_project = c.get_project(id="project_123")
-    >>> 
+    
     >>> data_view = DataView(name="m-data", uri="s3://my-data.csv")
     >>> my_project.add_dataview(data_view)
     DataView(id=abc123)
-    >>>
+    
     >>> # pass your own schema to your DataView
     >>> # DataViews can be instatiated with a pandas series of type pd.Series
     >>> import pandas as pd
@@ -56,7 +56,7 @@ Add a data view to a project
     col2    int64
     dtype: object
     >>> data_view = DataView(name="m-data", uri="s3://my-data.csv", schema=df.dtypes)
-    >>>
+    
     >>> # DataViews can also be instantiated as a list of data types:
     >>> schema = [{'name': 'col1', 'schema_type': 'integer', 'name': 'col2', 'schema_type': 'interger'}]
     >>> data_view = DataView(name="m-data", uri="s3://my-data.csv", schema=schema)
