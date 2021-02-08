@@ -11,9 +11,10 @@ List Projects
     >>> c.login()
     
     >>> c.list_projects()
-    PROJECT ID                  NAME                LABEL
-    --------------------------  ------------------  ------------------
-    01EXFE5TK3HJYDX50M85W2QQS1  Sales Transactions  sales-transactions
+
+    PROJECT ID   NAME                LABEL
+    -----------  ------------------  ------------------
+    project_123  Sales Transactions  sales-transactions
 
 
 Get Project
@@ -24,5 +25,19 @@ Get Project
     >>> c = Cape()
     >>> c.login()
     
-    >>> c.get_project(id="01EVS2MV3TEXQ04EPQ97F6CS50")
-    Project(id=01EVS2MV3TEXQ04EPQ97F6CS50, name=cape, label=cape)
+    >>> c.get_project(id="project_123")
+
+    Project(id=project_123, name=cape, label=cape)
+
+
+Delete a Project
+----------------
+
+.. code-block:: python
+
+    >>> c = Cape()
+    >>> c.login()
+    
+    >>> c.remove_project(id="project_123")
+
+    Project (project_123) deleted
