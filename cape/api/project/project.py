@@ -26,6 +26,7 @@ class Project:
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
         requester: Requester = None,
+        out = sys.stdout,
     ):
         """
         :param id: id
@@ -35,6 +36,7 @@ class Project:
         """
         self._requester: Requester = requester
         self._user_id: str = user_id
+        self._out = out
 
         if id is None:
             raise Exception("Projects cannot be initialized without an id")
@@ -76,7 +78,7 @@ class Project:
             **project_org.get("Project"),
         )
 
-    def list_dataviews(self, out=sys.stdout):
+    def list_dataviews(self):
         """
         :calls: `query project`
         :param project_id: string
@@ -97,7 +99,7 @@ class Project:
             ],
             "SCHEMA": [x.schema for x in get_data_view_values],
         }
-        return out.write(tabulate(format_data_views, headers="keys") + "\n")
+        return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
 
     def get_dataview(self, id: str = None, uri: str = None):
         """

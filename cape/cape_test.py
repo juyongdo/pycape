@@ -40,9 +40,9 @@ class TestCape:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/login", json=json, status=status
             )
-            c = Cape(endpoint=FAKE_HOST)
             out = StringIO()
-            c.login(token=token, out=out)
+            c = Cape(endpoint=FAKE_HOST, out=out)
+            c.login(token=token)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
@@ -78,9 +78,9 @@ class TestCape:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
-            c = Cape(endpoint=FAKE_HOST)
             out = StringIO()
-            c.list_projects(out=out)
+            c = Cape(endpoint=FAKE_HOST, out=out)
+            c.list_projects()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
