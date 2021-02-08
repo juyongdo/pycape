@@ -112,7 +112,9 @@ class Project:
         :param uri: string
         :rtype: :class:`cape.api.dataview.dataview`
         """
-        data_view = self._requester.get_dataview(project_id=self.id, id=id, uri=uri)
+        data_view = self._requester.get_dataview(
+            project_id=self.id, dataview_id=id, uri=uri
+        )
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 

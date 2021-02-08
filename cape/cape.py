@@ -61,3 +61,12 @@ class Cape:
             name=name, owner=owner, description=description
         )
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
+
+    def remove_project(self, id: str) -> str:
+        """
+        :calls: `mutation archiveProject`
+        :param id: string
+        :rtype: string
+        """
+        self.__requester.archive_project(id=id)
+        return self._out.write(f"Project ({id}) deleted" + "\n")

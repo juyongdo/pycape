@@ -16,7 +16,7 @@ class Requester:
         self.gql_endpoint = self.endpoint + "/v1/query"
         self.session = requests.Session()
 
-    def login(self, token: str = None):
+    def login(self, token: str = None) -> str:
         token = token or os.environ.get("CAPE_TOKEN")
 
         if not token:
@@ -35,7 +35,7 @@ class Requester:
         self.token = base64.from_string(json["token"])
         return json["user_id"]
 
-    def _gql_req(self, query: str, variables: Optional[dict]):
+    def _gql_req(self, query: str, variables: Optional[dict]) -> dict:
         input_json = {"query": query, "variables": {}}
         if variables is not None:
             input_json["variables"] = variables
@@ -51,7 +51,7 @@ class Requester:
             raise GQLException(f"An error occurred: {j['errors']}")
         return j["data"]
 
-    def list_projects(self):
+    def list_projects(self) -> list:
         return self._gql_req(
             query="""
             query ListProjects {
@@ -66,7 +66,7 @@ class Requester:
             variables=None,
         ).get("projects")
 
-    def get_project(self, id: str = None, label: str = None):
+    def get_project(self, id: str = None, label: str = None) -> dict:
         return self._gql_req(
             query="""
             query GetProject($id: String, $label: Label) {
@@ -90,7 +90,7 @@ class Requester:
             variables={"id": id, "label": label},
         ).get("project")
 
-    def create_project(self, name: str, owner: str, description: str):
+    def create_project(self, name: str, owner: str, description: str) -> dict:
         return self._gql_req(
             query="""
             mutation CreateProject (
@@ -118,7 +118,23 @@ class Requester:
             variables={"name": name, "owner": owner, "description": description},
         ).get("createProject")
 
-    def add_project_org(self, project_id: str, org_id: str):
+    def archive_project(self, id: str) -> dict:
+        return self._gql_req(
+            query="""
+            mutation ArchiveProject (
+              $id: String!,
+            ) {
+              archiveProject(
+                id: $id
+            ) {
+                archivedProjectId
+              }
+            }
+            """,
+            variables={"id": id},
+        ).get("archiveProject")
+
+    def add_project_org(self, project_id: str, org_id: str) -> dict:
         return self._gql_req(
             query="""
             mutation AddProjectOrganization (
@@ -133,7 +149,7 @@ class Requester:
             variables={"project_id": project_id, "organization_id": org_id},
         ).get("addProjectOrganization")
 
-    def add_dataview(self, project_id: str, data_view_input: dict):
+    def add_dataview(self, project_id: str, data_view_input: dict) -> dict:
         return self._gql_req(
             query="""
             mutation AddDataView (
@@ -159,7 +175,7 @@ class Requester:
             variables={"project_id": project_id, "data_view_input": data_view_input},
         ).get("addDataView")
 
-    def list_dataviews(self, project_id: str):
+    def list_dataviews(self, project_id: str) -> list:
         return (
             self._gql_req(
                 query="""
@@ -188,8 +204,10 @@ class Requester:
             .get("data_views")
         )
 
-    def get_dataview(self, project_id, **kwargs):
-        if not kwargs.get("id") and not kwargs.get("uri"):
+    def get_dataview(
+        self, project_id: str, dataview_id: str = None, uri: str = None
+    ) -> dict:
+        if not dataview_id and not uri:
             raise Exception("Required identifier id or uri not specified.")
         return (
             self._gql_req(
@@ -213,17 +231,13 @@ class Requester:
                 }
             }
             """,
-                variables={
-                    "project_id": project_id,
-                    "id": kwargs.get("id"),
-                    "uri": kwargs.get("uri"),
-                },
+                variables={"project_id": project_id, "id": dataview_id, "uri": uri},
             )
             .get("project", {})
             .get("data_views")
         )
 
-    def remove_dataview(self, id):
+    def remove_dataview(self, id: str) -> dict:
         return self._gql_req(
             query="""
                 mutation RemoveDataView($id: String!) {
@@ -235,7 +249,7 @@ class Requester:
             variables={"id": id},
         ).get("removeDataView", {})
 
-    def create_job(self, project_id, job_type, task_config):
+    def create_job(self, project_id: str, job_type: str, task_config: str) -> dict:
         return self._gql_req(
             query="""
             mutation CreateTask($project_id: String!, $task_type: TaskType!, $task_config: TaskConfigInput) {
@@ -251,7 +265,7 @@ class Requester:
             },
         ).get("createTask", {})
 
-    def submit_job(self, job_id):
+    def submit_job(self, job_id: str) -> dict:
         return self._gql_req(
             query="""
             mutation InitializeSession($task_id: String!) {
@@ -264,7 +278,7 @@ class Requester:
             variables={"task_id": job_id},
         ).get("initializeSession", {})
 
-    def get_job(self, project_id, job_id, return_params):
+    def get_job(self, project_id: str, job_id: str, return_params: str) -> dict:
         return (
             self._gql_req(
                 query=f"""
