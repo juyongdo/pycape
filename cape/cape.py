@@ -9,7 +9,7 @@ class Cape:
     This is the main class you instantiate to access the Cape DS API. Token parameter is required for authentication.
     """
 
-    def __init__(self, out = sys.stdout, endpoint: str = None):
+    def __init__(self, out=sys.stdout, endpoint: str = None):
         """
         :param endpoint: endpoint
         """

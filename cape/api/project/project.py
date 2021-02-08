@@ -26,7 +26,7 @@ class Project:
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
         requester: Requester = None,
-        out = sys.stdout,
+        out=sys.stdout,
     ):
         """
         :param id: id
