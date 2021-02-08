@@ -51,3 +51,10 @@ my_project.add_dataview(data_view)
 $ make test
 $ make coverage # to see the code coverage report
 ```
+
+### Build Documenation
+
+```sh
+$ pip install -U Sphinx
+$ sphinx-build -b html doc _build # to build documenation frontend in _build dir
+```
