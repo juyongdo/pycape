@@ -118,6 +118,22 @@ class Requester:
             variables={"name": name, "owner": owner, "description": description},
         ).get("createProject")
 
+    def archive_project(self, id: str):
+        return self._gql_req(
+            query="""
+            mutation ArchiveProject (
+              $id: String!,
+            ) {
+              archiveProject(
+                id: $id
+            ) {
+                archivedProjectId
+              }
+            }
+            """,
+            variables={"id": id},
+        ).get("archiveProject")
+
     def add_project_org(self, project_id: str, org_id: str):
         return self._gql_req(
             query="""
