@@ -19,7 +19,7 @@ class Cape:
         self.__user_id = None
         self._out = out
 
-    def login(self, token: str = None):
+    def login(self, token: str = None) -> str:
         """
         :calls: `POST /v1/login`
         :param token: token
@@ -27,7 +27,7 @@ class Cape:
         self.__user_id = self.__requester.login(token=token)
         return self._out.write("Login successful\n")
 
-    def list_projects(self):
+    def list_projects(self) -> str:
         """
         :calls: `query projects`
         :rtype: string
@@ -49,7 +49,7 @@ class Cape:
         project = self.__requester.get_project(id=id, label=label)
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
 
-    def create_project(self, name: str, owner: str, description: str = None):
+    def create_project(self, name: str, owner: str, description: str = None) -> Project:
         """
         :calls: `mutation createProject`
         :param name: string
