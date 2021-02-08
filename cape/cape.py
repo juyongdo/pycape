@@ -11,22 +11,23 @@ class Cape:
     This is the main class you instantiate to access the Cape DS API. Token parameter is required for authentication.
     """
 
-    def __init__(self, endpoint: str = None):
+    def __init__(self, out=sys.stdout, endpoint: str = None):
         """
         :param endpoint: endpoint
         """
         self.__requester = Requester(endpoint=endpoint)
         self.__user_id = None
+        self._out = out
 
-    def login(self, token: str = None, out=sys.stdout):
+    def login(self, token: str = None) -> str:
         """
         :calls: `POST /v1/login`
         :param token: token
         """
         self.__user_id = self.__requester.login(token=token)
-        return out.write("Login successful\n")
+        return self._out.write("Login successful\n")
 
-    def list_projects(self, out=sys.stdout):
+    def list_projects(self) -> str:
         """
         :calls: `query projects`
         :rtype: string
@@ -38,7 +39,7 @@ class Cape:
             "NAME": [x.name for x in get_project_values],
             "LABEL": [x.label for x in get_project_values],
         }
-        return out.write(tabulate(format_projects, headers="keys") + "\n")
+        return self._out.write(tabulate(format_projects, headers="keys") + "\n")
 
     def get_project(self, id: str = None, label: str = None) -> Project:
         """
@@ -48,7 +49,7 @@ class Cape:
         project = self.__requester.get_project(id=id, label=label)
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
 
-    def create_project(self, name: str, owner: str, description: str = None):
+    def create_project(self, name: str, owner: str, description: str = None) -> Project:
         """
         :calls: `mutation createProject`
         :param name: string
