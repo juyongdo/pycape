@@ -1,4 +1,5 @@
 import json
+from typing import Union
 import pandas as pd
 from marshmallow import Schema, fields
 from urllib.error import HTTPError
@@ -21,7 +22,7 @@ class DataView:
         owner: dict = None,
         owner_id: str = None,
         user_id: str = None,
-        schema: dict = None,
+        schema: pd.Series = None,
     ):
         """
         :param id: id
@@ -37,7 +38,7 @@ class DataView:
         self._location: str = location
         self._owner_id: str = owner.get("id") if owner else owner_id
         self._user_id: str = user_id
-        self.schema: pd.Series = schema
+        self.schema: Union[pd.Series, None] = schema
         self._cols = None
 
     def __repr__(self):
