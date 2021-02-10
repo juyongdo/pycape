@@ -51,8 +51,8 @@ def setup_project():
     print('orgs', project.organizations)
 
     org_dv = {
-        project.organizations[0].name: 'y_data',
-        #project.organizations[1].name: 'y_data',
+        project.organizations[0].name: 'x_data',
+        project.organizations[1].name: 'y_data',
     }
 
     df = pd.DataFrame({"x": [1.0, 2.0], "y": [1.0, 2.0]})
