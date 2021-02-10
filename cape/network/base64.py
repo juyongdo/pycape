@@ -1,7 +1,7 @@
+import binascii
 from base64 import urlsafe_b64decode
 from base64 import urlsafe_b64encode
 from typing import Union
-import binascii
 
 
 # This implements a similar wrapped as network has in golang.

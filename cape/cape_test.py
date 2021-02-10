@@ -1,8 +1,9 @@
 import contextlib
 import os
+from io import StringIO
+
 import pytest
 import responses
-from io import StringIO
 
 from cape.api.project.project import Project
 from cape.cape import Cape
@@ -40,9 +41,9 @@ class TestCape:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/login", json=json, status=status
             )
-            c = Cape(endpoint=FAKE_HOST)
             out = StringIO()
-            c.login(token=token, out=out)
+            c = Cape(endpoint=FAKE_HOST, out=out)
+            c.login(token=token)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
@@ -78,9 +79,9 @@ class TestCape:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
-            c = Cape(endpoint=FAKE_HOST)
             out = StringIO()
-            c.list_projects(out=out)
+            c = Cape(endpoint=FAKE_HOST, out=out)
+            c.list_projects()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
@@ -168,3 +169,33 @@ class TestCape:
 
             assert project.id == json.get("data", {}).get("createProject", {}).get("id")
             assert project.name == args.get("name")
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "id,json,exception",
+        [
+            (
+                "project_123",
+                {"data": {"archiveProject": {"archivedProjectId": "project_123"}}},
+                notraising(),
+            ),
+            (
+                "project_123",
+                {"errors": [{"message": "something went wrong"}]},
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_remove_project(self, id, json, exception, mocker):
+        with exception:
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            out = StringIO()
+            c = Cape(endpoint=FAKE_HOST, out=out)
+            c.remove_project(id=id)
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            output = out.getvalue().strip()
+            assert isinstance(output, str)
+            assert output == "Project (project_123) deleted"

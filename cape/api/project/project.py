@@ -1,5 +1,8 @@
 import sys
-from typing import Dict, Optional, List
+from typing import Dict
+from typing import List
+from typing import Optional
+
 from tabulate import tabulate
 
 from cape.api.dataview.dataview import DataView
@@ -26,6 +29,7 @@ class Project:
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
         requester: Requester = None,
+        out=sys.stdout,
     ):
         """
         :param id: id
@@ -35,6 +39,7 @@ class Project:
         """
         self._requester: Requester = requester
         self._user_id: str = user_id
+        self._out = out
 
         if id is None:
             raise Exception("Projects cannot be initialized without an id")
@@ -76,7 +81,7 @@ class Project:
             **project_org.get("Project"),
         )
 
-    def list_dataviews(self, out=sys.stdout):
+    def list_dataviews(self):
         """
         :calls: `query project`
         :param project_id: string
@@ -97,7 +102,7 @@ class Project:
             ],
             "SCHEMA": [x.schema for x in get_data_view_values],
         }
-        return out.write(tabulate(format_data_views, headers="keys") + "\n")
+        return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
 
     def get_dataview(self, id: str = None, uri: str = None):
         """
@@ -107,7 +112,9 @@ class Project:
         :param uri: string
         :rtype: :class:`cape.api.dataview.dataview`
         """
-        data_view = self._requester.get_dataview(project_id=self.id, id=id, uri=uri)
+        data_view = self._requester.get_dataview(
+            project_id=self.id, dataview_id=id, uri=uri
+        )
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
@@ -143,6 +150,11 @@ class Project:
         )
 
     def submit_job(self, job: Job) -> Job:
+        """
+        :calls: `query project.job`
+        :param id: string
+        :rtype: :class:`cape.api.job.Job`
+        """
         created_job = self._create_job(job)
 
         submitted_job = created_job._submit_job()
@@ -155,6 +167,11 @@ class Project:
         )
 
     def get_job(self, id: str) -> Job:
+        """
+        :calls: `query project.job`
+        :param id: string
+        :rtype: :class:`cape.api.job.Job`
+        """
         job = self._requester.get_job(
             project_id=self.id, job_id=id, return_params="status { code } task { type }"
         )
@@ -166,3 +183,12 @@ class Project:
         return job_class(
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
+
+    def remove_dataview(self, id: str, out=sys.stdout) -> str:
+        """
+        :calls: `mutation removeDataView`
+        :param id: string
+        :rtype: string
+        """
+        self._requester.remove_dataview(id=id)
+        return out.write(f"DataView ({id}) deleted" + "\n")
