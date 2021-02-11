@@ -13,7 +13,10 @@ You can create an org using [cape-ui](https://github.com/capeprivacy/cape-ui) or
 
 ![](./img/create_org.gif)
 
-_repeat this process for a second org_.
+_Repeat this process for a second org_.
+
+You'll also need to create tokens for your organizations and manually run two workers. See the cape-worker repo
+for more details [here](https://github.com/capeprivacy/cape-worker#production-docker-compose).
 
 ### Create a Project
 
@@ -23,9 +26,11 @@ Next, create a project within one of the orgs you just created.
 
 Then, add one of the other orgs you created.
 
-![](./img/add_org.gif) 
+![](./img/add_org.gif)
 
-### Get User & Org Tokens
+Copy the project id from the URL and save it for later.
+
+### Get a User Token
 
 Finally, we will need a user token to use with cape-ds. From the home page, ensure you are
 working within your user context and navigate to settings to create a token.
@@ -36,59 +41,47 @@ Take note of this value as you cannot recover it after you reload the page.
 
 That is it for the UI. We can use cape-ds for the rest of the tutorial.
 
-### Cape-ds
+### cape-ds
 
-[`liner_regression_project.py`](linear_regression/linear_regression_project.py). Provides the functionality needed
+[`liner_regression_project.py`](linear_regression_project.py). Provides the functionality needed
 to create a linear regression task within your project.
 
-Fill in the `token` variable at the top of the file from the token you generated in the previous step. 
-
-At the bottom of the file, there are a few different functions you can call. 
-
-First, we will just run `list_projects()`, E.g., convert the `main` block to 
-
-```python
-if __name__ == '__main__':
-    list_projects()
-    # get_project()
-    # setup_project()
-    # make_job()
+```
+python examples/linear_regression/linear_regression_project.py --token=<TOKEN> \
+    --project=<PROJECT ID> \
+    --coordinator https://demo.capeprivacy.com
 ```
 
-Run this, and you will see output that looks something like
+Fill in the `<TOKEN>` and the `<PROJECT ID>` from earilier and paste it into the above command.
+
+Once the computation completes you should see some output like:
 
 ```
-projects
-	<Project (id=01EWG92FW5TKPGCG0WSPBAXRZC, name=linear-regression, label=linear-regression)>
-	<Project (id=01EWK49HDBWKKXPZD2KHSP1EVW, name=cred-risk-assessment, label=cred-risk-assessment)>
+Login successful
+Project(id=01EY3Y5T3RDGBGYRCW319KDBZ8, name=my-proj, label=my-proj)
+
+Orgs:
+	<Organization (id=01EY3W9X6323RZ34XGBA4PRZB6, name=alice_org)>
+	<Organization (id=01EY3W9X6WGMZTXMBN9BT8WBB1, name=bob_org)>
+
+Data Views:
+	DataView(id=01EY8QX1CT5DDWBTXV9YCCA1J8, name=alice_org-data, location=None)
+	DataView(id=01EY8QX1DARH6CME93W511BE1Q, name=bob_org-data, location=None)
+
+Submitted job VerticalLinearRegressionJob(id=01EY8S9V7VATVQ1Y1JX46QZFPW, job_type=LINEAR_REGRESSION, status=Initialized) to run
+Waiting for job completion...
+Received status Completed. Exitting...
 ```
 
-Take note of the project ID (e.g. `01EWK49HDBWKKXPZD2KHSP1EVW` (yours will be different))
+If it errored the last line will be:
 
-Replace the project_id field at the top of the file
-
-From there, we can change the main block to setup the project and create tasks.
-
-```python
-if __name__ == '__main__':
-    # list_projects()
-    # get_project()
-    setup_project()
-    make_job()
+```
+Received status Error. Exitting...
 ```
 
-This will add two data views to your project and create a task.
+Recommend reaching out to platform for help debugging!
 
-You can only add the data views to your project once, so from then on your main block should look like
-
-```python
-if __name__ == '__main__':
-    # list_projects()
-    # get_project()
-    # setup_project()
-    make_job()
-```
-
-### TODO
-
-- Link to a tutorial showing how to run the task you created on a worker!
+**P.S. After running the computation check out your project again to see lots of other goodies about
+your job. For example, you'll see whether it succeeded or not, the metrics, how long and ran for,
+and history of any other jobs that were run. You're also see a list of activity on your project outlining
+every event that has occurded.**

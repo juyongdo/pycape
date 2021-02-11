@@ -35,7 +35,7 @@ c.login()
 c.list_projects()
 ```
 
-Get an instance your created `Project` in order conduct project-level level actions such as  creating `DataViews` and submitting `Jobs`: 
+Get an instance your created `Project` in order conduct project-level level actions such as  creating `DataViews` and submitting `Jobs`:
 ```
 from cape.api.dataview import DataView
 
@@ -44,6 +44,10 @@ c.get_project(id="project_123")
 data_view = DataView(name="my-data", uri="s3://my-data.csv")
 my_project.add_dataview(data_view)
 ```
+
+### Linear Regression Tutorial
+
+See [this tutorial](./examples/linear_regression/README.md) for a better tutorial.
 
 ### Running Tests
 
