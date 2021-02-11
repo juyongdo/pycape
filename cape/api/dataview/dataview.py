@@ -1,4 +1,5 @@
 import json
+from typing import Union
 from urllib.error import HTTPError
 
 import pandas as pd
@@ -24,7 +25,7 @@ class DataView:
         owner_id: str = None,
         owner_label: str = None,
         user_id: str = None,
-        schema: dict = None,
+        schema: pd.Series = None,
     ):
         """
         :param id: id
@@ -43,7 +44,7 @@ class DataView:
             owner and owner.get("label")
         ) else owner_label
         self._user_id: str = user_id
-        self.schema: pd.Series = schema
+        self.schema: Union[pd.Series, None] = schema
         self._cols = None
 
     def __repr__(self):
