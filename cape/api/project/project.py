@@ -152,7 +152,7 @@ class Project:
     def submit_job(self, job: Job) -> Job:
         """
         :calls: `query project.job`
-        :param id: string
+        :param job: Job
         :rtype: :class:`cape.api.job.Job`
         """
         created_job = self._create_job(job)
@@ -163,6 +163,16 @@ class Project:
             job_type=job.job_type,
             project_id=self.id,
             **submitted_job,
+            requester=self._requester,
+        )
+
+    def approve_job(self, job: Job) -> Job:
+        approved_job = job._approve_job()
+
+        return job.__class__(
+            job_type=job.job_type,
+            project_id=self.id,
+            **approved_job,
             requester=self._requester,
         )
 

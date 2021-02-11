@@ -84,6 +84,7 @@ def make_job():
     )
 
     job = project.submit_job(job)
+    project.approve_job(job)
     print(f'\nSubmitted job {job} to run')
 
     return job
