@@ -82,6 +82,6 @@ Received status Error. Exitting...
 Recommend reaching out to platform for help debugging!
 
 **P.S. After running the computation check out your project again to see lots of other goodies about
-your job ran. For example, you'll see whether it succeded or not, the metrics, how long and ran for,
+your job. For example, you'll see whether it succeeded or not, the metrics, how long and ran for,
 and history of any other jobs that were run. You're also see a list of activity on your project outlining
 every event that has occurded.**
