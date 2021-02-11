@@ -39,7 +39,9 @@ class DataView:
         self.uri: str = uri
         self._location: str = location
         self._owner_id: str = owner.get("id") if owner else owner_id
-        self._owner_label: str = owner.get("label") if (owner and owner.get("label")) else owner_label
+        self._owner_label: str = owner.get("label") if (
+            owner and owner.get("label")
+        ) else owner_label
         self._user_id: str = user_id
         self.schema: pd.Series = schema
         self._cols = None
