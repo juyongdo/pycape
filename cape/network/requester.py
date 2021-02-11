@@ -203,12 +203,12 @@ class Requester:
                       id,
                       name,
                       location,
-                      owner {
-                        ... on User {
-                          id
-                        }
                         ... on Organization {
                           id
+                          label
+                          members {
+                            id
+                          }
                         }
                       },
                       schema { name, schema_type }

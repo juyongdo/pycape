@@ -74,9 +74,10 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "user_id,json,expect,exception",
         [
             (
+                "user_123",
                 {
                     "data": {
                         "project": {
@@ -90,20 +91,78 @@ class TestProject:
                                     "schema": [
                                         {"name": "col_1", "schema_type": "string"}
                                     ],
+                                    "owner": {
+                                        "id": "org_123",
+                                        "label": "my-org",
+                                        "members": [{"id": "user_123"}],
+                                    },
                                 }
                             ],
                         }
                     }
                 },
+                (
+                    "DATAVIEW ID    NAME         LOCATION    OWNER"
+                    "\n-------------  -----------  ----------  ------------\n"
+                    "def123         my-dataview  https       my-org (You)"
+                ),
                 notraising(),
             ),
             (
+                "user_123",
+                {
+                    "data": {
+                        "project": {
+                            "id": "abc123",
+                            "label": "my-project",
+                            "data_views": [
+                                {
+                                    "id": "def123",
+                                    "name": "my-dataview",
+                                    "location": "https",
+                                    "schema": [
+                                        {"name": "col_1", "schema_type": "string"}
+                                    ],
+                                    "owner": {
+                                        "id": "org_123",
+                                        "label": "my-org",
+                                        "members": [{"id": "user_123"}],
+                                    },
+                                },
+                                {
+                                    "id": "def456",
+                                    "name": "your-dataview",
+                                    "location": "",
+                                    "schema": [
+                                        {"name": "col_1", "schema_type": "string"}
+                                    ],
+                                    "owner": {
+                                        "id": "another_org_123",
+                                        "label": "your-org",
+                                        "members": [{"id": "another_user_123"}],
+                                    },
+                                },
+                            ],
+                        }
+                    }
+                },
+                (
+                    "DATAVIEW ID    NAME           LOCATION    OWNER"
+                    "\n-------------  -------------  ----------  ------------\n"
+                    "def123         my-dataview    https       my-org (You)\n"
+                    "def456         your-dataview              your-org"
+                ),
+                notraising(),
+            ),
+            (
+                None,
                 {"errors": [{"message": "something went wrong"}]},
+                None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_list_dataviews(self, json, exception, mocker):
+    def test_list_dataviews(self, user_id, json, expect, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -116,7 +175,7 @@ class TestProject:
             my_project = Project(
                 requester=r,
                 out=out,
-                user_id=None,
+                user_id=user_id,
                 id="123",
                 name="my project",
                 label="my project",
@@ -125,11 +184,7 @@ class TestProject:
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
-            assert output == (
-                "DATAVIEW ID    NAME         LOCATION    SCHEMA"
-                "\n-------------  -----------  ----------  -------------------\n"
-                "def123         my-dataview              {'col_1': 'string'}"
-            )
+            assert output == expect
 
     @responses.activate
     @pytest.mark.parametrize(

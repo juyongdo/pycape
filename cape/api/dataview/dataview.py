@@ -52,6 +52,7 @@ class DataView(ABC):
         ) else owner_label
         self._user_id: str = user_id
         self.schema: Union[pd.Series, List, None] = schema
+        self._owner: dict = owner
         self._cols = None
 
     def __repr__(self):
@@ -66,11 +67,7 @@ class DataView(ABC):
 
     @property
     def location(self) -> str:
-        """
-        Protect location property by validating authorized user is the owner of the DataView
-        """
-        if self._validate_owner():
-            return self.uri or self._location
+        return self.uri or self._location
 
     @property
     def schema(self) -> dict:
@@ -109,14 +106,6 @@ class DataView(ABC):
                 return
 
         raise Exception("Schema is not of type pd.Series")
-
-    def _validate_owner(self):
-        """
-        Validating authorized user is the owner of the DataView
-        """
-        if self._user_id and self._owner_id and self._user_id == self._owner_id:
-            return True
-        return False
 
     def _get_input(self):
         """
