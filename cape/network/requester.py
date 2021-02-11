@@ -224,6 +224,7 @@ class Requester:
                         }
                         ... on Organization {
                           id
+                          label
                         }
                       },
                       schema { name, schema_type }

@@ -23,6 +23,7 @@ class DataView:
         location: str = None,
         owner: dict = None,
         owner_id: str = None,
+        owner_label: str = None,
         user_id: str = None,
         schema: pd.Series = None,
     ):
@@ -39,6 +40,9 @@ class DataView:
         self.uri: str = uri
         self._location: str = location
         self._owner_id: str = owner.get("id") if owner else owner_id
+        self._owner_label: str = owner.get("label") if (
+            owner and owner.get("label")
+        ) else owner_label
         self._user_id: str = user_id
         self.schema: Union[pd.Series, None] = schema
         self._cols = None
@@ -121,6 +125,7 @@ class DataView:
                 "name": self.name,
                 "uri": self.uri,
                 "owner_id": self._owner_id,
+                "owner_label": self._owner_label,
                 "schema": self._schema,
             }.items()
             if v
