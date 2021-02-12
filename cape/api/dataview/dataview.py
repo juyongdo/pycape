@@ -67,6 +67,8 @@ class DataView(ABC):
 
     @property
     def location(self) -> str:
+        if not self._location:
+            return self.uri or None
         return self.uri or self._location
 
     @property
