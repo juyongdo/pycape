@@ -40,7 +40,10 @@ class Cape:
             "LABEL": [x.label for x in get_project_values],
         }
         self._out.write(tabulate(format_projects, headers="keys") + "\n")
-        return [Project(requester=self.__requester, user_id=self.__user_id, **p) for p in projects]
+        return [
+            Project(requester=self.__requester, user_id=self.__user_id, **p)
+            for p in projects
+        ]
 
     def get_project(self, id: str = None, label: str = None) -> Project:
         """
