@@ -68,6 +68,24 @@ class TestJob:
                 "123",
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
+            (
+                {"data": {"initializeSession": {"id": "session_123"}}},
+                DataView(
+                    id="dv_1",
+                    name="my-data",
+                    uri="s3://my-data.csv",
+                    schema=[{"name": "123", "schema_type": "string"}],
+                ),
+                DataView(
+                    id="dv_2",
+                    name="my-data_1",
+                    uri="s3://my-data-2.csv",
+                    schema=[{"name": "123", "schema_type": "string"}],
+                ),
+                None,
+                None,
+                notraising(),
+            ),
         ],
     )
     def test_submit_lr_job(
