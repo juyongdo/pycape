@@ -185,12 +185,12 @@ class Requester:
                       id,
                       name,
                       location,
-                      owner { ... on Organization {
+                      owner {
+                        ... on User {
                           id
-                          label
-                          members {
-                            id
-                          }
+                        }
+                        ... on Organization {
+                          id
                         }
                       },
                       schema { name, schema_type }
@@ -224,6 +224,7 @@ class Requester:
                         }
                         ... on Organization {
                           id
+                          label
                         }
                       },
                       schema { name, schema_type }
