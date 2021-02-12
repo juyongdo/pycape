@@ -11,9 +11,9 @@ from cape.network.api_token import APIToken
 class Requester:
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
-            "CAPE_COORDINATOR", "http://localhost:8080"
+            "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
         )
-        self.gql_endpoint = self.endpoint + "/v1/query"
+        self.gql_endpoint = self.endpoint.rstrip("/") + "/v1/query"
         self.session = requests.Session()
 
     def login(self, token: str = None) -> str:
@@ -185,12 +185,12 @@ class Requester:
                       id,
                       name,
                       location,
-                      owner {
-                        ... on User {
+                      owner { ... on Organization {
                           id
-                        }
-                        ... on Organization {
-                          id
+                          label
+                          members {
+                            id
+                          }
                         }
                       },
                       schema { name, schema_type }
@@ -224,7 +224,6 @@ class Requester:
                         }
                         ... on Organization {
                           id
-                          label
                         }
                       },
                       schema { name, schema_type }
