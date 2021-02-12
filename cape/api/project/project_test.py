@@ -74,7 +74,7 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "user_id,json,expect,exception",
+        "user_id,json,out_expect,exception",
         [
             (
                 "user_123",
@@ -162,7 +162,7 @@ class TestProject:
             ),
         ],
     )
-    def test_list_dataviews(self, user_id, json, expect, exception, mocker):
+    def test_list_dataviews(self, user_id, json, out_expect, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -180,11 +180,15 @@ class TestProject:
                 name="my project",
                 label="my project",
             )
-            my_project.list_dataviews()
+            dataviews = my_project.list_dataviews()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
-            assert output == expect
+            assert output == out_expect
+            assert isinstance(dataviews, list)
+            assert dataviews[0].id == "def123"
+            assert isinstance(dataviews[0].schema, dict)
+            assert dataviews[0].schema["col_1"] == "string"
 
     @responses.activate
     @pytest.mark.parametrize(

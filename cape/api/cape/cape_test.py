@@ -105,7 +105,7 @@ class TestCape:
             )
             out = StringIO()
             c = Cape(endpoint=FAKE_HOST, out=out)
-            c.list_projects()
+            projects = c.list_projects()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
@@ -114,6 +114,9 @@ class TestCape:
                 "\n------------  ----------  ----------\n"
                 "abc123        my-project  my-project"
             )
+            assert len(projects) == 1
+            assert isinstance(projects[0], Project)
+            assert projects[0].id == "abc123"
 
     @responses.activate
     @pytest.mark.parametrize(

@@ -129,7 +129,8 @@ class Project(ABC):
             "LOCATION": dv_locations,
             "OWNER": dv_owners,
         }
-        return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
+        self._out.write(tabulate(format_data_views, headers="keys") + "\n")
+        return [DataView(user_id=self._user_id, **d) for d in data_views]
 
     def get_dataview(
         self, id: Optional[str] = None, uri: Optional[str] = None
