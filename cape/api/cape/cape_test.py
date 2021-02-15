@@ -5,11 +5,10 @@ from io import StringIO
 import pytest
 import responses
 
-from cape.api.project.project import Project
-from cape.cape import Cape
-from cape.exceptions import GQLException
-from tests.fake import FAKE_HOST
-from tests.fake import FAKE_TOKEN
+from .cape import Cape
+from ..project.project import Project
+from ...exceptions import GQLException
+from tests.fake import FAKE_HOST, FAKE_TOKEN
 
 
 @contextlib.contextmanager

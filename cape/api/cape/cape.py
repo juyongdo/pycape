@@ -2,8 +2,8 @@ import sys
 
 from tabulate import tabulate
 
-from cape.api.project import Project
-from cape.network.requester import Requester
+from ..project.project import Project
+from ...network.requester import Requester
 
 
 class Cape:

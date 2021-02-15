@@ -2,8 +2,7 @@ import contextlib
 
 import pytest
 
-from cape.network.base64 import Base64
-from cape.network.base64 import from_string
+from .base64 import Base64, from_string
 
 
 @contextlib.contextmanager

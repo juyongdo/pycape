@@ -4,14 +4,13 @@ from io import StringIO
 import pytest
 import responses
 
-from cape.api.dataview.dataview import DataView
-from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from cape.api.project.project import Project
-from cape.exceptions import GQLException
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPE_LR
-from tests.fake import FAKE_HOST
-from tests.fake import fake_dataframe
+from ..dataview.dataview import DataView
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..project.project import Project
+from ...exceptions import GQLException
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
+from tests.fake import FAKE_HOST, fake_dataframe
 
 
 @contextlib.contextmanager

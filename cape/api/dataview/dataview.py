@@ -5,8 +5,8 @@ import pandas as pd
 from marshmallow import Schema
 from marshmallow import fields
 
-from cape.utils import filter_date
-from cape.vars import PANDAS_TO_JSON_DATATYPES
+from ...utils import filter_date
+from ...vars import PANDAS_TO_JSON_DATATYPES
 
 
 class DataView:

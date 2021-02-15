@@ -5,12 +5,12 @@ from typing import Optional
 
 from tabulate import tabulate
 
-from cape.api.dataview.dataview import DataView
-from cape.api.job.job import Job
-from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from cape.api.organization.organization import Organization
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPE_LR
+from ..dataview.dataview import DataView
+from ..job.job import Job
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..organization.organization import Organization
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
 
 
 class Project:

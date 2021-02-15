@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 import boto3
 import numpy as np
 
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPES
+from ...network.requester import Requester
+from ...vars import JOB_TYPES
 
 
 class Job:
