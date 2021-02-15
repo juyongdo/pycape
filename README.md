@@ -2,59 +2,62 @@
 
 [![codecov](https://codecov.io/gh/capeprivacy/cape-ds/branch/main/graph/badge.svg?token=nimecXcQzo)](https://codecov.io/gh/capeprivacy/cape-ds)
 
-![](./img/logo.png)
+**cape-ds** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
 
-The Data Science Library for Cape
+- Create and query dataviews, or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
+- Submit and track jobs.
 
-### Developing
+Learn more: https://docs.capeprivacy.com/
 
-Initialize a virtual environment. Install dependecies by running:
+## Short Tutorial
+Access your Cape projects by creating a instance of the main `Cape` class:
+``` 
+    from cape import Cape
+
+    c = Cape()
+    c.login()
+
+    my_projects = c.list_projects()
+```
+
+Add dataviews to your project, review dataviews added by other organizations working in the project, and submit your job.
+```    
+    from cape import DataView, VerticalLinearRegressionJob
+
+    data_view = DataView(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
+    my_project = c.get_project("project_123")
+    my_project.add_dataview(data_view)
+
+    dvs = my_project.list_dataviews()
+
+    vlr_job = VerticalLinearRegressionJob(
+        train_dataview_x=dvs[0],
+        train_dataview_y=dvs[1]
+    )
+
+    my_project.submit_job(vlr_job)
+```
+
+## Installation
+
+### Prerequisites
+
+* Python 3.6 or above, and pip
+* [Make](https://www.gnu.org/software/make/) (if installing from source)
+
+
+### Download from source
+
+Install the library from and it's dependencies from git: 
 
 ```sh
-$ make bootstrap
+git clone https://github.com/capeprivacy/cape-ds.git
+cd cape-ds
+make bootstrap
 ```
 
-### Local Development
+## Licensing
 
-You'll need a user token to authenticate requests to the Coordinator API. Generate a new user token via the UI (demo.capeprivacy.com)
+TODO
 
-Set the Coordinator URL by exporting the `CAPE_COORDINATOR` environment variable, and your user token by exporting the `CAPE_TOKEN` environment variable:
-```sh
-$ export CAPE_COORDINATOR=https://demo.capeprivacy.com
-$ export CAPE_TOKEN=abc,123
-```
 
-### Quick Tutorial
-To access projects, create a `Cape` instance:
-```
-from cape import Cape
-
-c = Cape()
-c.login()
-
-c.list_projects()
-```
-
-Get an instance your created `Project` in order conduct project-level level actions such as  creating `DataViews` and submitting `Jobs`: 
-```
-from cape.api.dataview import DataView
-
-c.get_project(id="project_123")
-
-data_view = DataView(name="my-data", uri="s3://my-data.csv")
-my_project.add_dataview(data_view)
-```
-
-### Running Tests
-
-```sh
-$ make test
-$ make coverage # to see the code coverage report
-```
-
-### Build Documenation
-
-```sh
-$ pip install -U Sphinx
-$ sphinx-build -b html doc _build # to build documenation frontend in _build dir
-```
