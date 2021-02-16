@@ -1,3 +1,4 @@
+import io
 import sys
 from typing import Dict, List, Optional
 
@@ -13,7 +14,9 @@ from ...vars import JOB_TYPE_LR
 
 class Project:
     """
-    Projects are contexts in which we add DataViews and submit Jobs. Multiple organizations can collaborate on one Project.
+    Projects are business contexts in which we can add DataViews and submit Jobs. 
+    
+    Multiple organizations can collaborate on one Project.
     """
 
     def __init__(
@@ -27,17 +30,23 @@ class Project:
         organizations: List[Dict] = None,
         data_views: List[Dict] = None,
         requester: Requester = None,
-        out = sys.stdout,
+        out: io.StringIO = None,
     ):
         """
-        :param id: id
-        :param name: name
-        :param label: label
-        :param description: description
+        Initialize the object.
+
+        Arguments:
+            user_id: User ID of requester.
+            id: ID of `Project`.
+            name: name of `Project`.
+            label: label of `Project`.
+            description: description of `Project`.
         """
         self._requester: Requester = requester
         self._user_id: str = user_id
-        self._out = out
+        self._out: io.StringIO = out
+        if out is None:
+            self._out = sys.stdout
 
         if id is None:
             raise Exception("Projects cannot be initialized without an id")
@@ -81,11 +90,9 @@ class Project:
 
     def list_dataviews(self):
         """
-        :calls: `query project`
-        :param project_id: string
-        :param name: string
-        :param uri: string
-        :rtype: [:class:`cape.api.dataview.dataview`]
+        Calls GQL `query project() { dataviews }`
+        Returns:
+            A list of `DataView` instances.
         """
 
         data_views = self._requester.list_dataviews(project_id=self.id)
