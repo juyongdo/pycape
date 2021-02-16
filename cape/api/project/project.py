@@ -1,7 +1,7 @@
 import io
 import sys
 from typing import Dict, List, Optional
-
+from abc import ABC
 from tabulate import tabulate
 
 from ..dataview.dataview import DataView
@@ -12,7 +12,7 @@ from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 
 
-class Project:
+class Project(ABC):
     """
     Projects are business contexts in which we can add DataViews and submit Jobs.
 
@@ -90,7 +90,7 @@ class Project:
 
     def list_dataviews(self):
         """
-        Calls GQL `query project() { dataviews }`
+        Calls GQL `query project.dataviews`
         Returns:
             A list of `DataView` instances.
         """
@@ -109,13 +109,14 @@ class Project:
         }
         return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
 
-    def get_dataview(self, id: str = None, uri: str = None):
+    def get_dataview(self, id: Optional[str] = None, uri: Optional[str] = None):
         """
-        :calls: `query project`
-        :param project_id: string
-        :param id: string
-        :param uri: string
-        :rtype: :class:`cape.api.dataview.dataview`
+        Calls GQL `query project.dataview`
+        Arguments:
+            id: ID of `DataView`.
+            uri: Unique `DataView` URI.
+        Returns:
+            A `DataView` instance.
         """
         data_view = self._requester.get_dataview(
             project_id=self.id, dataview_id=id, uri=uri
@@ -125,13 +126,13 @@ class Project:
 
     def add_dataview(self, dataview: DataView):
         """
-        :calls: `mutation addDataView`
-        :param project_id: string
-        :param name: string
-        :param uri: string
-        :rtype: :class:`cape.api.dataview.dataview`
+        Calls GQL `mutation addDataView`
+        Arguments:
+            dataview: Instance of class `DataView`.
+        Returns:
+            A `DataView` instance.
         """
-        # TODO: make get_input compatible with DataViews that have been constructed with schemas
+        # TODO: validate get_input
         data_view_input = dataview.get_input()
         data_view = self._requester.add_dataview(
             project_id=self.id, data_view_input=data_view_input
@@ -140,9 +141,11 @@ class Project:
 
     def _create_job(self, job: Job) -> Job:
         """
-        :calls: `mutation createTask`
-        :param job: :class:`cape.api.job.job`
-        :rtype: :class:`cape.api.job.job`
+        Calls GQL `mutation createTask`
+        Arguments:
+            dataview: Instance of class `Job`.
+        Returns:
+            A `Job` instance.
         """
 
         job_instance = {k: v for k, v in job.__dict__.items()}
@@ -156,9 +159,11 @@ class Project:
 
     def submit_job(self, job: Job) -> Job:
         """
-        :calls: `query project.job`
-        :param id: string
-        :rtype: :class:`cape.api.job.Job`
+        Calls GQL `mutation createTask`
+        Arguments:
+            dataview: Instance of class `Job`.
+        Returns:
+            A `Job` instance.
         """
         created_job = self._create_job(job)
 
@@ -173,9 +178,11 @@ class Project:
 
     def get_job(self, id: str) -> Job:
         """
-        :calls: `query project.job`
-        :param id: string
-        :rtype: :class:`cape.api.job.Job`
+        Calls GQL `query project.job`
+        Arguments:
+            id: ID of `Job`.
+        Returns:
+            A `Job` instance.
         """
         job = self._requester.get_job(
             project_id=self.id, job_id=id, return_params="status { code } task { type }"
@@ -189,11 +196,13 @@ class Project:
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
 
-    def remove_dataview(self, id: str, out=sys.stdout) -> str:
+    def remove_dataview(self, id: str) -> str:
         """
-        :calls: `mutation removeDataView`
-        :param id: string
-        :rtype: string
+        Calls GQL `mutation removeDataView`
+        Arguments:
+            id: ID of `DataView`.
+        Returns:
+            A success messsage write out.
         """
         self._requester.remove_dataview(id=id)
-        return out.write(f"DataView ({id}) deleted" + "\n")
+        return self._out.write(f"DataView ({id}) deleted" + "\n")

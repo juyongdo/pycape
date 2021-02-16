@@ -282,15 +282,16 @@ class TestProject:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             r = Requester(endpoint=FAKE_HOST)
+            out = StringIO()
             my_project = Project(
                 requester=r,
+                out=out,
                 user_id=None,
                 id="123",
                 name="my project",
                 label="my-project",
             )
-            out = StringIO()
-            my_project.remove_dataview(id=id, out=out)
+            my_project.remove_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
