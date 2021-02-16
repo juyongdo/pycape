@@ -42,6 +42,7 @@ class Cape(ABC):
     def list_projects(self) -> List[Project]:
         """
         Calls GQL `query projects`
+
         Returns:
             A list of `Project` instances.
         """
@@ -59,6 +60,7 @@ class Cape(ABC):
     ) -> Project:
         """
         Calls GQL `query project`
+
         Arguments:
             id: ID of `Project`.
             label: Unique `Project` label.
@@ -73,6 +75,7 @@ class Cape(ABC):
     ) -> Project:
         """
         Calls GQL `mutation createProject`
+
         Arguments:
             name: name of project.
             owner: ID of `Organization` this project should belong to.
@@ -88,6 +91,7 @@ class Cape(ABC):
     def remove_project(self, id: str) -> str:
         """
         Calls GQL `mutation archiveProject`
+
         Arguments:
             id: ID of `Project`.
         Returns:

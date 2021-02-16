@@ -76,10 +76,12 @@ class Project(ABC):
 
     def add_org(self, org_id: str):
         """
-        :calls: `mutation addProjectOrganization`
-        :param project_id: string
-        :param org_id: string
-        :rtype: [:class:`cape.api.project.Project`]
+        Calls GQL `mutation addProjectOrganization`
+
+        Arguments:
+            org_id: ID of `Organization`.
+        Returns:
+            A list of `Project` instances.
         """
         project_org = self._requester.add_project_org(project_id=self.id, org_id=org_id)
         return Project(
@@ -88,9 +90,10 @@ class Project(ABC):
             **project_org.get("Project"),
         )
 
-    def list_dataviews(self):
+    def list_dataviews(self) -> List[DataView]:
         """
         Calls GQL `query project.dataviews`
+
         Returns:
             A list of `DataView` instances.
         """
@@ -109,9 +112,12 @@ class Project(ABC):
         }
         return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
 
-    def get_dataview(self, id: Optional[str] = None, uri: Optional[str] = None):
+    def get_dataview(
+        self, id: Optional[str] = None, uri: Optional[str] = None
+    ) -> DataView:
         """
         Calls GQL `query project.dataview`
+
         Arguments:
             id: ID of `DataView`.
             uri: Unique `DataView` URI.
@@ -124,16 +130,17 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def add_dataview(self, dataview: DataView):
+    def add_dataview(self, dataview: DataView) -> DataView:
         """
         Calls GQL `mutation addDataView`
+
         Arguments:
             dataview: Instance of class `DataView`.
         Returns:
             A `DataView` instance.
         """
         # TODO: validate get_input
-        data_view_input = dataview.get_input()
+        data_view_input = dataview._get_input()
         data_view = self._requester.add_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
@@ -142,6 +149,7 @@ class Project(ABC):
     def _create_job(self, job: Job) -> Job:
         """
         Calls GQL `mutation createTask`
+
         Arguments:
             dataview: Instance of class `Job`.
         Returns:
@@ -152,7 +160,7 @@ class Project(ABC):
 
         created_job = job.__class__(
             **job_instance, requester=self._requester,
-        ).create_job(project_id=self.id)
+        )._create_job(project_id=self.id)
         return job.__class__(
             job_type=job.job_type, **created_job, requester=self._requester,
         )
@@ -160,8 +168,9 @@ class Project(ABC):
     def submit_job(self, job: Job) -> Job:
         """
         Calls GQL `mutation createTask`
+
         Arguments:
-            dataview: Instance of class `Job`.
+            job: Instance of class `Job`.
         Returns:
             A `Job` instance.
         """
@@ -179,6 +188,7 @@ class Project(ABC):
     def get_job(self, id: str) -> Job:
         """
         Calls GQL `query project.job`
+
         Arguments:
             id: ID of `Job`.
         Returns:
@@ -199,6 +209,7 @@ class Project(ABC):
     def remove_dataview(self, id: str) -> str:
         """
         Calls GQL `mutation removeDataView`
+
         Arguments:
             id: ID of `DataView`.
         Returns:
