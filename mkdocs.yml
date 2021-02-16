@@ -1,0 +1,43 @@
+site_name: Cape DS
+dev_addr: '127.0.0.1:7334'
+copyright: Cape Privacy, Inc.
+theme:
+    features:
+        - tabs
+    font:
+        text: Inter
+    language: en
+    name: material
+    palette:
+        scheme: slate
+        primary: teal
+        accent: purple
+extra:
+    social:
+    - icon: fontawesome/brands/linkedin-in
+      link: https://www.linkedin.com/company/capeprivacy
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/capeprivacy
+    - icon: fontawesome/brands/github
+      link: https://github.com/capeprivacy
+nav:
+    - Home: index.md
+    - Usage:
+        - Login: usage/login.md
+        - Projects: usage/project.md
+        - DataViews: usage/dataview.md
+        - Jobs: usage/job.md
+    - Reference: reference.md
+plugins:
+    - search
+    - mkdocstrings
+markdown_extensions:
+    - admonition
+    - pymdownx.highlight:
+        use_pygments: true
+    - pymdownx.tabbed
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - toc:
+        permalink: "#"
+        

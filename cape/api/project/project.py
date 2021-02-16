@@ -1,7 +1,5 @@
 import sys
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 
 from tabulate import tabulate
 
@@ -15,7 +13,7 @@ from ...vars import JOB_TYPE_LR
 
 class Project:
     """
-    Projects are the higher order objects that we create DataViews and Jobs on
+    Projects are contexts in which we add DataViews and submit Jobs. Multiple organizations can collaborate on one Project.
     """
 
     def __init__(
