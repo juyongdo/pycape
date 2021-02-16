@@ -8,4 +8,7 @@ class TestOrganization:
         label = "fun-company-label"
 
         org = Organization(id=id, name=name, label=label)
-        assert repr(org) == f"{org.__class__.__name__}(id={id}, name={name}, label={label})"
+        assert (
+            repr(org)
+            == f"{org.__class__.__name__}(id={id}, name={name}, label={label})"
+        )

@@ -21,17 +21,16 @@ class Cape(ABC):
             out: The interpreter to be written to.
             endpoint: Coordinator endoint to point to.
         """
-        self.__requester = Requester(endpoint=endpoint)
-        self.__user_id = None
-        self._out = out
+        self.__requester: Requester = Requester(endpoint=endpoint)
+        self.__user_id: str = None
+        self._out: io.StringIO = out
         if out is None:
             self._out = sys.stdout
-        
 
     def login(self, token: Optional[str] = None) -> str:
         """
         Calls `POST /v1/login`
-        
+
         Arguments:
             token:  User authentication token.
         Returns:
@@ -55,7 +54,9 @@ class Cape(ABC):
         }
         return self._out.write(tabulate(format_projects, headers="keys") + "\n")
 
-    def get_project(self, id: Optional[str] = None, label: Optional[str] = None) -> Project:
+    def get_project(
+        self, id: Optional[str] = None, label: Optional[str] = None
+    ) -> Project:
         """
         Calls GQL `query project`
         Arguments:
@@ -67,7 +68,9 @@ class Cape(ABC):
         project = self.__requester.get_project(id=id, label=label)
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
 
-    def create_project(self, name: str, owner: str, description: Optional[str] = None) -> Project:
+    def create_project(
+        self, name: str, owner: str, description: Optional[str] = None
+    ) -> Project:
         """
         Calls GQL `mutation createProject`
         Arguments:

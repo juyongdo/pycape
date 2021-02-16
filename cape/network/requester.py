@@ -4,7 +4,7 @@ from typing import Optional
 import requests
 
 from ..exceptions import GQLException
-from .base64 import Base64, from_string
+from .base64 import from_string
 from .api_token import APIToken
 
 

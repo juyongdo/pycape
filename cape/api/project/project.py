@@ -14,8 +14,8 @@ from ...vars import JOB_TYPE_LR
 
 class Project:
     """
-    Projects are business contexts in which we can add DataViews and submit Jobs. 
-    
+    Projects are business contexts in which we can add DataViews and submit Jobs.
+
     Multiple organizations can collaborate on one Project.
     """
 
