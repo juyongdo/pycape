@@ -22,6 +22,8 @@ class VerticalLinearRegressionJob(Job):
     def _create_job(self, project_id: str):
         def validate_params(dataview_x, dataview_y):
             missing_params = []
+            x_cols = dataview_x._cols
+            y_cols = dataview_y._cols
 
             if not dataview_x.id:
                 missing_params.append("X DataView ID")
@@ -29,18 +31,22 @@ class VerticalLinearRegressionJob(Job):
             if not dataview_y.id:
                 missing_params.append("Y DataView ID")
 
-            if not dataview_x._cols:
+            if not x_cols and dataview_x.schema:
+                x_cols = list(dataview_x.schema.keys())
+            elif not x_cols and not dataview_x.schema:
                 missing_params.append("X DataView columns")
 
-            if not dataview_y._cols:
+            if not y_cols and dataview_y.schema:
+                y_cols = list(dataview_y.schema.keys())
+            elif not y_cols and not dataview_y.schema:
                 missing_params.append("Y DataView columns")
 
             return (
                 {
                     "x_id": dataview_x.id,
                     "y_id": dataview_y.id,
-                    "x_cols": dataview_x._cols,
-                    "y_cols": dataview_y._cols,
+                    "x_cols": x_cols,
+                    "y_cols": y_cols,
                 },
                 missing_params,
             )

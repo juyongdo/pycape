@@ -7,7 +7,7 @@
 - Create and query dataviews, or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
 - Submit and track jobs.
 
-Learn more: https://docs.capeprivacy.com/
+Learn more: https://docs.capeprivacy.com/libraries/cape-ds
 
 ## Short Tutorial
 Access your Cape projects by creating a instance of the main `Cape` class:
@@ -45,16 +45,25 @@ Add dataviews to your project, review dataviews added by other organizations wor
 * Python 3.6 or above, and pip
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
 
-
 ### Download from source
 
 Install the library from and it's dependencies from git: 
 
 ```sh
-git clone https://github.com/capeprivacy/cape-ds.git
-cd cape-ds
-make bootstrap
+$ git clone https://github.com/capeprivacy/cape-ds.git
+$ cd cape-ds
+$ make bootstrap
 ```
+
+## Running Tests
+```sh
+$ make test
+$ make coverage # to see the code coverage report
+```
+
+## Linear Regression Tutorial
+
+See [this tutorial](./examples/linear_regression/README.md) for a better tutorial.
 
 ## Licensing
 

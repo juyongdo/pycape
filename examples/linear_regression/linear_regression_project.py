@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 import pandas as pd
 
@@ -23,8 +24,7 @@ def list_projects():
     c = Cape(endpoint=coordinator_url)
     c.login(token=token)
     print('projects')
-    for p in c.list_projects():
-        print(f'\t{p}')
+    c.list_projects()
 
 
 def get_project():
@@ -51,8 +51,8 @@ def setup_project():
     print('orgs', project.organizations)
 
     org_dv = {
-        project.organizations[0].name: 'x_data',
-        project.organizations[1].name: 'y_data',
+        project.organizations[0].name: 's3://cape-worker/x_data_120000_instances_10_features.csv',
+        project.organizations[1].name: 's3://cape-worker/y_data_120000_instances.csv',
     }
 
     df = pd.DataFrame({"x": [1.0, 2.0], "y": [1.0, 2.0]})
@@ -83,7 +83,10 @@ def make_job():
         y_train_dataview=project.dataviews[1]['col1'],
     )
 
-    print(f'\nSubmitted job {project.submit_job(job)} to run')
+    job = project.submit_job(job)
+    print(f'\nSubmitted job {job} to run')
+
+    return job
 
 
 if __name__ == '__main__':
@@ -94,4 +97,14 @@ if __name__ == '__main__':
     if not args.skip_setup:
         setup_project()
 
-    make_job()
+    job = make_job()
+    status = job.get_status()
+    print("Waiting for job completion...")
+    while status != "Completed" and status != "Error":
+        status = job.get_status()
+
+    print(f"Received status {status}. Exitting...")
+    if status == "Completed":
+        sys.exit()
+    else:
+        sys.exit(-1)

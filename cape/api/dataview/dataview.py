@@ -21,7 +21,8 @@ class DataView(ABC):
         name: str = None,
         uri: str = None,
         owner_id: str = None,
-        schema: Union[pd.Series, List] = None,
+        owner_label: str = None,
+        schema: Union[pd.Series, List, None] = None,
         id: str = None,
         location: str = None,
         owner: dict = None,
@@ -33,6 +34,7 @@ class DataView(ABC):
         Arguments:
             name: name of `DataView`.
             uri: URI of `DataView`.
+            owner_label: Label of `Organization` that owns this `DataView`
             owner_id: ID of `Organization` that owns this `DataView`
             schema: schema (description of each column's datatype) of the data that `DataView` points to.
             id: Returned ID of `DataView`.
@@ -45,8 +47,11 @@ class DataView(ABC):
         self.uri: str = uri
         self._location: str = location
         self._owner_id: str = owner.get("id") if owner else owner_id
+        self._owner_label: str = owner.get("label") if (
+            owner and owner.get("label")
+        ) else owner_label
         self._user_id: str = user_id
-        self.schema: Union[pd.Series, List] = schema
+        self.schema: Union[pd.Series, List, None] = schema
         self._cols = None
 
     def __repr__(self):
@@ -127,6 +132,7 @@ class DataView(ABC):
                 "name": self.name,
                 "uri": self.uri,
                 "owner_id": self._owner_id,
+                "owner_label": self._owner_label,
                 "schema": self._schema,
             }.items()
             if v

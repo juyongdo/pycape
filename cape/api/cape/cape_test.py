@@ -8,6 +8,7 @@ import responses
 from .cape import Cape
 from ..project.project import Project
 from ...exceptions import GQLException
+from ...network import NotAUserException
 from tests.fake import FAKE_HOST, FAKE_TOKEN
 
 
@@ -19,13 +20,33 @@ def notraising():
 class TestCape:
     @responses.activate
     @pytest.mark.parametrize(
-        "token,json,status,exception",
+        "token,json,query_json,status,exception",
         [
-            (FAKE_TOKEN, {"token": "cookie", "user_id": "user_1"}, 200, notraising()),
-            (None, {}, 200, pytest.raises(Exception, match="No token provided")),
-            ("abc123", {}, 200, pytest.raises(Exception, match="Bad token provided")),
             (
                 FAKE_TOKEN,
+                {"token": "cookie", "user_id": "user_1"},
+                {"data": {"me": {"__typename": "MeResponse"}}},
+                200,
+                notraising(),
+            ),
+            (
+                FAKE_TOKEN,
+                {"token": "cookie", "user_id": "user_1"},
+                {"data": {"me": {"__typename": "UnverifiedError"}}},
+                200,
+                pytest.raises(NotAUserException),
+            ),
+            (None, {}, {}, 200, pytest.raises(Exception, match="No token provided")),
+            (
+                "abc123",
+                {},
+                {},
+                200,
+                pytest.raises(Exception, match="Bad token provided"),
+            ),
+            (
+                FAKE_TOKEN,
+                {},
                 {},
                 400,
                 pytest.raises(
@@ -34,11 +55,15 @@ class TestCape:
             ),
         ],
     )
-    def test_login(self, token, json, status, exception):
+    def test_login(self, token, json, query_json, status, exception):
         os.environ["CAPE_TOKEN"] = ""
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/login", json=json, status=status
+            )
+
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=query_json, status=status
             )
             out = StringIO()
             c = Cape(endpoint=FAKE_HOST, out=out)
