@@ -51,8 +51,8 @@ def setup_project():
     print('orgs', project.organizations)
 
     org_dv = {
-        project.organizations[0].name: 's3://cape-worker/x_data',
-        project.organizations[1].name: 's3://cape-worker/y_data',
+        project.organizations[0].name: 's3://cape-worker/x_data_120000_instances_10_features.csv',
+        project.organizations[1].name: 's3://cape-worker/y_data_120000_instances.csv',
     }
 
     df = pd.DataFrame({"x": [1.0, 2.0], "y": [1.0, 2.0]})
