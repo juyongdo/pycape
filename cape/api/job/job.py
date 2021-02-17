@@ -1,21 +1,21 @@
 import json
 import tempfile
-from typing import Optional
-from urllib.parse import urlparse
-
 import boto3
 import numpy as np
+from typing import Optional, Tuple
+from urllib.parse import urlparse
+from abc import ABC
 
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPES
+from ...network.requester import Requester
+from ...vars import JOB_TYPES
 
 
-class Job:
+class Job(ABC):
     """
-    Job objects keep track of tasks/jobs that will be/have been submitted to cape workers
+    Job objects keep track of jobs that will be/have been submitted to cape workers.
     """
 
-    job_type: Optional[str]
+    job_type: str
     id: Optional[str]
 
     def __init__(self, requester: Requester = None, **kwargs):
@@ -33,7 +33,7 @@ class Job:
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status.get('code')})"
 
-    def create_job(
+    def _create_job(
         self, project_id: str, timeout: float = 600, task_config: dict = None
     ) -> dict:
         task_config["timeout"] = timeout
@@ -48,12 +48,25 @@ class Job:
         return self._requester.submit_job(job_id=self.id)
 
     def get_status(self) -> str:
+        """
+        Calls GQL `query project.job`.
+
+        Returns:
+            A `Job` status string.
+        """
         job = self._requester.get_job(
             project_id=self.project_id, job_id=self.id, return_params="status { code }"
         )
         return job.get("status", {}).get("code")
 
-    def get_results(self):
+    def get_results(self) -> Tuple[np.ndarray, dict]:
+        """
+        Given the requester's project role and authorization level, returns the trained model's weights and metrics.
+
+        Returns:
+            weights: A numpy array.
+            metrics: A dictionary of different metric values.
+        """
         job_results = self._requester.get_job(
             project_id=self.project_id,
             job_id=self.id,

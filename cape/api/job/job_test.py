@@ -3,13 +3,12 @@ import contextlib
 import pytest
 import responses
 
-from cape.api.dataview.dataview import DataView
-from cape.api.job import VerticalLinearRegressionJob
-from cape.api.job.job import Job
-from cape.api.project.project import Project
-from cape.network.requester import Requester
-from cape.vars import JOB_STATUS_CREATED
-from cape.vars import JOB_TYPE_LR
+from .vertical_linear_regression_job import VerticalLinearRegressionJob
+from .job import Job
+from ..dataview.dataview import DataView
+from ..project.project import Project
+from ...network.requester import Requester
+from ...vars import JOB_STATUS_CREATED, JOB_TYPE_LR
 from tests.fake import FAKE_HOST
 
 

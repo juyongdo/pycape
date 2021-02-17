@@ -4,14 +4,13 @@ from io import StringIO
 import pytest
 import responses
 
-from cape.api.dataview.dataview import DataView
-from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from cape.api.project.project import Project
-from cape.exceptions import GQLException
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPE_LR
-from tests.fake import FAKE_HOST
-from tests.fake import fake_dataframe
+from ..dataview.dataview import DataView
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..project.project import Project
+from ...exceptions import GQLException
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
+from tests.fake import FAKE_HOST, fake_dataframe
 
 
 @contextlib.contextmanager
@@ -283,15 +282,16 @@ class TestProject:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             r = Requester(endpoint=FAKE_HOST)
+            out = StringIO()
             my_project = Project(
                 requester=r,
+                out=out,
                 user_id=None,
                 id="123",
                 name="my project",
                 label="my-project",
             )
-            out = StringIO()
-            my_project.remove_dataview(id=id, out=out)
+            my_project.remove_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()

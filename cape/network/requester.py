@@ -3,9 +3,9 @@ from typing import Optional
 
 import requests
 
-from cape.exceptions import GQLException
-from cape.network import base64
-from cape.network.api_token import APIToken
+from ..exceptions import GQLException
+from .base64 import from_string
+from .api_token import APIToken
 
 
 class NotAUserException(Exception):
@@ -36,7 +36,7 @@ class Requester:
         resp.raise_for_status()
         json = resp.json()
 
-        self.token = base64.from_string(json["token"])
+        self.token = from_string(json["token"])
 
         self._check_user(token)
 
