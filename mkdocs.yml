@@ -27,6 +27,8 @@ nav:
         - Projects: usage/project.md
         - DataViews: usage/dataview.md
         - Jobs: usage/job.md
+    - Tutorials:
+        - Train Linear Regression Model: tutorials/submit_linear_regression_job.md
     - Reference: reference.md
 plugins:
     - search
