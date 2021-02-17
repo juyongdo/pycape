@@ -4,7 +4,7 @@ from abc import ABC
 from typing import Union, List
 import pandas as pd
 from marshmallow import Schema, fields
-
+from urllib.parse import urlparse
 from ...utils import filter_date
 from ...vars import PANDAS_TO_JSON_DATATYPES
 
@@ -122,9 +122,15 @@ class DataView(ABC):
         """
         Format dict for gql type DataViewInput
         """
-        if not hasattr(self, "_schema"):
+
+        if not hasattr(self, "_schema") and urlparse(self.uri).scheme in [
+            "http",
+            "https",
+        ]:
             schema = self._get_schema_from_uri()
             self._schema = schema
+        elif not hasattr(self, "_schema"):
+            raise Exception("DataView schema must be specified.")
 
         return {
             k: v
