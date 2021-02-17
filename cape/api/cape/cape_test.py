@@ -7,8 +7,7 @@ import responses
 
 from .cape import Cape
 from ..project.project import Project
-from ...exceptions import GQLException
-from ...network import NotAUserException
+from ...exceptions import GQLException, NotAUserException
 from tests.fake import FAKE_HOST, FAKE_TOKEN
 
 

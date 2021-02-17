@@ -3,13 +3,9 @@ from typing import Optional
 
 import requests
 
-from ..exceptions import GQLException
+from ..exceptions import GQLException, NotAUserException
 from .base64 import from_string
 from .api_token import APIToken
-
-
-class NotAUserException(Exception):
-    pass
 
 
 class Requester:
