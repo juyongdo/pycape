@@ -64,4 +64,6 @@ class VerticalLinearRegressionJob(Job):
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
         }
-        return super()._create_job(project_id=project_id, timeout=timeout, task_config=task_config)
+        return super()._create_job(
+            project_id=project_id, timeout=timeout, task_config=task_config
+        )
