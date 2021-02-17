@@ -83,7 +83,7 @@ def make_job():
         y_train_dataview=project.dataviews[1]['col1'],
     )
 
-    job = project.submit_job(job)
+    job = project.submit_job(job, timeout=60)
     print(f'\nSubmitted job {job} to run')
 
     return job
