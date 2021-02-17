@@ -29,8 +29,36 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "json,uri_type,schema,exception",
         [
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "http://my-data.csv",
+                        }
+                    }
+                },
+                "http",
+                None,
+                notraising(),
+            ),
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "https://my-data.csv",
+                        }
+                    }
+                },
+                "https",
+                None,
+                notraising(),
+            ),
             (
                 {
                     "data": {
@@ -41,15 +69,33 @@ class TestProject:
                         }
                     }
                 },
+                "s3",
+                [{"name": "col_1", "schema_type": "integer"}],
                 notraising(),
             ),
             (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "s3://my-data.csv",
+                        }
+                    }
+                },
+                "s3",
+                None,
+                pytest.raises(Exception, match="DataView schema must be specified."),
+            ),
+            (
                 {"errors": [{"message": "something went wrong"}]},
+                "http",
+                None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_add_dataview(self, json, exception, mocker):
+    def test_add_dataview(self, json, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -65,7 +111,9 @@ class TestProject:
                 name="my project",
                 label="my project",
             )
-            my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
+            my_data_view = DataView(
+                name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
+            )
             dataview = my_project.add_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
