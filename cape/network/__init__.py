@@ -1,4 +1,4 @@
-from cape.network.requester import NotAUserException
+from .requester import NotAUserException
 
 __all__ = [
     "NotAUserException",
