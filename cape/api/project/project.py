@@ -151,7 +151,7 @@ class Project(ABC):
         )
         return DataView(user_id=self._user_id, **data_view)
 
-    def _create_job(self, job: Job) -> Job:
+    def _create_job(self, job: Job, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -165,12 +165,12 @@ class Project(ABC):
 
         created_job = job.__class__(
             **job_instance, requester=self._requester,
-        )._create_job(project_id=self.id)
+        )._create_job(project_id=self.id, timeout=timeout)
         return job.__class__(
             job_type=job.job_type, **created_job, requester=self._requester,
         )
 
-    def submit_job(self, job: Job) -> Job:
+    def submit_job(self, job: Job, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -179,7 +179,7 @@ class Project(ABC):
         Returns:
             A `Job` instance.
         """
-        created_job = self._create_job(job)
+        created_job = self._create_job(job, timeout=timeout)
 
         submitted_job = created_job._submit_job()
 

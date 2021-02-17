@@ -19,7 +19,7 @@ class VerticalLinearRegressionJob(Job):
     status: dict = {"code": JOB_STATUS_CREATED}
     id: Optional[str] = None
 
-    def _create_job(self, project_id: str):
+    def _create_job(self, project_id: str, timeout: float = 600):
         def validate_params(dataview_x, dataview_y):
             missing_params = []
             x_cols = dataview_x._cols
@@ -64,4 +64,4 @@ class VerticalLinearRegressionJob(Job):
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
         }
-        return super()._create_job(project_id=project_id, task_config=task_config)
+        return super()._create_job(project_id=project_id, timeout=timeout, task_config=task_config)

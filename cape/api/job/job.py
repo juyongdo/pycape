@@ -33,7 +33,11 @@ class Job(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status.get('code')})"
 
-    def _create_job(self, project_id: str, task_config: dict = None) -> dict:
+    def create_job(
+        self, project_id: str, timeout: float = 600, task_config: dict = None
+    ) -> dict:
+        task_config["timeout"] = timeout
+
         return self._requester.create_job(
             project_id=project_id,
             job_type=self.job_type,
