@@ -22,7 +22,7 @@ We'll also use the [`cape-ds`](https://github.com/capeprivacy/cape-ds) Python li
 
 First you'll need to create an organization at demo.capeprivacy.com.
 
-![](../img/create_org.gif)
+![](../../img/create_org.gif)
 
 Once you've created your organization, you can navigate to _Organization Settings_ and generate a token for your organization. You'll need this token to configure your worker.
 
@@ -34,18 +34,18 @@ Next, create a Project within one of the organizations you just created.
 
 Projects serve as the context in which you can define and review `Jobs` with other organizations.
 
-![](../img/create_project.gif)
+![](../../img/create_project.gif)
 
 Add organizations to your project in order to begin collaborating with them on training a model.
 
-![](../img/add_org.gif)
+![](../../img/add_org.gif)
 
 ### Get a User Token
 
 Finally, we will need a user token to authenticate against `cape-ds`. Ensure you are
 working within your user context and navigate to _Account Settings_ to create a token.
 
-![](../img/create_user_token.gif)
+![](../../img/create_user_token.gif)
 
 Take note of this value as, like the user token, you cannot recover it after you reload the page.
 

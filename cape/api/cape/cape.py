@@ -2,7 +2,7 @@ import io
 import sys
 from abc import ABC
 from tabulate import tabulate
-from typing import List, Optional
+from typing import Optional
 
 from ..project.project import Project
 from ...network.requester import Requester
