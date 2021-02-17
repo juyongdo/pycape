@@ -8,15 +8,19 @@ from cape.network import base64
 from cape.network.api_token import APIToken
 
 
+class NotAUserException(Exception):
+    pass
+
+
 class Requester:
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
-            "CAPE_COORDINATOR", "http://localhost:8080"
+            "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
         )
-        self.gql_endpoint = self.endpoint + "/v1/query"
+        self.gql_endpoint = self.endpoint.rstrip("/") + "/v1/query"
         self.session = requests.Session()
 
-    def login(self, token: str = None) -> str:
+    def login(self, token: Optional[str] = None) -> str:
         token = token or os.environ.get("CAPE_TOKEN")
 
         if not token:
@@ -33,7 +37,20 @@ class Requester:
         json = resp.json()
 
         self.token = base64.from_string(json["token"])
+
+        self._check_user(token)
+
         return json["user_id"]
+
+    def _check_user(self, token):
+        me = self.me()
+
+        if me["__typename"] == "MeResponse":
+            return True
+        else:
+            raise NotAUserException(
+                f"Token {token} is not a user token. Please navigate to User Settings on Cape to retrieve a user token"
+            )
 
     def _gql_req(self, query: str, variables: Optional[dict]) -> dict:
         input_json = {"query": query, "variables": {}}
@@ -42,6 +59,7 @@ class Requester:
 
         r = self.session.post(self.gql_endpoint, json=input_json)
 
+        j = {}
         try:
             j = r.json()
         except ValueError:
@@ -51,7 +69,7 @@ class Requester:
             raise GQLException(f"An error occurred: {j['errors']}")
         return j["data"]
 
-    def list_projects(self) -> list:
+    def list_projects(self) -> Optional[list]:
         return self._gql_req(
             query="""
             query ListProjects {
@@ -66,7 +84,7 @@ class Requester:
             variables=None,
         ).get("projects")
 
-    def get_project(self, id: str = None, label: str = None) -> dict:
+    def get_project(self, id: str = None, label: str = None) -> Optional[dict]:
         return self._gql_req(
             query="""
             query GetProject($id: String, $label: Label) {
@@ -90,7 +108,7 @@ class Requester:
             variables={"id": id, "label": label},
         ).get("project")
 
-    def create_project(self, name: str, owner: str, description: str) -> dict:
+    def create_project(self, name: str, owner: str, description: str) -> Optional[dict]:
         return self._gql_req(
             query="""
             mutation CreateProject (
@@ -118,7 +136,7 @@ class Requester:
             variables={"name": name, "owner": owner, "description": description},
         ).get("createProject")
 
-    def archive_project(self, id: str) -> dict:
+    def archive_project(self, id: str) -> Optional[dict]:
         return self._gql_req(
             query="""
             mutation ArchiveProject (
@@ -134,7 +152,7 @@ class Requester:
             variables={"id": id},
         ).get("archiveProject")
 
-    def add_project_org(self, project_id: str, org_id: str) -> dict:
+    def add_project_org(self, project_id: str, org_id: str) -> Optional[dict]:
         return self._gql_req(
             query="""
             mutation AddProjectOrganization (
@@ -149,7 +167,7 @@ class Requester:
             variables={"project_id": project_id, "organization_id": org_id},
         ).get("addProjectOrganization")
 
-    def add_dataview(self, project_id: str, data_view_input: dict) -> dict:
+    def add_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
         return self._gql_req(
             query="""
             mutation AddDataView (
@@ -175,7 +193,7 @@ class Requester:
             variables={"project_id": project_id, "data_view_input": data_view_input},
         ).get("addDataView")
 
-    def list_dataviews(self, project_id: str) -> list:
+    def list_dataviews(self, project_id: str) -> Optional[list]:
         return (
             self._gql_req(
                 query="""
@@ -206,7 +224,7 @@ class Requester:
 
     def get_dataview(
         self, project_id: str, dataview_id: str = None, uri: str = None
-    ) -> dict:
+    ) -> Optional[dict]:
         if not dataview_id and not uri:
             raise Exception("Required identifier id or uri not specified.")
         return (
@@ -224,6 +242,7 @@ class Requester:
                         }
                         ... on Organization {
                           id
+                          label
                         }
                       },
                       schema { name, schema_type }
@@ -291,7 +310,9 @@ class Requester:
             variables={"task_id": job_id},
         ).get("initializeSession", {})
 
-    def get_job(self, project_id: str, job_id: str, return_params: str) -> dict:
+    def get_job(
+        self, project_id: str, job_id: str, return_params: str
+    ) -> Optional[dict]:
         return (
             self._gql_req(
                 query=f"""
@@ -309,3 +330,26 @@ class Requester:
             .get("project", {})
             .get("job")
         )
+
+    def me(self):
+        return self._gql_req(
+            query="""
+        query Me {
+            me {
+                __typename
+                ... on MeResponse {
+                    user {
+                        id
+                        email
+                        name
+                    }
+                }
+
+                ... on UnverifiedError {
+                    message
+                }
+            }
+        }
+            """,
+            variables=None,
+        ).get("me", {})
