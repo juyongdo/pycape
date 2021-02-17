@@ -22,15 +22,15 @@ class Project(ABC):
     def __init__(
         self,
         user_id: str,
-        id: str = None,
-        name: str = None,
-        label: str = None,
-        description: str = None,
-        owner: str = None,
-        organizations: List[Dict] = None,
-        data_views: List[Dict] = None,
-        requester: Requester = None,
-        out: io.StringIO = None,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        label: Optional[str] = None,
+        description: Optional[str] = None,
+        owner: Optional[dict] = None,
+        organizations: Optional[List[Dict]] = None,
+        data_views: Optional[List[Dict]] = None,
+        requester: Optional[Requester] = None,
+        out: Optional[io.StringIO] = None,
     ):
         """
         Initialize the object.
@@ -41,6 +41,11 @@ class Project(ABC):
             name: name of `Project`.
             label: label of `Project`.
             description: description of `Project`.
+            owner: Returned dictionary of fields related to the `Project` owner.
+            organizations: Returned list of fields related to the organizations associated with the `Project`.
+            data_views: Returned list of `DataViews` added to the `Project`.
+            requester: Instance of `Requester` class so that we can chain methods on `Project` class instantiations.
+            out: Function to use to write to the interpreter.
         """
         self._requester: Requester = requester
         self._user_id: str = user_id
