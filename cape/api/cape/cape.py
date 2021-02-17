@@ -39,7 +39,7 @@ class Cape(ABC):
         self.__user_id = self.__requester.login(token=token)
         return self._out.write("Login successful\n")
 
-    def list_projects(self) -> List[Project]:
+    def list_projects(self) -> str:
         """
         Calls GQL `query projects`
 
