@@ -129,12 +129,69 @@ You can also inspect the schema of each dataview in your project in order to see
         'total_estimated_sales': 'integer'
     }
 ```
+### Submitting a Linear Regression Job
 
+Now that we've added our own `DataView` to the project, and vetted the `DataView` of our collaborator, we are ready to submit our Cape linear regression job.
 
+Pass the `DataView` that contains training data to `x_train_dataview`, and the `DataView` that contains the target values to `y_train_dataview`.
+
+```python
+    >>> dataview_1 = my_project.get_dataview(id="01EY48")
+    >>> dataview_2 = my_project.get_dataview(id="01EY49")
+
+    >>> lr_job = VerticalLinearRegressionJob(
+    >>>     x_train_dataview=dataview_1,
+    >>>     y_train_dataview=dataview_2,
+    >>> )
+    >>> my_project.submit_job(job=lr_job)
 ```
-**TODO:** 
-- Creating job
-- Submitting job
-- Approving job
-- Getting job results
+
+You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the `VerticalLinearRegressionJob` class like so:
+```python
+    >>> lr_job = VerticalLinearRegressionJob(
+    >>>     x_train_dataview=dataview_1["x_total_estimated_sales"],
+    >>>     y_train_dataview=dataview_2["y_total_estimated_sales"],
+    >>> )
+```
+
+### Tracking Job Status
+
+After submitting your job, you should be able to see the status and details of your `Job` in the UI.
+
+**TODO:** Add GIF of Job/Job Details UI here.
+
+To check the status of your submitted linear regression job, use the [`get_status`](/reference/#cape.api.job.job.Job.get_status) method:
+```python
+    >>> lr_job = my_project.get_job(id="abc_123")
+
+    >>> lr_job.get_status()
+    Success
+```
+
+**TODO:** Add note about what to do if Job errors, note retry feature.
+
+### Approving Jobs
+
+**TODO:** Need to understand if this is going to implemented in Phase 0, what the workflow is, etc.
+
+### Getting Weights and Metrics from Trained Model
+
+Once your job has successfully completed, you can view the results of the trained model. 
+
+Whether you can view the weights or metrics of the trained model (or both!) depends on the role you and your organization play in the project.
+
+**TODO:** Need to elaborate on project/task roles, link to seperate documentation about this.
+
+To view the weights and metrics of a job, use the [`get_results`](/reference/#cape.api.job.job.Job.get_results) method:
+
+```python
+    >>> lr_job = my_project.get_job(id="abc_123")
+
+    >>> weights, metrics = lr_job.get_results()
+
+    >>> weights
+    array([12.14955139,  1.96560669])
+
+    >>> metrics
+    {'r_squared_result': [0.8804865768463074], 'mse_result': [37.94773864746094]}
 ```
