@@ -11,8 +11,10 @@ class VerticalLinearRegressionJob(Job):
     VerticalLinearRegressionJob is a child Class of `Job`
 
     Arguments:
-        x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points to a dataset that contains training set values.
-        y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points to a dataset that contains target values.
+        x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
+        to a dataset that contains training set values.
+        y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
+        to a dataset that contains target values.
     """
 
     x_train_dataview: DataView = None
