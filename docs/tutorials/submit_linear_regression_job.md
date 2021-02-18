@@ -173,7 +173,7 @@ To check the status of your submitted linear regression job, use the [`get_statu
 
 ### Approving Jobs
 
-**TODO:** Need to understand if this is going to implemented in Phase 0, what the workflow is, etc.
+**TODO:** Need to what the workflow is here.
 
 ### Getting Weights and Metrics from Trained Model
 
