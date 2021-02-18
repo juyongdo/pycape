@@ -166,8 +166,8 @@ class Project:
             requester=self._requester,
         )
 
-    def approve_job(self, job: Job) -> Job:
-        approved_job = job._approve_job()
+    def approve_job(self, job: Job, org: Organization) -> Job:
+        approved_job = job._approve_job(org.id)
 
         return job.__class__(
             job_type=job.job_type,

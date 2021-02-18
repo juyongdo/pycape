@@ -84,7 +84,10 @@ def make_job():
     )
 
     job = project.submit_job(job)
-    project.approve_job(job)
+
+    # for o in project.organizations:
+    #     project.approve_job(job, o)
+
     print(f'\nSubmitted job {job} to run')
 
     return job

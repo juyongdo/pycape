@@ -5,7 +5,9 @@ import pytest
 import responses
 
 from cape.api.dataview.dataview import DataView
+from cape.api.job.job import Job
 from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from cape.api.organization.organization import Organization
 from cape.api.project.project import Project
 from cape.exceptions import GQLException
 from cape.network.requester import Requester
@@ -297,3 +299,26 @@ class TestProject:
             output = out.getvalue().strip()
             assert isinstance(output, str)
             assert output == "DataView (job_123) deleted"
+
+    @responses.activate
+    def test_approve_job(self):
+        responses.add(
+            responses.POST,
+            f"{FAKE_HOST}/v1/query",
+            json={
+                "data": {
+                    "approveJob": {
+                        "id": "abc123",
+                        "status": {"code": "Initialized"},
+                        "task": {"type": JOB_TYPE_LR},
+                    }
+                }
+            },
+        )
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, user_id=None, id="123", name="my project", label="my-project",
+        )
+        org = Organization(id="org123")
+        j = Job(id="abc123", job_type=JOB_TYPE_LR, requester=r)
+        my_project.approve_job(j, org)

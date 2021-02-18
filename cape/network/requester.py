@@ -284,20 +284,20 @@ class Requester:
             },
         ).get("createTask", {})
 
-    def submit_job(self, job_id: str) -> dict:
+    def approve_job(self, job_id: str, org_id: str) -> dict:
         return self._gql_req(
             query="""
-            mutation ApproveJob($job_id: String!) {
-                approveJob(job_id: $job_id) {
+            mutation ApproveJob($job_id: String!, $organization_id: String!) {
+                approveJob(job_id: $job_id, organization_id: $organization_id) {
                   id
                   status { code }
                 }
             }
             """,
-            variables={"job_id": job_id},
+            variables={"job_id": job_id, "organization_id": org_id},
         ).get("approveJob", {})
 
-    def approve_job(self, job_id: str) -> dict:
+    def submit_job(self, job_id: str) -> dict:
         return self._gql_req(
             query="""
                     mutation InitializeSession($task_id: String!) {

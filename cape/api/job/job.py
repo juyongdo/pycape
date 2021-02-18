@@ -43,8 +43,8 @@ class Job:
     def _submit_job(self) -> dict:
         return self._requester.submit_job(job_id=self.id)
 
-    def _approve_job(self) -> dict:
-        return self._requester.approve_job(job_id=self.id)
+    def _approve_job(self, org_id: str) -> dict:
+        return self._requester.approve_job(job_id=self.id, org_id=org_id)
 
     def get_status(self) -> str:
         job = self._requester.get_job(
