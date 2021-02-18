@@ -203,7 +203,7 @@ class TestCape:
         [
             (
                 "project_123",
-                {"data": {"archiveProject": {"archivedProjectId": "project_123"}}},
+                {"data": {"archiveProject": {"ArchivedProjectID": "project_123"}}},
                 notraising(),
             ),
             (

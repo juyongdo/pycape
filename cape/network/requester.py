@@ -169,7 +169,7 @@ class Requester:
               archiveProject(
                 id: $id
             ) {
-                archivedProjectId
+                ArchivedProjectID
               }
             }
             """,
