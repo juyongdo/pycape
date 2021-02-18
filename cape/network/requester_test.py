@@ -3,9 +3,10 @@ from contextlib import contextmanager
 import pytest
 import responses
 
-from cape.exceptions import GQLException
-from cape.network.requester import Requester
 from tests.fake import FAKE_HOST
+
+from ..exceptions import GQLException
+from .requester import Requester
 
 
 @contextmanager

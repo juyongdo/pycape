@@ -1,5 +1,5 @@
-from . import base64
 from .base64 import Base64
+from .base64 import from_string
 
 SECRET_BYTES = 16
 VERSION = b"\x01"
@@ -29,7 +29,7 @@ class APIToken:
         if len(splits) > 1:
             self.token_id = splits[0]
 
-            token_bytes = bytes(base64.from_string(splits[1]))
+            token_bytes = bytes(from_string(splits[1]))
             self.version = token_bytes[0]
             self.secret = str(Base64(token_bytes[1:]))
         else:
@@ -45,7 +45,7 @@ def create_api_token(token_id: str, secret: bytes) -> APIToken:
         The constructed APIToken.
     """
     token_bytes = bytes(VERSION) + bytes(secret, "utf-8")
-    b64 = base64.Base64(token_bytes)
+    b64 = Base64(token_bytes)
 
     token = f"{token_id},{b64}"
 

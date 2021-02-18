@@ -11,7 +11,7 @@ To run a linear regression task, you must have two orgs to partake in the comput
 
 You can create an org using [cape-ui](https://github.com/capeprivacy/cape-ui) or your account on [demo.capeprivacy.com](https://demo.capeprivacy.com)
 
-![](./img/create_org.gif)
+![](../img/create_org.gif)
 
 _Repeat this process for a second org_.
 
@@ -22,11 +22,11 @@ for more details [here](https://github.com/capeprivacy/cape-worker#production-do
 
 Next, create a project within one of the orgs you just created.
 
-![](./img/create_project.gif)
+![](../img/create_project.gif)
 
 Then, add one of the other orgs you created.
 
-![](./img/add_org.gif)
+![](../img/add_org.gif)
 
 Copy the project id from the URL and save it for later.
 
@@ -35,7 +35,7 @@ Copy the project id from the URL and save it for later.
 Finally, we will need a user token to use with cape-ds. From the home page, ensure you are
 working within your user context and navigate to settings to create a token.
 
-![](./img/create_user_token.gif)
+![](../img/create_user_token.gif)
 
 Take note of this value as you cannot recover it after you reload the page.
 

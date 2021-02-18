@@ -4,16 +4,17 @@ from io import StringIO
 import pytest
 import responses
 
-from cape.api.dataview.dataview import DataView
-from cape.api.job.job import Job
-from cape.api.job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from cape.api.organization.organization import Organization
-from cape.api.project.project import Project
-from cape.exceptions import GQLException
-from cape.network.requester import Requester
-from cape.vars import JOB_TYPE_LR
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
+
+from ...exceptions import GQLException
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
+from ..dataview.dataview import DataView
+from ..job.job import Job
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..organization.organization import Organization
+from ..project.project import Project
 
 
 @contextlib.contextmanager
@@ -32,8 +33,36 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "json,uri_type,schema,exception",
         [
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "http://my-data.csv",
+                        }
+                    }
+                },
+                "http",
+                None,
+                notraising(),
+            ),
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "https://my-data.csv",
+                        }
+                    }
+                },
+                "https",
+                None,
+                notraising(),
+            ),
             (
                 {
                     "data": {
@@ -44,15 +73,33 @@ class TestProject:
                         }
                     }
                 },
+                "s3",
+                [{"name": "col_1", "schema_type": "integer"}],
                 notraising(),
             ),
             (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "s3://my-data.csv",
+                        }
+                    }
+                },
+                "s3",
+                None,
+                pytest.raises(Exception, match="DataView schema must be specified."),
+            ),
+            (
                 {"errors": [{"message": "something went wrong"}]},
+                "http",
+                None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_add_dataview(self, json, exception, mocker):
+    def test_add_dataview(self, json, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -68,7 +115,9 @@ class TestProject:
                 name="my project",
                 label="my project",
             )
-            my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
+            my_data_view = DataView(
+                name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
+            )
             dataview = my_project.add_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
@@ -285,15 +334,16 @@ class TestProject:
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             r = Requester(endpoint=FAKE_HOST)
+            out = StringIO()
             my_project = Project(
                 requester=r,
+                out=out,
                 user_id=None,
                 id="123",
                 name="my project",
                 label="my-project",
             )
-            out = StringIO()
-            my_project.remove_dataview(id=id, out=out)
+            my_project.remove_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()

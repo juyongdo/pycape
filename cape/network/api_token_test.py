@@ -1,5 +1,5 @@
-from cape.network.api_token import create_api_token
-from cape.network.base64 import Base64
+from .api_token import create_api_token
+from .base64 import Base64
 
 
 def test_api_token():

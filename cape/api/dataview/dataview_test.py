@@ -3,9 +3,10 @@ import contextlib
 import pytest
 import responses
 
-from cape.api.dataview.dataview import DataView
 from tests.fake import fake_csv_dob_date_field
 from tests.fake import fake_dataframe
+
+from .dataview import DataView
 
 
 @contextlib.contextmanager

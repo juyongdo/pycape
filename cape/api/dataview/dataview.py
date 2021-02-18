@@ -1,39 +1,50 @@
 import json
+from abc import ABC
+from typing import List
 from typing import Union
 from urllib.error import HTTPError
+from urllib.parse import urlparse
 
 import pandas as pd
 from marshmallow import Schema
 from marshmallow import fields
 
-from cape.utils import filter_date
-from cape.vars import PANDAS_TO_JSON_DATATYPES
+from ...utils import filter_date
+from ...vars import PANDAS_TO_JSON_DATATYPES
 
 
-class DataView:
+class DataView(ABC):
     """
-    Dataview objects keep track of the business logic around datasets. Dataviews can be added to projects.
+    Dataview objects keep track of the business logic around datasets.
+
+    Dataviews can be added to projects.
     """
 
     def __init__(
         self,
-        id: str = None,
         name: str = None,
         uri: str = None,
-        location: str = None,
-        owner: dict = None,
         owner_id: str = None,
         owner_label: str = None,
+        schema: Union[pd.Series, List, None] = None,
+        id: str = None,
+        location: str = None,
+        owner: dict = None,
         user_id: str = None,
-        schema: pd.Series = None,
     ):
         """
-        :param id: id
-        :param name: name
-        :param uri: uri
-        :param _location: location
-        :param _owner: _owner
-        :param schema: schema
+        Initialize the object.
+
+        Arguments:
+            name: name of `DataView`.
+            uri: URI of `DataView`.
+            owner_label: Label of `Organization` that owns this `DataView`
+            owner_id: ID of `Organization` that owns this `DataView`
+            schema: schema (description of each column's datatype) of the data that `DataView` points to.
+            id: Returned ID of `DataView`.
+            location: Returned URI of `DataView`.
+            owner: Returned dictionary of fields related to the `DataView` owner.
+            user_id: User ID of requester.
         """
         self.id: str = id
         self.name: str = name
@@ -44,7 +55,7 @@ class DataView:
             owner and owner.get("label")
         ) else owner_label
         self._user_id: str = user_id
-        self.schema: Union[pd.Series, None] = schema
+        self.schema: Union[pd.Series, List, None] = schema
         self._cols = None
 
     def __repr__(self):
@@ -74,7 +85,7 @@ class DataView:
             return {s.get("name"): s.get("schema_type") for s in self._schema}
 
     @schema.setter
-    def schema(self, s):
+    def schema(self, s: Union[pd.Series, List]):
         """
         Validate that updates to the schema property are pd.Series.
         """
@@ -95,7 +106,7 @@ class DataView:
         except ValueError:
             if isinstance(s, pd.Series):
                 try:
-                    jsonify_schema = self.convert_pd_objects_json(s)
+                    jsonify_schema = self._convert_pd_objects_json(s)
                 except Exception as e:
                     raise Exception(f"Invalid schema pd.Series: {e}")
                 self._schema = jsonify_schema
@@ -111,13 +122,19 @@ class DataView:
             return True
         return False
 
-    def get_input(self):
+    def _get_input(self):
         """
         Format dict for gql type DataViewInput
         """
-        if not hasattr(self, "_schema"):
+
+        if not hasattr(self, "_schema") and urlparse(self.uri).scheme in [
+            "http",
+            "https",
+        ]:
             schema = self._get_schema_from_uri()
             self._schema = schema
+        elif not hasattr(self, "_schema"):
+            raise Exception("DataView schema must be specified.")
 
         return {
             k: v
@@ -131,7 +148,7 @@ class DataView:
             if v
         }
 
-    def convert_pd_objects_json(self, pd_obj: pd.Series) -> list:
+    def _convert_pd_objects_json(self, pd_obj: pd.Series) -> list:
         """
         Accepts a pandas dataframe.dtype, converts this pandas schema to a dictionary of JSON-like
         data types defined by the PANDAS_TO_JSON_DATATYPES. Returns converted schema list.

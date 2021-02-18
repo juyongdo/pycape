@@ -4,9 +4,9 @@ import sys
 
 import pandas as pd
 
-from cape.api.dataview import DataView
-from cape.api.job import VerticalLinearRegressionJob
-from cape.cape import Cape
+from cape import Cape
+from cape import DataView
+from cape import VerticalLinearRegressionJob
 
 parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")
 parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))
@@ -83,10 +83,9 @@ def make_job():
         y_train_dataview=project.dataviews[1]['col1'],
     )
 
-    job = project.submit_job(job)
-
-    # for o in project.organizations:
-    #     project.approve_job(job, o)
+    job = project.submit_job(job, timeout=60)
+    for o in project.organizations:
+        project.approve_job(job, o)
 
     print(f'\nSubmitted job {job} to run')
 
