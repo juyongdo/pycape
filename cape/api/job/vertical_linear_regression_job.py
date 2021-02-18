@@ -8,6 +8,8 @@ class VerticalLinearRegressionJob(Job):
     """
     Intializes a Job that can be submitted to Cape to train a Linear Regression Model.
 
+    VerticalLinearRegressionJob is a child Class of `Job`
+
     Arguments:
         x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points to a dataset that contains training set values.
         y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points to a dataset that contains target values.

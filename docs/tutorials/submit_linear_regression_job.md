@@ -9,7 +9,7 @@ This tutorial will walk you through the process of training an encrypted linear 
 
 We'll use the [Cape UI](https://demo.capeprivacy.com) to setup and review actvity in the project. 
 
-We'll also use the [`cape-ds`](https://github.com/capeprivacy/cape-ds) Python library to create and review pointers to datasets or [`DataViews`](/reference#dataview), and create and review [`Jobs`](/reference#job), Cape Python objects that contain instructions for how to train a model using the data provided.
+We'll also use the [`cape-ds`](https://github.com/capeprivacy/cape-ds) Python library to create and review pointers to datasets or [`DataViews`](/libraries/cape-ds/reference#dataview), and create and review [`Jobs`](/libraries/cape-ds/reference#job), Cape Python objects that contain instructions for how to train a model using the data provided.
 ```
 **TODO:** 
 - Docs on project/task roles (/understand/features/roles/)
@@ -19,7 +19,7 @@ We'll also use the [`cape-ds`](https://github.com/capeprivacy/cape-ds) Python li
 
 ### Create an Organization
 
-First you'll need to create an organization at demo.capeprivacy.com.
+First you'll need to create an organization at [demo.capeprivacy.com](https://demo.capeprivacy.com).
 
 ![](../img/create_org.gif)
 
@@ -29,9 +29,9 @@ Take note of this value as you cannot recover it after you reload the page.
 
 ### Create a Project
 
-Next, create a Project within one of the organizations you just created.
+Next, create a [`Project`](/libraries/cape-ds/reference#project) within one of the organizations you just created.
 
-Projects serve as the context in which you can define and review `Jobs` with other organizations.
+`Projects` serve as the context in which you can define and review `Jobs` with other organizations.
 
 ![](../img/create_project.gif)
 
@@ -54,7 +54,7 @@ Next we will setup `DataViews` and `Jobs` in `cape-ds`.
 
 ### Login to Cape DS
 
-Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/usage/login) with our API using `cape-ds`. Once you've logged in successfully, you should see a success message.
+Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/libraries/cape-ds/usage/login) with our API using `cape-ds`. Once you've logged in successfully, you should see a success message.
 
 ```python
 	>>> c = Cape()
@@ -92,12 +92,12 @@ Once you have the project in-memory that you want to add a `DataView` to, you ca
     >>> )
     >>> my_project.add_dataview(data_view)
 ```
-All `DataViews` must be associated with an organization. This association can be made by passing eiher an `owner_label` or an `owner_id` to the [`DataView`](/reference#cape.api.dataview.dataview.DataView.__init__) class instantiation.
+All `DataViews` must be associated with an organization. This association can be made by passing eiher an `owner_label` or an `owner_id` to the [`DataView`](/libraries/cape-ds/reference#cape.api.dataview.dataview.DataView.__init__) class instantiation.
 
 **TODO:** Add note about how you can find your org label.
 
 !!! note
-    Unless your dataset is publically accessible, you'll need to [specify your schema](/usage/dataview#specifying-a-schema-for-your-dataview).
+    Unless your dataset is publically accessible, you'll need to [specify your schema](/libraries/cape-ds/usage/dataview#specifying-a-schema-for-your-dataview).
 
 ### Review Your Collaborator's DataView
 
@@ -146,7 +146,8 @@ Pass the `DataView` that contains training data to `x_train_dataview`, and the `
     >>> my_project.submit_job(job=lr_job)
 ```
 
-You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the `VerticalLinearRegressionJob` class like so:
+You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticalLinearRegressionJob`](/libraries/cape-ds/reference#verticallinearregressionjob) class like so:
+
 ```python
     >>> lr_job = VerticalLinearRegressionJob(
     >>>     x_train_dataview=dataview_1["x_total_estimated_sales"],
