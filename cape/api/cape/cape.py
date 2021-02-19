@@ -38,7 +38,8 @@ class Cape(ABC):
             A success messsage write out.
         """
         self.__user_id = self.__requester.login(token=token)
-        return self._out.write("Login successful\n")
+        self._out.write("Login successful\n")
+        return
 
     def list_projects(self) -> str:
         """
