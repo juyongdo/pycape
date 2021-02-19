@@ -90,19 +90,22 @@ class Requester:
 
     def list_projects(self) -> Optional[list]:
         return self._gql_req(
-            query="""
-            query ListProjects {
-                projects {
+            query=f"""
+            query ListProjects {{
+                projects {{
                     id
                     name
                     label
                     description
-                    organizations {
+                    organizations {{
                         id
                         name
-                    }
-                }
-            }
+                    }}
+                    data_views {{
+                        {self.dataview_fragment}
+                    }}
+                }}
+            }}
             """,
             variables=None,
         ).get("projects")
