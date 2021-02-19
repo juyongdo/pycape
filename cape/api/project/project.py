@@ -121,7 +121,6 @@ class Project(ABC):
             dv_locations.append(dv.location)
             dv_owner_label = dv._owner.get("label")
             if self._user_id in [x.get("id") for x in dv._owner.get("members")]:
-
                 dv_owners.append(f"{dv_owner_label} (You)")
             else:
                 dv_owners.append(dv_owner_label)
@@ -164,10 +163,16 @@ class Project(ABC):
         """
         # TODO: validate get_input
         data_view_input = dataview._get_input()
-        data_view = self._requester.add_dataview(
+        data_view_dict = self._requester.add_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
-        return DataView(user_id=self._user_id, **data_view)
+        data_view = DataView(user_id=self._user_id, **data_view_dict)
+
+        if hasattr(self, "dataviews"):
+            self.dataviews.append(data_view)
+        else:
+            self.dataviews = [data_view]
+        return data_view
 
     def _create_job(self, job: Job, timeout: float = 600) -> Job:
         """
