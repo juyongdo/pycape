@@ -3,8 +3,10 @@ import contextlib
 import pytest
 import responses
 
+from tests.fake import fake_csv_dob_date_field
+from tests.fake import fake_dataframe
+
 from .dataview import DataView
-from tests.fake import fake_csv_dob_date_field, fake_dataframe
 
 
 @contextlib.contextmanager
@@ -18,9 +20,8 @@ class TestDataView:
         name = "hey"
         location = "cool.com"
         dv = DataView(id=id, name=name, location=location)
-        # expect None for location, since this location is only shown when DataView
-        # has been instantiated with user_id and matching owner_id
-        expect = f"{dv.__class__.__name__}(id={id}, name={name}, location={None})"
+
+        expect = f"{dv.__class__.__name__}(id={id}, name={name}, location={location})"
         assert repr(dv) == expect
 
     def test__get_item__(self):
@@ -39,10 +40,7 @@ class TestDataView:
     @responses.activate
     @pytest.mark.parametrize(
         "owner_id,user_id,expectation",
-        [
-            ("owner_user", "user_user", None),
-            ("main_user", "main_user", "s3://my-data.csv"),
-        ],
+        [("main_user", "main_user", "s3://my-data.csv")],
     )
     def test_location_property(self, owner_id, user_id, expectation, mocker):
         dv = DataView(

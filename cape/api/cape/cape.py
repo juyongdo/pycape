@@ -1,11 +1,12 @@
 import io
 import sys
 from abc import ABC
-from tabulate import tabulate
 from typing import Optional
 
-from ..project.project import Project
+from tabulate import tabulate
+
 from ...network.requester import Requester
+from ..project.project import Project
 
 
 class Cape(ABC):
@@ -53,7 +54,11 @@ class Cape(ABC):
             "NAME": [x.name for x in get_project_values],
             "LABEL": [x.label for x in get_project_values],
         }
-        return self._out.write(tabulate(format_projects, headers="keys") + "\n")
+        self._out.write(tabulate(format_projects, headers="keys") + "\n")
+        return [
+            Project(requester=self.__requester, user_id=self.__user_id, **p)
+            for p in projects
+        ]
 
     def get_project(
         self, id: Optional[str] = None, label: Optional[str] = None

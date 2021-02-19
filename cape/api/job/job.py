@@ -1,10 +1,12 @@
 import json
 import tempfile
+from abc import ABC
+from typing import Optional
+from typing import Tuple
+from urllib.parse import urlparse
+
 import boto3
 import numpy as np
-from typing import Optional, Tuple
-from urllib.parse import urlparse
-from abc import ABC
 
 from ...network.requester import Requester
 from ...vars import JOB_TYPES
@@ -46,6 +48,9 @@ class Job(ABC):
 
     def _submit_job(self) -> dict:
         return self._requester.submit_job(job_id=self.id)
+
+    def _approve_job(self, org_id: str) -> dict:
+        return self._requester.approve_job(job_id=self.id, org_id=org_id)
 
     def get_status(self) -> str:
         """
