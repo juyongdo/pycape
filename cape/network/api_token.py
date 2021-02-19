@@ -1,4 +1,5 @@
-from .base64 import Base64, from_string
+from .base64 import Base64
+from .base64 import from_string
 
 SECRET_BYTES = 16
 VERSION = b"\x01"

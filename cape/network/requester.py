@@ -4,8 +4,8 @@ from typing import Optional
 import requests
 
 from ..exceptions import GQLException
-from .base64 import from_string
 from .api_token import APIToken
+from .base64 import from_string
 
 
 class NotAUserException(Exception):
@@ -274,16 +274,29 @@ class Requester:
             },
         ).get("createTask", {})
 
-    def submit_job(self, job_id: str) -> dict:
+    def approve_job(self, job_id: str, org_id: str) -> dict:
         return self._gql_req(
             query="""
-            mutation InitializeSession($task_id: String!) {
-                initializeSession(task_id: $task_id) {
+            mutation ApproveJob($job_id: String!, $organization_id: String!) {
+                approveJob(job_id: $job_id, organization_id: $organization_id) {
                   id
                   status { code }
                 }
             }
             """,
+            variables={"job_id": job_id, "organization_id": org_id},
+        ).get("approveJob", {})
+
+    def submit_job(self, job_id: str) -> dict:
+        return self._gql_req(
+            query="""
+                    mutation InitializeSession($task_id: String!) {
+                        initializeSession(task_id: $task_id) {
+                          id
+                          status { code }
+                        }
+                    }
+                    """,
             variables={"task_id": job_id},
         ).get("initializeSession", {})
 

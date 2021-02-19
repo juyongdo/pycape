@@ -3,13 +3,15 @@ import contextlib
 import pytest
 import responses
 
-from .vertical_linear_regression_job import VerticalLinearRegressionJob
-from .job import Job
+from tests.fake import FAKE_HOST
+
+from ...network.requester import Requester
+from ...vars import JOB_STATUS_CREATED
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..project.project import Project
-from ...network.requester import Requester
-from ...vars import JOB_STATUS_CREATED, JOB_TYPE_LR
-from tests.fake import FAKE_HOST
+from .job import Job
+from .vertical_linear_regression_job import VerticalLinearRegressionJob
 
 
 @contextlib.contextmanager

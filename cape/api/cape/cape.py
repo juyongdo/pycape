@@ -1,11 +1,12 @@
 import io
 import sys
 from abc import ABC
-from tabulate import tabulate
 from typing import Optional
 
-from ..project.project import Project
+from tabulate import tabulate
+
 from ...network.requester import Requester
+from ..project.project import Project
 
 
 class Cape(ABC):

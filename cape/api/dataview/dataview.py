@@ -1,10 +1,14 @@
 import json
-from urllib.error import HTTPError
 from abc import ABC
-from typing import Union, List
-import pandas as pd
-from marshmallow import Schema, fields
+from typing import List
+from typing import Union
+from urllib.error import HTTPError
 from urllib.parse import urlparse
+
+import pandas as pd
+from marshmallow import Schema
+from marshmallow import fields
+
 from ...utils import filter_date
 from ...vars import PANDAS_TO_JSON_DATATYPES
 

@@ -4,13 +4,17 @@ from io import StringIO
 import pytest
 import responses
 
-from ..dataview.dataview import DataView
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from ..project.project import Project
+from tests.fake import FAKE_HOST
+from tests.fake import fake_dataframe
+
 from ...exceptions import GQLException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
-from tests.fake import FAKE_HOST, fake_dataframe
+from ..dataview.dataview import DataView
+from ..job.job import Job
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..organization.organization import Organization
+from ..project.project import Project
 
 
 @contextlib.contextmanager
@@ -404,3 +408,26 @@ class TestProject:
             output = out.getvalue().strip()
             assert isinstance(output, str)
             assert output == "DataView (job_123) deleted"
+
+    @responses.activate
+    def test_approve_job(self):
+        responses.add(
+            responses.POST,
+            f"{FAKE_HOST}/v1/query",
+            json={
+                "data": {
+                    "approveJob": {
+                        "id": "abc123",
+                        "status": {"code": "Initialized"},
+                        "task": {"type": JOB_TYPE_LR},
+                    }
+                }
+            },
+        )
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, user_id=None, id="123", name="my project", label="my-project",
+        )
+        org = Organization(id="org123")
+        j = Job(id="abc123", job_type=JOB_TYPE_LR, requester=r)
+        my_project.approve_job(j, org)

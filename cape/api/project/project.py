@@ -1,15 +1,18 @@
 import io
 import sys
-from typing import Dict, List, Optional
 from abc import ABC
+from typing import Dict
+from typing import List
+from typing import Optional
+
 from tabulate import tabulate
 
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
 from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from ..organization.organization import Organization
-from ...network.requester import Requester
-from ...vars import JOB_TYPE_LR
 
 
 class Project(ABC):
@@ -202,6 +205,16 @@ class Project(ABC):
             job_type=job.job_type,
             project_id=self.id,
             **submitted_job,
+            requester=self._requester,
+        )
+
+    def approve_job(self, job: Job, org: Organization) -> Job:
+        approved_job = job._approve_job(org.id)
+
+        return job.__class__(
+            job_type=job.job_type,
+            project_id=self.id,
+            **approved_job,
             requester=self._requester,
         )
 
