@@ -254,4 +254,9 @@ class Project(ABC):
             A success messsage write out.
         """
         self._requester.remove_dataview(id=id)
-        return self._out.write(f"DataView ({id}) deleted" + "\n")
+
+        if hasattr(self, "dataviews"):
+            self.dataviews = [x for x in self.dataviews if id != x.id]
+
+        self._out.write(f"DataView ({id}) deleted" + "\n")
+        return

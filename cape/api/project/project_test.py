@@ -397,17 +397,35 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "id,json,exception",
+        "id,json,dvs,exception",
         [
-            ("job_123", {"data": {"removeDataView": {"id": "job_123"}}}, notraising(),),
             (
-                "job_123",
+                "dv_123",
+                {"data": {"removeDataView": {"id": "dv_123"}}},
+                [
+                    {
+                        "id": "dv_123",
+                        "name": "my-dataview",
+                        "location": "https",
+                        "schema": [{"name": "col_1", "schema_type": "string"}],
+                        "owner": {
+                            "id": "org_123",
+                            "label": "my-org",
+                            "members": [{"id": "user_123"}],
+                        },
+                    }
+                ],
+                notraising(),
+            ),
+            (
+                "dv_123",
                 {"errors": [{"message": "something went wrong"}]},
+                [],
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_remove_dataview(self, id, json, exception, mocker):
+    def test_remove_dataview(self, id, json, dvs, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -421,13 +439,15 @@ class TestProject:
                 id="123",
                 name="my project",
                 label="my-project",
+                data_views=dvs,
             )
             my_project.remove_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
             assert isinstance(output, str)
-            assert output == "DataView (job_123) deleted"
+            assert output == "DataView (dv_123) deleted"
+            assert len(my_project.dataviews) == len(dvs) - 1
 
     @responses.activate
     def test_approve_job(self):
