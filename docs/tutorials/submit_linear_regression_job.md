@@ -163,7 +163,7 @@ After submitting your job, you should be able to see the status and details of y
 
 **TODO:** Add GIF of Job/Job Details UI here.
 
-To check the status of your submitted linear regression job, use the [`get_status`](/reference/#cape.api.job.job.Job.get_status) method:
+To check the status of your submitted linear regression job using Cape DS, use the [`get_status`](/reference/#cape.api.job.job.Job.get_status) method:
 ```python
     >>> lr_job = my_project.get_job(id="abc_123")
 
@@ -173,7 +173,14 @@ To check the status of your submitted linear regression job, use the [`get_statu
 
 ### Approving Jobs
 
-**TODO:** Need to know what the workflow is here.
+Before Cape can begin to train a linear regression model using the datasets submitted via `submit_job` method, both parties need to review and approve the Job.
+
+To approve, you'll need to head over to the UI and navigate to your Job's details page. Once you've reviewed the details of your Job are correct, you can click "Approve Job" to let Cape know the job looks good on your end.
+
+**TODO:** Add GIF of Job Approval UI flow here .
+
+!!!note
+    Before your job can run, both parties need to approve it.
 
 ### Getting Weights and Metrics from Trained Model
 
