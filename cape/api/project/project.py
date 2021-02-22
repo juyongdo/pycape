@@ -167,7 +167,7 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def add_dataview(self, dataview: DataView) -> DataView:
+    def create_dataview(self, dataview: DataView) -> DataView:
         """
         Calls GQL `mutation addDataView`
 
@@ -178,7 +178,7 @@ class Project(ABC):
         """
         # TODO: validate get_input
         data_view_input = dataview._get_input()
-        data_view_dict = self._requester.add_dataview(
+        data_view_dict = self._requester.create_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
         data_view = DataView(user_id=self._user_id, **data_view_dict)
@@ -257,7 +257,7 @@ class Project(ABC):
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
 
-    def remove_dataview(self, id: str) -> str:
+    def delete_dataview(self, id: str) -> str:
         """
         Calls GQL `mutation removeDataView`
 
@@ -266,7 +266,7 @@ class Project(ABC):
         Returns:
             A success messsage write out.
         """
-        self._requester.remove_dataview(id=id)
+        self._requester.delete_dataview(id=id)
 
         if hasattr(self, "dataviews"):
             self.dataviews = [x for x in self.dataviews if id != x.id]

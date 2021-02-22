@@ -225,14 +225,14 @@ class TestCape:
             ),
         ],
     )
-    def test_remove_project(self, id, json, exception, mocker):
+    def test_delete_project(self, id, json, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
             out = StringIO()
             c = Cape(endpoint=FAKE_HOST, out=out)
-            c.remove_project(id=id)
+            c.delete_project(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
