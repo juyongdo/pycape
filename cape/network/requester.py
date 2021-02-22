@@ -167,7 +167,7 @@ class Requester:
             variables={"project_id": project_id, "organization_id": org_id},
         ).get("addProjectOrganization")
 
-    def add_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
+    def create_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
         return self._gql_req(
             query="""
             mutation AddDataView (

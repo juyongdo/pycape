@@ -37,13 +37,13 @@ Default response:
 
 ## Add a data view to a project
 
-Initialize a `DataView` class and pass the instance to the `add_dataview` method.
+Initialize a `DataView` class and pass the instance to the `create_dataview` method.
 
 ```python
     my_project = c.get_project(id="project_123")
 
     data_view = DataView(name="my-data", uri="s3://my-data.csv", owner_label="my-org")
-    my_project.add_dataview(data_view)
+    my_project.create_dataview(data_view)
 ```
 
 Default response:

@@ -49,7 +49,7 @@ class TestProject:
             ),
         ],
     )
-    def test_add_dataview(self, json, exception, mocker):
+    def test_create_dataview(self, json, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -66,7 +66,7 @@ class TestProject:
                 label="my project",
             )
             my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
-            dataview = my_project.add_dataview(dataview=my_data_view)
+            dataview = my_project.create_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(dataview, DataView)

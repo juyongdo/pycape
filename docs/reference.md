@@ -19,7 +19,7 @@
         members:
             - list_dataviews
             - get_dataview
-            - add_dataview
+            - create_dataview
             - get_job
             - submit_job
             - delete_dataview

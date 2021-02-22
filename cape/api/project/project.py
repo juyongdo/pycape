@@ -135,7 +135,7 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def add_dataview(self, dataview: DataView) -> DataView:
+    def create_dataview(self, dataview: DataView) -> DataView:
         """
         Calls GQL `mutation addDataView`
 
@@ -146,7 +146,7 @@ class Project(ABC):
         """
         # TODO: validate get_input
         data_view_input = dataview._get_input()
-        data_view = self._requester.add_dataview(
+        data_view = self._requester.create_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
         return DataView(user_id=self._user_id, **data_view)
