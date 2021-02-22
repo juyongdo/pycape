@@ -60,7 +60,7 @@ class Job(ABC):
             A `Job` status string.
         """
         job = self._requester.get_job(
-            project_id=self.project_id, job_id=self.id, return_params="status { code }"
+            project_id=self.project_id, job_id=self.id, return_params=""
         )
         return job.get("status", {}).get("code")
 

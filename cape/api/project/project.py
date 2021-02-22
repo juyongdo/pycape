@@ -32,6 +32,7 @@ class Project(ABC):
         owner: Optional[dict] = None,
         organizations: Optional[List[Dict]] = None,
         data_views: Optional[List[Dict]] = None,
+        jobs: Optional[List[Dict]] = None,
         requester: Optional[Requester] = None,
         out: Optional[io.StringIO] = None,
     ):
@@ -65,14 +66,28 @@ class Project(ABC):
         self.description: Optional[str] = description
 
         if organizations is not None:
-            self.organizations: List[Organization] = list(
-                map(lambda org_json: Organization(**org_json), organizations)
-            )
+            self.organizations: List[Organization] = [
+                Organization(**o) for o in organizations
+            ]
 
         if data_views is not None:
-            self.dataviews: List[DataView] = list(
-                map(lambda dv_json: DataView(**dv_json), data_views)
-            )
+            self.dataviews: List[DataView] = [DataView(**d) for d in data_views]
+
+        if jobs is not None:
+            jobs_temp = []
+            for j in jobs:
+                job_type = j.get("task", {}).get("type")
+                job_class = self._get_job_class(job_type=job_type)
+                jobs_temp.append(
+                    job_class(
+                        job_type=job_type,
+                        project_id=self.id,
+                        **j,
+                        requester=self._requester,
+                    )
+                )
+
+            self.jobs: List[Job] = jobs_temp
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
@@ -232,9 +247,7 @@ class Project(ABC):
         Returns:
             A `Job` instance.
         """
-        job = self._requester.get_job(
-            project_id=self.id, job_id=id, return_params="status { code } task { type }"
-        )
+        job = self._requester.get_job(project_id=self.id, job_id=id, return_params="")
 
         job_type = job.get("task", {}).get("type")
 
