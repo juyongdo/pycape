@@ -31,6 +31,12 @@ class Requester:
             schema_type
         }"""
 
+    job_fragment = """
+        id
+        status { code }
+        task { type }
+    """
+
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
@@ -104,6 +110,9 @@ class Requester:
                     data_views {{
                         {self.dataview_fragment}
                     }}
+                    jobs {{
+                        {self.job_fragment}
+                    }}
                 }}
             }}
             """,
@@ -125,6 +134,9 @@ class Requester:
                     }}
                     data_views {{
                         {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
                     }}
                 }}
             }}
@@ -156,6 +168,9 @@ class Requester:
                 }}
                 data_views {{
                     {self.dataview_fragment}
+                }}
+                jobs {{
+                    {self.job_fragment}
                 }}
               }}
             }}
@@ -218,6 +233,9 @@ class Requester:
                     data_views {{
                       {self.dataview_fragment}
                     }}
+                    jobs {{
+                        {self.job_fragment}
+                    }}
                 }}
             }}
             """,
@@ -239,6 +257,9 @@ class Requester:
                 project(id: $project_id) {{
                     data_views(id: $id, uri: $uri) {{
                       {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
                     }}
                 }}
             }}
@@ -279,26 +300,24 @@ class Requester:
 
     def approve_job(self, job_id: str, org_id: str) -> dict:
         return self._gql_req(
-            query="""
-            mutation ApproveJob($job_id: String!, $organization_id: String!) {
-                approveJob(job_id: $job_id, organization_id: $organization_id) {
-                  id
-                  status { code }
-                }
-            }
+            query=f"""
+            mutation ApproveJob($job_id: String!, $organization_id: String!) {{
+                approveJob(job_id: $job_id, organization_id: $organization_id) {{
+                    {self.job_fragment}
+                }}
+            }}
             """,
             variables={"job_id": job_id, "organization_id": org_id},
         ).get("approveJob", {})
 
     def submit_job(self, job_id: str) -> dict:
         return self._gql_req(
-            query="""
-                    mutation InitializeSession($task_id: String!) {
-                        initializeSession(task_id: $task_id) {
-                          id
-                          status { code }
-                        }
-                    }
+            query=f"""
+                    mutation InitializeSession($task_id: String!) {{
+                        initializeSession(task_id: $task_id) {{
+                            {self.job_fragment}
+                        }}
+                    }}
                     """,
             variables={"task_id": job_id},
         ).get("initializeSession", {})
@@ -312,7 +331,7 @@ class Requester:
             query GetJob($project_id: String! $job_id: String!) {{
                 project(id: $project_id) {{
                   job(id: $job_id) {{
-                    id
+                    {self.job_fragment}
                     {return_params}
                   }}
                 }}
