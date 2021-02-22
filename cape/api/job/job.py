@@ -55,7 +55,7 @@ class Job(ABC):
             A `Job` status string.
 
         ** Status Types:**
-        
+
         Status | Desciption
         ------ | ----------
         **`Initialized`** | Job has been intialized.

@@ -60,7 +60,7 @@ def setup_project():
             dv = DataView(name=f"{org.name}-data", owner_id=org.id, uri=org_dv[org.name], schema=df.dtypes)
         except KeyError:
             continue
-        print(project.add_dataview(dv))
+        print(project.create_dataview(dv))
 
 
 def make_job():

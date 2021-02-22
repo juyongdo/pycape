@@ -136,7 +136,7 @@ class Project(ABC):
     def create_dataview(self, dataview: DataView) -> DataView:
         """
         Creates a `DataView` in Cape Cloud. Returns created `Dataview`
-    
+
         Arguments:
             dataview: Instance of class `DataView`.
         Returns:
@@ -171,7 +171,7 @@ class Project(ABC):
     def submit_job(self, job: Job, timeout: float = 600) -> Job:
         """
         Submits a `Job` to be run by your Cape worker in \
-        collaboration with other organizations in your `Project`. 
+        collaboration with other organizations in your `Project`.
 
         Arguments:
             job: Instance of class `Job`.
