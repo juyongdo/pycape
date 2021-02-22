@@ -14,6 +14,17 @@ class DataView(ABC):
     Dataview objects keep track of the business logic around datasets.
 
     Dataviews can be added to projects.
+
+    Arguments:
+        name: name of `DataView`.
+        uri: URI of `DataView`.
+        owner_label: Label of `Organization` that owns this `DataView`
+        owner_id: ID of `Organization` that owns this `DataView`
+        schema: schema (description of each column's datatype) of the data that `DataView` points to.
+        id: Returned ID of `DataView`.
+        location: Returned URI of `DataView`.
+        owner: Returned dictionary of fields related to the `DataView` owner.
+        user_id: User ID of requester.
     """
 
     def __init__(
@@ -28,20 +39,6 @@ class DataView(ABC):
         owner: dict = None,
         user_id: str = None,
     ):
-        """
-        Initialize the object.
-
-        Arguments:
-            name: name of `DataView`.
-            uri: URI of `DataView`.
-            owner_label: Label of `Organization` that owns this `DataView`
-            owner_id: ID of `Organization` that owns this `DataView`
-            schema: schema (description of each column's datatype) of the data that `DataView` points to.
-            id: Returned ID of `DataView`.
-            location: Returned URI of `DataView`.
-            owner: Returned dictionary of fields related to the `DataView` owner.
-            user_id: User ID of requester.
-        """
         self.id: str = id
         self.name: str = name
         self.uri: str = uri

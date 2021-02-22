@@ -12,7 +12,7 @@ from ...vars import JOB_TYPES
 
 class Job(ABC):
     """
-    Job objects keep track of jobs that will be/have been submitted to cape workers.
+    Jobs track the status and eventually report the results of computation sessions run on Cape workers.
     """
 
     job_type: str

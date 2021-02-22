@@ -4,11 +4,15 @@ from ..dataview.dataview import DataView
 from ...vars import JOB_STATUS_CREATED, JOB_TYPE_LR
 
 
-class VerticalLinearRegressionJob(Job):
+class VerticallyPartitionedLinearRegression(Job):
     """
-    Intializes a Job that can be submitted to Cape to train a Linear Regression Model.
+    Inherits from: `Job`.
 
-    VerticalLinearRegressionJob is a child Class of `Job`
+    Tracks jobs that contain instructions for training linear regression models using \
+    verically-partioned datasets.
+
+    Verically-partioned datasets refer to the joining of columns (i.e. features) from \
+    serveral parties.
 
     Arguments:
         x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \

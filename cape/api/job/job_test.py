@@ -3,7 +3,7 @@ import contextlib
 import pytest
 import responses
 
-from .vertical_linear_regression_job import VerticalLinearRegressionJob
+from .vertical_linear_regression_job import VerticallyPartitionedLinearRegression
 from .job import Job
 from ..dataview.dataview import DataView
 from ..project.project import Project
@@ -114,12 +114,12 @@ class TestJob:
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
             }
-            my_job = VerticalLinearRegressionJob(**task_config)
+            my_job = VerticallyPartitionedLinearRegression(**task_config)
 
             submitted_job = my_project.submit_job(my_job)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(submitted_job, VerticalLinearRegressionJob)
+            assert isinstance(submitted_job, VerticallyPartitionedLinearRegression)
             assert submitted_job.id == "session_123"
 
     @responses.activate
@@ -149,7 +149,7 @@ class TestJob:
             )
             r = Requester(endpoint=FAKE_HOST)
 
-            my_job = VerticalLinearRegressionJob(
+            my_job = VerticallyPartitionedLinearRegression(
                 id="abc_123", project_id="123", requester=r
             )
 
@@ -188,7 +188,7 @@ class TestJob:
             )
             r = Requester(endpoint=FAKE_HOST)
 
-            my_job = VerticalLinearRegressionJob(
+            my_job = VerticallyPartitionedLinearRegression(
                 id="abc_123", project_id="123", requester=r
             )
 

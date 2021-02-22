@@ -5,7 +5,7 @@ import pytest
 import responses
 
 from ..dataview.dataview import DataView
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..job.vertical_linear_regression_job import VerticallyPartitionedLinearRegression
 from ..project.project import Project
 from ...exceptions import GQLException
 from ...network.requester import Requester
@@ -308,7 +308,7 @@ class TestProject:
             job = my_project.get_job(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(job, VerticalLinearRegressionJob)
+            assert isinstance(job, VerticallyPartitionedLinearRegression)
             assert job.id == id
             assert job.status == {"code": "Initialized"}
 

@@ -11,12 +11,12 @@ from ...network.requester import Requester
 class Cape(ABC):
     """
     This is the main class you instantiate to access the Cape DS API.
+
+    Use to authenticate with the Cape Cloud and manage top-level resources such as `Project`.
     """
 
     def __init__(self, out: io.StringIO = None, endpoint: Optional[str] = None) -> None:
         """
-        Initialize the object.
-
         Arguments:
             out: The interpreter to be written to.
             endpoint: Coordinator endoint to point to.

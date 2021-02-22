@@ -138,17 +138,17 @@ Pass the `DataView` that contains training data to `x_train_dataview`, and the `
     >>> dataview_1 = my_project.get_dataview(id="01EY48")
     >>> dataview_2 = my_project.get_dataview(id="01EY49")
 
-    >>> lr_job = VerticalLinearRegressionJob(
+    >>> lr_job = VerticallyPartitionedLinearRegression(
     >>>     x_train_dataview=dataview_1,
     >>>     y_train_dataview=dataview_2,
     >>> )
     >>> my_project.submit_job(job=lr_job)
 ```
 
-You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticalLinearRegressionJob`](/libraries/cape-ds/reference#verticallinearregressionjob) class like so:
+You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/cape-ds/reference#VerticallyPartitionedLinearRegression) class like so:
 
 ```python
-    >>> lr_job = VerticalLinearRegressionJob(
+    >>> lr_job = VerticallyPartitionedLinearRegression(
     >>>     x_train_dataview=dataview_1["x_total_estimated_sales"],
     >>>     y_train_dataview=dataview_2["y_total_estimated_sales"],
     >>> )

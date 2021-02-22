@@ -6,7 +6,7 @@ from tabulate import tabulate
 
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..job.vertical_linear_regression_job import VerticallyPartitionedLinearRegression
 from ..organization.organization import Organization
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
@@ -17,6 +17,18 @@ class Project(ABC):
     Projects are business contexts in which we can add DataViews and submit Jobs.
 
     Multiple organizations can collaborate on one Project.
+
+        Arguments:
+        user_id: User ID of requester.
+        id: ID of `Project`.
+        name: name of `Project`.
+        label: label of `Project`.
+        description: description of `Project`.
+        owner: Returned dictionary of fields related to the `Project` owner.
+        organizations: Returned list of fields related to the organizations associated with the `Project`.
+        data_views: Returned list of `DataViews` added to the `Project`.
+        requester: Instance of `Requester` class so that we can chain methods on `Project` class instantiations.
+        out: Function to use to write to the interpreter.
     """
 
     def __init__(
@@ -32,21 +44,6 @@ class Project(ABC):
         requester: Optional[Requester] = None,
         out: Optional[io.StringIO] = None,
     ):
-        """
-        Initialize the object.
-
-        Arguments:
-            user_id: User ID of requester.
-            id: ID of `Project`.
-            name: name of `Project`.
-            label: label of `Project`.
-            description: description of `Project`.
-            owner: Returned dictionary of fields related to the `Project` owner.
-            organizations: Returned list of fields related to the organizations associated with the `Project`.
-            data_views: Returned list of `DataViews` added to the `Project`.
-            requester: Instance of `Requester` class so that we can chain methods on `Project` class instantiations.
-            out: Function to use to write to the interpreter.
-        """
         self._requester: Requester = requester
         self._user_id: str = user_id
         self._out: io.StringIO = out
@@ -76,7 +73,7 @@ class Project(ABC):
 
     @staticmethod
     def _get_job_class(job_type):
-        job_type_map = {JOB_TYPE_LR: VerticalLinearRegressionJob}
+        job_type_map = {JOB_TYPE_LR: VerticallyPartitionedLinearRegression}
         return job_type_map.get(job_type)
 
     def add_org(self, org_id: str):
