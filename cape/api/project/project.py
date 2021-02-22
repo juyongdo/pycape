@@ -1,15 +1,18 @@
 import io
 import sys
-from typing import Dict, List, Optional
 from abc import ABC
+from typing import Dict
+from typing import List
+from typing import Optional
+
 from tabulate import tabulate
 
+from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
 from ..job.vertical_linear_regression_job import VerticallyPartitionedLinearRegression
 from ..organization.organization import Organization
-from ...network.requester import Requester
-from ...vars import JOB_TYPE_LR
 
 
 class Project(ABC):
@@ -104,15 +107,30 @@ class Project(ABC):
         get_data_view_values = [
             DataView(user_id=self._user_id, **d) for d in data_views
         ]
+        dv_ids = []
+        dv_names = []
+        dv_locations = []
+        dv_owners = []
+
+        for dv in get_data_view_values:
+            dv_ids.append(dv.id)
+            dv_names.append(dv.name)
+            dv_locations.append(dv.location)
+            dv_owner_label = dv._owner.get("label")
+            if self._user_id in [x.get("id") for x in dv._owner.get("members")]:
+
+                dv_owners.append(f"{dv_owner_label} (You)")
+            else:
+                dv_owners.append(dv_owner_label)
+
         format_data_views = {
-            "DATAVIEW ID": [x.id for x in get_data_view_values],
-            "NAME": [x.name for x in get_data_view_values],
-            "LOCATION": [
-                x.location for x in get_data_view_values if x._validate_owner()
-            ],
-            "SCHEMA": [x.schema for x in get_data_view_values],
+            "DATAVIEW ID": dv_ids,
+            "NAME": dv_names,
+            "LOCATION": dv_locations,
+            "OWNER": dv_owners,
         }
-        return self._out.write(tabulate(format_data_views, headers="keys") + "\n")
+        self._out.write(tabulate(format_data_views, headers="keys") + "\n")
+        return [DataView(user_id=self._user_id, **d) for d in data_views]
 
     def get_dataview(
         self, id: Optional[str] = None, uri: Optional[str] = None
@@ -186,6 +204,16 @@ class Project(ABC):
             job_type=job.job_type,
             project_id=self.id,
             **submitted_job,
+            requester=self._requester,
+        )
+
+    def approve_job(self, job: Job, org: Organization) -> Job:
+        approved_job = job._approve_job(org.id)
+
+        return job.__class__(
+            job_type=job.job_type,
+            project_id=self.id,
+            **approved_job,
             requester=self._requester,
         )
 

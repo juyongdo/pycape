@@ -2,7 +2,8 @@ import contextlib
 
 import pytest
 
-from .base64 import Base64, from_string
+from .base64 import Base64
+from .base64 import from_string
 
 
 @contextlib.contextmanager

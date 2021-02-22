@@ -5,11 +5,13 @@ from io import StringIO
 import pytest
 import responses
 
-from .cape import Cape
-from ..project.project import Project
+from tests.fake import FAKE_HOST
+from tests.fake import FAKE_TOKEN
+
 from ...exceptions import GQLException
 from ...network import NotAUserException
-from tests.fake import FAKE_HOST, FAKE_TOKEN
+from ..project.project import Project
+from .cape import Cape
 
 
 @contextlib.contextmanager
@@ -105,7 +107,7 @@ class TestCape:
             )
             out = StringIO()
             c = Cape(endpoint=FAKE_HOST, out=out)
-            c.list_projects()
+            projects = c.list_projects()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
@@ -114,6 +116,9 @@ class TestCape:
                 "\n------------  ----------  ----------\n"
                 "abc123        my-project  my-project"
             )
+            assert len(projects) == 1
+            assert isinstance(projects[0], Project)
+            assert projects[0].id == "abc123"
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -200,7 +205,7 @@ class TestCape:
         [
             (
                 "project_123",
-                {"data": {"archiveProject": {"archivedProjectId": "project_123"}}},
+                {"data": {"archiveProject": {"ArchivedProjectID": "project_123"}}},
                 notraising(),
             ),
             (

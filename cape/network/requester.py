@@ -4,8 +4,8 @@ from typing import Optional
 import requests
 
 from ..exceptions import GQLException
-from .base64 import from_string
 from .api_token import APIToken
+from .base64 import from_string
 
 
 class NotAUserException(Exception):
@@ -13,6 +13,24 @@ class NotAUserException(Exception):
 
 
 class Requester:
+    dataview_fragment = """
+        id
+        name
+        location
+        owner {
+            ... on Organization {
+                id
+                label
+                members {
+                    id
+                }
+            }
+        }
+        schema {
+            name
+            schema_type
+        }"""
+
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
@@ -33,6 +51,7 @@ class Requester:
             self.endpoint + "/v1/login",
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
+
         resp.raise_for_status()
         json = resp.json()
 
@@ -74,21 +93,6 @@ class Requester:
             query="""
             query ListProjects {
                 projects {
-                    id,
-                    name,
-                    label,
-                    description
-                }
-            }
-            """,
-            variables=None,
-        ).get("projects")
-
-    def get_project(self, id: str = None, label: str = None) -> Optional[dict]:
-        return self._gql_req(
-            query="""
-            query GetProject($id: String, $label: Label) {
-                project(id: $id, label: $label) {
                     id
                     name
                     label
@@ -97,41 +101,61 @@ class Requester:
                         id
                         name
                     }
-                    data_views {
-                        id
-                        name
-                        location
-                    }
                 }
             }
+            """,
+            variables=None,
+        ).get("projects")
+
+    def get_project(self, id: str = None, label: str = None) -> Optional[dict]:
+        return self._gql_req(
+            query=f"""
+            query GetProject($id: String, $label: Label) {{
+                project(id: $id, label: $label) {{
+                    id
+                    name
+                    label
+                    description
+                    organizations {{
+                        id
+                        name
+                    }}
+                    data_views {{
+                        {self.dataview_fragment}
+                    }}
+                }}
+            }}
             """,
             variables={"id": id, "label": label},
         ).get("project")
 
     def create_project(self, name: str, owner: str, description: str) -> Optional[dict]:
         return self._gql_req(
-            query="""
+            query=f"""
             mutation CreateProject (
               $name: ProjectDisplayName!,
               $description: ProjectDescription!,
               $owner: String
-            ) {
+            ) {{
               createProject(
-                    project: {
+                    project: {{
                     name: $name,
                     Description: $description,
                     owner: $owner
-                    }
-                ) {
+                    }}
+                ) {{
                 id
                 name
-                owner {
-                  ... on Organization {
+                owner {{
+                  ... on Organization {{
                     id
-                  }
-                }
-              }
-            }
+                  }}
+                }}
+                data_views {{
+                    {self.dataview_fragment}
+                }}
+              }}
+            }}
             """,
             variables={"name": name, "owner": owner, "description": description},
         ).get("createProject")
@@ -145,7 +169,7 @@ class Requester:
               archiveProject(
                 id: $id
             ) {
-                archivedProjectId
+                ArchivedProjectID
               }
             }
             """,
@@ -169,26 +193,15 @@ class Requester:
 
     def create_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
         return self._gql_req(
-            query="""
+            query=f"""
             mutation AddDataView (
               $project_id: String!,
               $data_view_input: DataViewInput!
-            ) {
-              addDataView(project_id: $project_id, data_view_input: $data_view_input) {
-                id
-                name
-                location
-                owner {
-                  ... on User {
-                    id
-                  }
-                  ... on Organization {
-                    id
-                  }
-                },
-                schema { name, schema_type }
-              }
-            }
+            ) {{
+              addDataView(project_id: $project_id, data_view_input: $data_view_input) {{
+                {self.dataview_fragment}
+              }}
+            }}
             """,
             variables={"project_id": project_id, "data_view_input": data_view_input},
         ).get("addDataView")
@@ -196,25 +209,14 @@ class Requester:
     def list_dataviews(self, project_id: str) -> Optional[list]:
         return (
             self._gql_req(
-                query="""
-            query ListDataViews($id: String!) {
-                project(id: $id) {
-                    data_views {
-                      id,
-                      name,
-                      location,
-                      owner {
-                        ... on User {
-                          id
-                        }
-                        ... on Organization {
-                          id
-                        }
-                      },
-                      schema { name, schema_type }
-                    }
-                }
-            }
+                query=f"""
+            query ListDataViews($id: String!) {{
+                project(id: $id) {{
+                    data_views {{
+                      {self.dataview_fragment}
+                    }}
+                }}
+            }}
             """,
                 variables={"id": project_id},
             )
@@ -229,26 +231,14 @@ class Requester:
             raise Exception("Required identifier id or uri not specified.")
         return (
             self._gql_req(
-                query="""
-            query GetDataView($id: String, $project_id: String, $uri: String) {
-                project(id: $project_id) {
-                    data_views(id: $id, uri: $uri) {
-                      id,
-                      name,
-                      location,
-                      owner {
-                        ... on User {
-                          id
-                        }
-                        ... on Organization {
-                          id
-                          label
-                        }
-                      },
-                      schema { name, schema_type }
-                    }
-                }
-            }
+                query=f"""
+            query GetDataView($id: String, $project_id: String, $uri: String) {{
+                project(id: $project_id) {{
+                    data_views(id: $id, uri: $uri) {{
+                      {self.dataview_fragment}
+                    }}
+                }}
+            }}
             """,
                 variables={"project_id": project_id, "id": dataview_id, "uri": uri},
             )
@@ -284,16 +274,29 @@ class Requester:
             },
         ).get("createTask", {})
 
-    def submit_job(self, job_id: str) -> dict:
+    def approve_job(self, job_id: str, org_id: str) -> dict:
         return self._gql_req(
             query="""
-            mutation InitializeSession($task_id: String!) {
-                initializeSession(task_id: $task_id) {
+            mutation ApproveJob($job_id: String!, $organization_id: String!) {
+                approveJob(job_id: $job_id, organization_id: $organization_id) {
                   id
                   status { code }
                 }
             }
             """,
+            variables={"job_id": job_id, "organization_id": org_id},
+        ).get("approveJob", {})
+
+    def submit_job(self, job_id: str) -> dict:
+        return self._gql_req(
+            query="""
+                    mutation InitializeSession($task_id: String!) {
+                        initializeSession(task_id: $task_id) {
+                          id
+                          status { code }
+                        }
+                    }
+                    """,
             variables={"task_id": job_id},
         ).get("initializeSession", {})
 

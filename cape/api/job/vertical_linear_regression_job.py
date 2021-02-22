@@ -1,7 +1,9 @@
 from typing import Optional
-from .job import Job
+
+from ...vars import JOB_STATUS_CREATED
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
-from ...vars import JOB_STATUS_CREATED, JOB_TYPE_LR
+from .job import Job
 
 
 class VerticallyPartitionedLinearRegression(Job):
