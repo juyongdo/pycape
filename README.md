@@ -26,7 +26,7 @@ Add dataviews to your project, review dataviews added by other organizations wor
 
     data_view = DataView(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
     my_project = c.get_project("project_123")
-    my_project.add_dataview(data_view)
+    my_project.create_dataview(data_view)
 
     dvs = my_project.list_dataviews()
 

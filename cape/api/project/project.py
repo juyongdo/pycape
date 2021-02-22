@@ -18,7 +18,7 @@ class Project(ABC):
 
     Multiple organizations can collaborate on one Project.
 
-        Arguments:
+    Arguments:
         user_id: User ID of requester.
         id: ID of `Project`.
         name: name of `Project`.
@@ -94,7 +94,7 @@ class Project(ABC):
 
     def list_dataviews(self) -> List[DataView]:
         """
-        Calls GQL `query project.dataviews`
+        Returns a list of dataviews for the scoped `Project`.
 
         Returns:
             A list of `DataView` instances.
@@ -118,7 +118,8 @@ class Project(ABC):
         self, id: Optional[str] = None, uri: Optional[str] = None
     ) -> DataView:
         """
-        Calls GQL `query project.dataview`
+        Query a `DataView` for the scoped `Project` by `DataView` \
+        ID or URI.
 
         Arguments:
             id: ID of `DataView`.
@@ -132,10 +133,10 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def add_dataview(self, dataview: DataView) -> DataView:
+    def create_dataview(self, dataview: DataView) -> DataView:
         """
-        Calls GQL `mutation addDataView`
-
+        Creates a `DataView` in Cape Cloud. Returns created `Dataview`
+    
         Arguments:
             dataview: Instance of class `DataView`.
         Returns:
@@ -143,7 +144,7 @@ class Project(ABC):
         """
         # TODO: validate get_input
         data_view_input = dataview._get_input()
-        data_view = self._requester.add_dataview(
+        data_view = self._requester.create_dataview(
             project_id=self.id, data_view_input=data_view_input
         )
         return DataView(user_id=self._user_id, **data_view)
@@ -169,7 +170,8 @@ class Project(ABC):
 
     def submit_job(self, job: Job, timeout: float = 600) -> Job:
         """
-        Calls GQL `mutation createTask`
+        Submits a `Job` to be run by your Cape worker in \
+        collaboration with other organizations in your `Project`. 
 
         Arguments:
             job: Instance of class `Job`.
@@ -189,7 +191,7 @@ class Project(ABC):
 
     def get_job(self, id: str) -> Job:
         """
-        Calls GQL `query project.job`
+        Returns a `Job` given an ID.
 
         Arguments:
             id: ID of `Job`.
@@ -208,14 +210,15 @@ class Project(ABC):
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
 
-    def remove_dataview(self, id: str) -> str:
+    def delete_dataview(self, id: str) -> str:
         """
-        Calls GQL `mutation removeDataView`
+        Remove a `Job` by ID.
 
         Arguments:
             id: ID of `DataView`.
         Returns:
             A success messsage write out.
         """
-        self._requester.remove_dataview(id=id)
-        return self._out.write(f"DataView ({id}) deleted" + "\n")
+        self._requester.delete_dataview(id=id)
+        self._out.write(f"DataView ({id}) deleted" + "\n")
+        return

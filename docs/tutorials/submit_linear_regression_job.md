@@ -78,7 +78,7 @@ Use the `list_projects` method defined on the main `Cape` class, to query a list
 	[Project(id=project_123, name=Sales Transactions, label=sales-transactions)]
 ```
 
-Once you have the project in-memory that you want to add a `DataView` to, you can initialize a `DataView` class and pass the instance to the `add_dataview` method.
+Once you have the project in-memory that you want to add a `DataView` to, you can initialize a `DataView` class and pass the instance to the `create_dataview` method.
 
 ```python
     >>> my_project = c.get_project(id="project_123")
@@ -89,7 +89,7 @@ Once you have the project in-memory that you want to add a `DataView` to, you ca
     >>>     uri="s3://my-data.csv", 
     >>>     owner_label="my-org"
     >>> )
-    >>> my_project.add_dataview(data_view)
+    >>> my_project.create_dataview(data_view)
 ```
 All `DataViews` must be associated with an organization. This association can be made by passing eiher an `owner_label` or an `owner_id` to the [`DataView`](/libraries/cape-ds/reference#cape.api.dataview.dataview.DataView.__init__) class instantiation.
 

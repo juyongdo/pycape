@@ -29,7 +29,7 @@ class Cape(ABC):
 
     def login(self, token: Optional[str] = None) -> str:
         """
-        Calls `POST /v1/login`
+        Calls `POST /v1/login`. Authenticate with Cape Cloud in order to make subsequent requests.
 
         Arguments:
             token:  User authentication token.
@@ -41,7 +41,7 @@ class Cape(ABC):
 
     def list_projects(self) -> str:
         """
-        Calls GQL `query projects`
+        Returns all list of projects that requesting user is a contributor of.
 
         Returns:
             A list of `Project` instances.
@@ -59,7 +59,10 @@ class Cape(ABC):
         self, id: Optional[str] = None, label: Optional[str] = None
     ) -> Project:
         """
-        Calls GQL `query project`
+        Query a `Project` by either ID or label.
+
+        Returns:
+            A list of `Project` instances.
 
         Arguments:
             id: ID of `Project`.
@@ -88,9 +91,9 @@ class Cape(ABC):
         )
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
 
-    def remove_project(self, id: str) -> str:
+    def delete_project(self, id: str) -> str:
         """
-        Calls GQL `mutation archiveProject`
+        Delete a `Job` by ID.
 
         Arguments:
             id: ID of `Project`.

@@ -4,8 +4,11 @@
 ::: cape.Cape
     handler: python
     selection:
-        filters:
-            - "!^_"  # exlude all members starting with _
+        members:
+            - login
+            - list_projects
+            - get_project
+            - delete_project
     rendering:
         heading_level: 4
         show_root_heading: false
@@ -19,10 +22,10 @@
         members:
             - list_dataviews
             - get_dataview
-            - add_dataview
+            - create_dataview
             - get_job
             - submit_job
-            - remove_dataview
+            - delete_dataview
     rendering:
         heading_level: 4
         show_root_heading: false
@@ -34,8 +37,7 @@
     handler: python
     selection:
         members:
-            - "!^_"  # exlude all members starting with _
-            - "!"  # exlude all members starting with _
+            - "!"  # exlude all members
     rendering:
         heading_level: 4
         show_root_heading: false

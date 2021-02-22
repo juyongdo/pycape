@@ -95,7 +95,7 @@ class TestProject:
             ),
         ],
     )
-    def test_add_dataview(self, json, uri_type, schema, exception, mocker):
+    def test_create_dataview(self, json, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -114,7 +114,7 @@ class TestProject:
             my_data_view = DataView(
                 name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
             )
-            dataview = my_project.add_dataview(dataview=my_data_view)
+            dataview = my_project.create_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(dataview, DataView)
@@ -324,7 +324,7 @@ class TestProject:
             ),
         ],
     )
-    def test_remove_dataview(self, id, json, exception, mocker):
+    def test_delete_dataview(self, id, json, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -339,7 +339,7 @@ class TestProject:
                 name="my project",
                 label="my-project",
             )
-            my_project.remove_dataview(id=id)
+            my_project.delete_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
