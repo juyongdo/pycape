@@ -78,7 +78,7 @@ DataViews can also be instantiated as a list of data types. Accepted schema data
 ```python
     my_project = c.get_project(id="project_123")
 
-    my_project.remove_dataview(id="dataview_123")
+    my_project.delete_dataview(id="dataview_123")
 ```
 
 Default response:

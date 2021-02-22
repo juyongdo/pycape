@@ -276,7 +276,7 @@ class TestProject:
             ),
         ],
     )
-    def test_remove_dataview(self, id, json, exception, mocker):
+    def test_delete_dataview(self, id, json, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -291,7 +291,7 @@ class TestProject:
                 name="my project",
                 label="my-project",
             )
-            my_project.remove_dataview(id=id)
+            my_project.delete_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()

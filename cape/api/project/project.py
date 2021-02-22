@@ -211,7 +211,7 @@ class Project(ABC):
             job_type=job_type, **job, project_id=self.id, requester=self._requester,
         )
 
-    def remove_dataview(self, id: str) -> str:
+    def delete_dataview(self, id: str) -> str:
         """
         Calls GQL `mutation removeDataView`
 
@@ -220,5 +220,5 @@ class Project(ABC):
         Returns:
             A success messsage write out.
         """
-        self._requester.remove_dataview(id=id)
+        self._requester.delete_dataview(id=id)
         return self._out.write(f"DataView ({id}) deleted" + "\n")

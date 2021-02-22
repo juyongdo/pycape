@@ -256,7 +256,7 @@ class Requester:
             .get("data_views")
         )
 
-    def remove_dataview(self, id: str) -> dict:
+    def delete_dataview(self, id: str) -> dict:
         return self._gql_req(
             query="""
                 mutation RemoveDataView($id: String!) {

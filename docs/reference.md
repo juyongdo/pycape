@@ -22,7 +22,7 @@
             - add_dataview
             - get_job
             - submit_job
-            - remove_dataview
+            - delete_dataview
     rendering:
       show_root_heading: false
       show_source: false
