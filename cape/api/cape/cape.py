@@ -93,7 +93,7 @@ class Cape(ABC):
         )
         return Project(requester=self.__requester, user_id=self.__user_id, **project)
 
-    def remove_project(self, id: str) -> str:
+    def delete_project(self, id: str) -> str:
         """
         Calls GQL `mutation archiveProject`
 
