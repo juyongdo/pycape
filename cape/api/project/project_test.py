@@ -4,13 +4,17 @@ from io import StringIO
 import pytest
 import responses
 
-from ..dataview.dataview import DataView
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
-from ..project.project import Project
+from tests.fake import FAKE_HOST
+from tests.fake import fake_dataframe
+
 from ...exceptions import GQLException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
-from tests.fake import FAKE_HOST, fake_dataframe
+from ..dataview.dataview import DataView
+from ..job.job import Job
+from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..organization.organization import Organization
+from ..project.project import Project
 
 
 @contextlib.contextmanager
@@ -29,8 +33,36 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "json,uri_type,schema,exception",
         [
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "http://my-data.csv",
+                        }
+                    }
+                },
+                "http",
+                None,
+                notraising(),
+            ),
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "https://my-data.csv",
+                        }
+                    }
+                },
+                "https",
+                None,
+                notraising(),
+            ),
             (
                 {
                     "data": {
@@ -41,15 +73,33 @@ class TestProject:
                         }
                     }
                 },
+                "s3",
+                [{"name": "col_1", "schema_type": "integer"}],
                 notraising(),
             ),
             (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "s3://my-data.csv",
+                        }
+                    }
+                },
+                "s3",
+                None,
+                pytest.raises(Exception, match="DataView schema must be specified."),
+            ),
+            (
                 {"errors": [{"message": "something went wrong"}]},
+                "http",
+                None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_create_dataview(self, json, exception, mocker):
+    def test_create_dataview(self, json, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -65,7 +115,9 @@ class TestProject:
                 name="my project",
                 label="my project",
             )
-            my_data_view = DataView(name="my-data", uri="s3://my-data.csv")
+            my_data_view = DataView(
+                name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
+            )
             dataview = my_project.create_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
@@ -74,9 +126,10 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "user_id,json,out_expect,exception",
         [
             (
+                "user_123",
                 {
                     "data": {
                         "project": {
@@ -90,20 +143,78 @@ class TestProject:
                                     "schema": [
                                         {"name": "col_1", "schema_type": "string"}
                                     ],
+                                    "owner": {
+                                        "id": "org_123",
+                                        "label": "my-org",
+                                        "members": [{"id": "user_123"}],
+                                    },
                                 }
                             ],
                         }
                     }
                 },
+                (
+                    "DATAVIEW ID    NAME         LOCATION    OWNER"
+                    "\n-------------  -----------  ----------  ------------\n"
+                    "def123         my-dataview  https       my-org (You)"
+                ),
                 notraising(),
             ),
             (
+                "user_123",
+                {
+                    "data": {
+                        "project": {
+                            "id": "abc123",
+                            "label": "my-project",
+                            "data_views": [
+                                {
+                                    "id": "def123",
+                                    "name": "my-dataview",
+                                    "location": "https",
+                                    "schema": [
+                                        {"name": "col_1", "schema_type": "string"}
+                                    ],
+                                    "owner": {
+                                        "id": "org_123",
+                                        "label": "my-org",
+                                        "members": [{"id": "user_123"}],
+                                    },
+                                },
+                                {
+                                    "id": "def456",
+                                    "name": "your-dataview",
+                                    "location": "",
+                                    "schema": [
+                                        {"name": "col_1", "schema_type": "string"}
+                                    ],
+                                    "owner": {
+                                        "id": "another_org_123",
+                                        "label": "your-org",
+                                        "members": [{"id": "another_user_123"}],
+                                    },
+                                },
+                            ],
+                        }
+                    }
+                },
+                (
+                    "DATAVIEW ID    NAME           LOCATION    OWNER"
+                    "\n-------------  -------------  ----------  ------------\n"
+                    "def123         my-dataview    https       my-org (You)\n"
+                    "def456         your-dataview              your-org"
+                ),
+                notraising(),
+            ),
+            (
+                None,
                 {"errors": [{"message": "something went wrong"}]},
+                None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_list_dataviews(self, json, exception, mocker):
+    def test_list_dataviews(self, user_id, json, out_expect, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -116,20 +227,20 @@ class TestProject:
             my_project = Project(
                 requester=r,
                 out=out,
-                user_id=None,
+                user_id=user_id,
                 id="123",
                 name="my project",
                 label="my project",
             )
-            my_project.list_dataviews()
+            dataviews = my_project.list_dataviews()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
-            assert output == (
-                "DATAVIEW ID    NAME         LOCATION    SCHEMA"
-                "\n-------------  -----------  ----------  -------------------\n"
-                "def123         my-dataview              {'col_1': 'string'}"
-            )
+            assert output == out_expect
+            assert isinstance(dataviews, list)
+            assert dataviews[0].id == "def123"
+            assert isinstance(dataviews[0].schema, dict)
+            assert dataviews[0].schema["col_1"] == "string"
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -297,3 +408,26 @@ class TestProject:
             output = out.getvalue().strip()
             assert isinstance(output, str)
             assert output == "DataView (job_123) deleted"
+
+    @responses.activate
+    def test_approve_job(self):
+        responses.add(
+            responses.POST,
+            f"{FAKE_HOST}/v1/query",
+            json={
+                "data": {
+                    "approveJob": {
+                        "id": "abc123",
+                        "status": {"code": "Initialized"},
+                        "task": {"type": JOB_TYPE_LR},
+                    }
+                }
+            },
+        )
+        r = Requester(endpoint=FAKE_HOST)
+        my_project = Project(
+            requester=r, user_id=None, id="123", name="my project", label="my-project",
+        )
+        org = Organization(id="org123")
+        j = Job(id="abc123", job_type=JOB_TYPE_LR, requester=r)
+        my_project.approve_job(j, org)

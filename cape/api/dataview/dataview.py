@@ -1,9 +1,13 @@
 import json
-from urllib.error import HTTPError
 from abc import ABC
-from typing import Union, List
+from typing import List
+from typing import Union
+from urllib.error import HTTPError
+from urllib.parse import urlparse
+
 import pandas as pd
-from marshmallow import Schema, fields
+from marshmallow import Schema
+from marshmallow import fields
 
 from ...utils import filter_date
 from ...vars import PANDAS_TO_JSON_DATATYPES
@@ -52,6 +56,7 @@ class DataView(ABC):
         ) else owner_label
         self._user_id: str = user_id
         self.schema: Union[pd.Series, List, None] = schema
+        self._owner: dict = owner
         self._cols = None
 
     def __repr__(self):
@@ -66,11 +71,9 @@ class DataView(ABC):
 
     @property
     def location(self) -> str:
-        """
-        Protect location property by validating authorized user is the owner of the DataView
-        """
-        if self._validate_owner():
-            return self.uri or self._location
+        if not self._location:
+            return self.uri or None
+        return self.uri or self._location
 
     @property
     def schema(self) -> dict:
@@ -110,21 +113,19 @@ class DataView(ABC):
 
         raise Exception("Schema is not of type pd.Series")
 
-    def _validate_owner(self):
-        """
-        Validating authorized user is the owner of the DataView
-        """
-        if self._user_id and self._owner_id and self._user_id == self._owner_id:
-            return True
-        return False
-
     def _get_input(self):
         """
         Format dict for gql type DataViewInput
         """
-        if not hasattr(self, "_schema"):
+
+        if not hasattr(self, "_schema") and urlparse(self.uri).scheme in [
+            "http",
+            "https",
+        ]:
             schema = self._get_schema_from_uri()
             self._schema = schema
+        elif not hasattr(self, "_schema"):
+            raise Exception("DataView schema must be specified.")
 
         return {
             k: v
