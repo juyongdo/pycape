@@ -6,7 +6,6 @@ import requests
 from ..exceptions import GQLException
 from .api_token import APIToken
 from .base64 import from_string
-from IPython import embed
 
 
 class NotAUserException(Exception):

@@ -10,7 +10,6 @@ from marshmallow import fields
 
 from ...utils import filter_date
 from ...vars import PANDAS_TO_JSON_DATATYPES
-from IPython import embed
 
 
 class DataView(ABC):

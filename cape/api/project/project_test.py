@@ -12,7 +12,6 @@ from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from ..organization.organization import Organization
 from ..project.project import Project
 
@@ -393,9 +392,9 @@ class TestProject:
             job = my_project.get_job(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(job, VerticalLinearRegressionJob)
+            assert isinstance(job, Job)
             assert job.id == id
-            assert job.status == {"code": "Initialized"}
+            assert job.status == "Initialized"
 
     @responses.activate
     @pytest.mark.parametrize(
@@ -471,5 +470,11 @@ class TestProject:
             requester=r, user_id=None, id="123", name="my project", label="my-project",
         )
         org = Organization(id="org123")
-        j = Job(id="abc123", job_type=JOB_TYPE_LR, requester=r)
+        j = Job(
+            id="abc123",
+            status={"code": "Initialized"},
+            task={"type": JOB_TYPE_LR},
+            requester=r,
+            project_id="p_123",
+        )
         my_project.approve_job(j, org)

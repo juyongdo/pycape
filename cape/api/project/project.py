@@ -8,12 +8,10 @@ from tabulate import tabulate
 from urllib.parse import urlparse
 
 from ...network.requester import Requester
-from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..task.task import Task
 from ..organization.organization import Organization
-from IPython import embed
 
 
 class Project(ABC):
@@ -75,28 +73,12 @@ class Project(ABC):
             self.dataviews: List[DataView] = [DataView(**d) for d in data_views]
 
         if jobs is not None:
-            jobs_temp = []
-            for j in jobs:
-                job_type = j.get("task", {}).get("type")
-                job_class = self._get_job_class(job_type=job_type)
-                jobs_temp.append(
-                    job_class(
-                        job_type=job_type,
-                        project_id=self.id,
-                        **j,
-                        requester=self._requester,
-                    )
-                )
-
-            self.jobs: List[Job] = jobs_temp
+            self.jobs: List[Job] = [
+                Job(project_id=self.id, **j, requester=self._requester,) for j in jobs
+            ]
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
-
-    @staticmethod
-    def _get_job_class(job_type):
-        job_type_map = {JOB_TYPE_LR: VerticalLinearRegressionJob}
-        return job_type_map.get(job_type)
 
     def add_org(self, org_id: str):
         """
@@ -210,7 +192,7 @@ class Project(ABC):
             self.dataviews = [data_view]
         return data_view
 
-    def _create_job(self, job: Job, timeout: float = 600) -> Job:
+    def _create_task(self, task: Task, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -220,16 +202,14 @@ class Project(ABC):
             A `Job` instance.
         """
 
-        job_instance = {k: v for k, v in job.__dict__.items()}
+        task_config = {k: v for k, v in task.__dict__.items()}
 
-        created_job = job.__class__(
-            **job_instance, requester=self._requester,
-        )._create_job(project_id=self.id, timeout=timeout)
-        return job.__class__(
-            job_type=job.job_type, **created_job, requester=self._requester,
+        created_task = task.__class__(**task_config)._create_task(
+            project_id=self.id, timeout=timeout, requester=self._requester
         )
+        return task.__class__(**created_task)
 
-    def submit_job(self, job: Job, timeout: float = 600) -> Job:
+    def submit_job(self, task: Task, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -238,25 +218,17 @@ class Project(ABC):
         Returns:
             A `Job` instance.
         """
-        created_job = self._create_job(job, timeout=timeout)
+        created_job = self._create_task(task=task, timeout=timeout)
 
-        submitted_job = created_job._submit_job()
+        submitted_job = created_job._submit_job(requester=self._requester)
 
-        return job.__class__(
-            job_type=job.job_type,
-            project_id=self.id,
-            **submitted_job,
-            requester=self._requester,
-        )
+        return Job(project_id=self.id, **submitted_job, requester=self._requester)
 
     def approve_job(self, job: Job, org: Organization) -> Job:
         approved_job = job._approve_job(org.id)
 
         return job.__class__(
-            job_type=job.job_type,
-            project_id=self.id,
-            **approved_job,
-            requester=self._requester,
+            project_id=self.id, **approved_job, requester=self._requester,
         )
 
     def get_job(self, id: str) -> Job:
@@ -270,13 +242,7 @@ class Project(ABC):
         """
         job = self._requester.get_job(project_id=self.id, job_id=id, return_params="")
 
-        job_type = job.get("task", {}).get("type")
-
-        job_class = self._get_job_class(job_type=job_type)
-
-        return job_class(
-            job_type=job_type, **job, project_id=self.id, requester=self._requester,
-        )
+        return Job(**job, project_id=self.id, requester=self._requester)
 
     def delete_dataview(self, id: str) -> str:
         """
