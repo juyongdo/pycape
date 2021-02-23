@@ -1,5 +1,5 @@
 from ..dataview.dataview import DataView
-from .vertical_linear_regression_task import VerticalLinearRegression
+from .vertical_linear_regression_task import VerticallyPartitionedLinearRegression
 from .task import Task
 
 
@@ -25,9 +25,9 @@ class TestTask:
             location="s3://my-data.csv",
             schema=[{"name": "b", "schema_type": "string"}],
         )
-        t = VerticalLinearRegression(
+        t = VerticallyPartitionedLinearRegression(
             x_train_dataview=dataview_x, y_train_dataview=dataview_y["b"],
         )
-        rep = "VerticalLinearRegression(x_train_dataview=my-data-x, y_train_dataview=my-data-y['b'])"
+        rep = "VerticallyPartitionedLinearRegression(x_train_dataview=my-data-x, y_train_dataview=my-data-y['b'])"
 
         assert repr(t) == rep

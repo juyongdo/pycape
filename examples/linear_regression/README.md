@@ -68,7 +68,7 @@ Data Views:
 	DataView(id=01EY8QX1CT5DDWBTXV9YCCA1J8, name=alice_org-data, location=None)
 	DataView(id=01EY8QX1DARH6CME93W511BE1Q, name=bob_org-data, location=None)
 
-Submitted job VerticalLinearRegressionJob(id=01EY8S9V7VATVQ1Y1JX46QZFPW, job_type=LINEAR_REGRESSION, status=Initialized) to run
+Submitted job VerticallyPartitionedLinearRegression(id=01EY8S9V7VATVQ1Y1JX46QZFPW, job_type=LINEAR_REGRESSION, status=Initialized) to run
 Waiting for job completion...
 Received status Completed. Exitting...
 ```

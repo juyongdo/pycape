@@ -6,7 +6,7 @@ import pandas as pd
 
 from cape import Cape
 from cape import DataView
-from cape import VerticalLinearRegressionJob
+from cape import VerticallyPartitionedLinearRegression
 
 parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")
 parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))
@@ -77,7 +77,7 @@ def make_job():
     for dv in project.dataviews:
         print(f'\t{dv}')
 
-    job = VerticalLinearRegressionJob(
+    job = VerticallyPartitionedLinearRegression(
         x_train_dataview=project.dataviews[0]['col1'],
         y_train_dataview=project.dataviews[1]['col1'],
     )

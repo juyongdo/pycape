@@ -9,7 +9,7 @@ from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..project.project import Project
-from ..task.vertical_linear_regression_task import VerticalLinearRegression
+from ..task.vertical_linear_regression_task import VerticallyPartitionedLinearRegression
 from .job import Job
 
 
@@ -155,7 +155,7 @@ class TestJob:
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
             }
-            vlr = VerticalLinearRegression(**task_config)
+            vlr = VerticallyPartitionedLinearRegression(**task_config)
 
             submitted_job = my_project.submit_job(vlr)
 

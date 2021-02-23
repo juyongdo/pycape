@@ -6,7 +6,7 @@ from ..dataview.dataview import DataView
 from .task import Task
 
 
-class VerticalLinearRegression(Task):
+class VerticallyPartitionedLinearRegression(Task):
     """
     Intializes a Job that can be submitted to Cape to train a Linear Regression Model.
 
