@@ -4,7 +4,7 @@ from ...vars import JOB_STATUS_CREATED
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from .job import Job
-
+from IPython import embed
 
 class VerticalLinearRegressionJob(Job):
     """

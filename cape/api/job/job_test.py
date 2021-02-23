@@ -12,7 +12,7 @@ from ..dataview.dataview import DataView
 from ..project.project import Project
 from .job import Job
 from .vertical_linear_regression_job import VerticalLinearRegressionJob
-
+from IPython import embed
 
 @contextlib.contextmanager
 def notraising():
@@ -33,16 +33,16 @@ class TestJob:
         [
             (
                 {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 notraising(),
             ),
             (
                 {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(name="my-data", uri="s3://my-data.csv"),
-                DataView(name="my-data_1", uri="s3://my-data-2.csv"),
+                DataView(name="my-data", location="s3://my-data.csv"),
+                DataView(name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 pytest.raises(
@@ -52,8 +52,8 @@ class TestJob:
             ),
             (
                 {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 None,
                 None,
                 pytest.raises(
@@ -63,8 +63,8 @@ class TestJob:
             ),
             (
                 {"errors": [{"message": "something went wrong"}]},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 pytest.raises(Exception, match="An error occurred: .*"),
@@ -74,13 +74,13 @@ class TestJob:
                 DataView(
                     id="dv_1",
                     name="my-data",
-                    uri="s3://my-data.csv",
+                    location="s3://my-data.csv",
                     schema=[{"name": "123", "schema_type": "string"}],
                 ),
                 DataView(
                     id="dv_2",
                     name="my-data_1",
-                    uri="s3://my-data-2.csv",
+                    location="s3://my-data-2.csv",
                     schema=[{"name": "123", "schema_type": "string"}],
                 ),
                 None,

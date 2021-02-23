@@ -1,11 +1,11 @@
 import io
 import sys
 from abc import ABC
-from typing import Dict
-from typing import List
-from typing import Optional
-
+from typing import Dict, List, Optional, Union
+import pandas as pd
 from tabulate import tabulate
+
+from urllib.parse import urlparse
 
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
@@ -13,6 +13,7 @@ from ..dataview.dataview import DataView
 from ..job.job import Job
 from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from ..organization.organization import Organization
+from IPython import embed
 
 
 class Project(ABC):
@@ -167,7 +168,14 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def create_dataview(self, dataview: DataView) -> DataView:
+    def create_dataview(
+        self,
+        name: str,
+        uri: str,
+        owner_id: Optional[str] = None,
+        owner_label: Optional[str] = None,
+        schema: Union[pd.Series, List, None] = None,
+    ) -> DataView:
         """
         Calls GQL `mutation addDataView`
 
@@ -176,10 +184,23 @@ class Project(ABC):
         Returns:
             A `DataView` instance.
         """
-        # TODO: validate get_input
-        data_view_input = dataview._get_input()
+        parse_schema = DataView._validate_schema(schema)
+
+        if not parse_schema and urlparse(uri).scheme in [
+            "http",
+            "https",
+        ]:
+            parse_schema = DataView._get_schema_from_uri(uri)
+        elif not parse_schema:
+            raise Exception("DataView schema must be specified.")
+
         data_view_dict = self._requester.create_dataview(
-            project_id=self.id, data_view_input=data_view_input
+            project_id=self.id,
+            name=name,
+            uri=uri,
+            owner_id=owner_id,
+            owner_label=owner_label,
+            schema=parse_schema,
         )
         data_view = DataView(user_id=self._user_id, **data_view_dict)
 

@@ -133,10 +133,12 @@ class TestProject:
                 label="my project",
                 data_views=dvs,
             )
-            my_data_view = DataView(
-                name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
+            dataview = my_project.create_dataview(
+                name="my-data",
+                uri=f"{uri_type}://my-data.csv",
+                owner_id="fsda",
+                schema=schema,
             )
-            dataview = my_project.create_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(dataview, DataView)

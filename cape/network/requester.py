@@ -6,6 +6,7 @@ import requests
 from ..exceptions import GQLException
 from .api_token import APIToken
 from .base64 import from_string
+from IPython import embed
 
 
 class NotAUserException(Exception):
@@ -209,7 +210,15 @@ class Requester:
             variables={"project_id": project_id, "organization_id": org_id},
         ).get("addProjectOrganization")
 
-    def create_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
+    def create_dataview(
+        self,
+        project_id: str,
+        name: str,
+        uri: str,
+        owner_id: Optional[str],
+        owner_label: Optional[str],
+        schema: list,
+    ) -> Optional[dict]:
         return self._gql_req(
             query=f"""
             mutation AddDataView (
@@ -221,7 +230,16 @@ class Requester:
               }}
             }}
             """,
-            variables={"project_id": project_id, "data_view_input": data_view_input},
+            variables={
+                "project_id": project_id,
+                "data_view_input": {
+                    "name": name,
+                    "uri": uri,
+                    "owner_id": owner_id,
+                    "owner_label": owner_label,
+                    "schema": schema,
+                },
+            },
         ).get("addDataView")
 
     def list_dataviews(self, project_id: str) -> Optional[list]:
