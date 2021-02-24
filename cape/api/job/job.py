@@ -1,7 +1,5 @@
-import json
 import tempfile
 from abc import ABC
-from typing import Optional
 from typing import Tuple
 from urllib.parse import urlparse
 
@@ -9,7 +7,6 @@ import boto3
 import numpy as np
 
 from ...network.requester import Requester
-from ...vars import JOB_TYPES
 
 
 class Job(ABC):
@@ -17,37 +14,24 @@ class Job(ABC):
     Job objects keep track of jobs that will be/have been submitted to cape workers.
     """
 
-    job_type: str
-    id: Optional[str]
+    def __init__(
+        self, id: str, status: dict, task: dict, project_id: str, requester: Requester
+    ):
+        self.id = id
+        self.status = status
+        self.project_id = project_id
 
-    def __init__(self, requester: Requester = None, **kwargs):
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
+        if task:
+            self.job_type = task.get("type", {})
+
+        if status:
+            self.status = status.get("code")
 
         if requester:
             self._requester = requester
 
-        if not self.job_type:
-            raise Exception("Jobs cannot be initialized without a job type")
-        elif self.job_type not in JOB_TYPES:
-            raise Exception("Job initialized with invalid job type")
-
     def __repr__(self):
-        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status.get('code')})"
-
-    def _create_job(
-        self, project_id: str, timeout: float = 600, task_config: dict = None
-    ) -> dict:
-        task_config["timeout"] = timeout
-
-        return self._requester.create_job(
-            project_id=project_id,
-            job_type=self.job_type,
-            task_config=json.dumps(task_config) if task_config else None,
-        )
-
-    def _submit_job(self) -> dict:
-        return self._requester.submit_job(job_id=self.id)
+        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status})"
 
     def _approve_job(self, org_id: str) -> dict:
         return self._requester.approve_job(job_id=self.id, org_id=org_id)
@@ -60,7 +44,7 @@ class Job(ABC):
             A `Job` status string.
         """
         job = self._requester.get_job(
-            project_id=self.project_id, job_id=self.id, return_params="status { code }"
+            project_id=self.project_id, job_id=self.id, return_params=""
         )
         return job.get("status", {}).get("code")
 

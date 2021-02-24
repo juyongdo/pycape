@@ -51,8 +51,8 @@
       show_source: false
       show_root_toc_entry: false
 
-## VerticalLinearRegressionJob
-::: cape.api.job.vertical_linear_regression_job.VerticalLinearRegressionJob
+## VerticallyPartitionedLinearRegression
+::: cape.api.job.vertical_linear_regression_job.VerticallyPartitionedLinearRegression
     handler: python
     selection:
         filters:

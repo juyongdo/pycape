@@ -12,7 +12,6 @@ from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
 from ..organization.organization import Organization
 from ..project.project import Project
 
@@ -33,7 +32,7 @@ class TestProject:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,uri_type,schema,exception",
+        "json,dvs,uri_type,schema,exception",
         [
             (
                 {
@@ -45,6 +44,7 @@ class TestProject:
                         }
                     }
                 },
+                [],
                 "http",
                 None,
                 notraising(),
@@ -59,6 +59,7 @@ class TestProject:
                         }
                     }
                 },
+                [],
                 "https",
                 None,
                 notraising(),
@@ -73,6 +74,19 @@ class TestProject:
                         }
                     }
                 },
+                [
+                    {
+                        "id": "def123",
+                        "name": "my-dataview",
+                        "location": "https",
+                        "schema": [{"name": "col_1", "schema_type": "string"}],
+                        "owner": {
+                            "id": "org_123",
+                            "label": "my-org",
+                            "members": [{"id": "user_123"}],
+                        },
+                    }
+                ],
                 "s3",
                 [{"name": "col_1", "schema_type": "integer"}],
                 notraising(),
@@ -87,19 +101,21 @@ class TestProject:
                         }
                     }
                 },
+                [],
                 "s3",
                 None,
                 pytest.raises(Exception, match="DataView schema must be specified."),
             ),
             (
                 {"errors": [{"message": "something went wrong"}]},
+                [],
                 "http",
                 None,
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_create_dataview(self, json, uri_type, schema, exception, mocker):
+    def test_create_dataview(self, json, dvs, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
                 "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
@@ -114,14 +130,19 @@ class TestProject:
                 id="123",
                 name="my project",
                 label="my project",
+                data_views=dvs,
             )
-            my_data_view = DataView(
-                name="my-data", uri=f"{uri_type}://my-data.csv", schema=schema
+            dataview = my_project.create_dataview(
+                name="my-data",
+                uri=f"{uri_type}://my-data.csv",
+                owner_id="fsda",
+                schema=schema,
             )
-            dataview = my_project.create_dataview(dataview=my_data_view)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(dataview, DataView)
+            assert len(my_project.dataviews) == len(dvs) + 1
+            assert isinstance(my_project.dataviews[len(dvs) - 1], DataView)
             assert dataview.id == "abc123"
 
     @responses.activate
@@ -371,23 +392,41 @@ class TestProject:
             job = my_project.get_job(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(job, VerticalLinearRegressionJob)
+            assert isinstance(job, Job)
             assert job.id == id
-            assert job.status == {"code": "Initialized"}
+            assert job.status == "Initialized"
 
     @responses.activate
     @pytest.mark.parametrize(
-        "id,json,exception",
+        "id,json,dvs,exception",
         [
-            ("job_123", {"data": {"removeDataView": {"id": "job_123"}}}, notraising(),),
             (
-                "job_123",
+                "dv_123",
+                {"data": {"removeDataView": {"id": "dv_123"}}},
+                [
+                    {
+                        "id": "dv_123",
+                        "name": "my-dataview",
+                        "location": "https",
+                        "schema": [{"name": "col_1", "schema_type": "string"}],
+                        "owner": {
+                            "id": "org_123",
+                            "label": "my-org",
+                            "members": [{"id": "user_123"}],
+                        },
+                    }
+                ],
+                notraising(),
+            ),
+            (
+                "dv_123",
                 {"errors": [{"message": "something went wrong"}]},
+                [],
                 pytest.raises(GQLException, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_delete_dataview(self, id, json, exception, mocker):
+    def test_delete_dataview(self, id, json, dvs, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -401,13 +440,15 @@ class TestProject:
                 id="123",
                 name="my project",
                 label="my-project",
+                data_views=dvs,
             )
             my_project.delete_dataview(id=id)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             output = out.getvalue().strip()
             assert isinstance(output, str)
-            assert output == "DataView (job_123) deleted"
+            assert output == "DataView (dv_123) deleted"
+            assert len(my_project.dataviews) == len(dvs) - 1
 
     @responses.activate
     def test_approve_job(self):
@@ -429,5 +470,11 @@ class TestProject:
             requester=r, user_id=None, id="123", name="my project", label="my-project",
         )
         org = Organization(id="org123")
-        j = Job(id="abc123", job_type=JOB_TYPE_LR, requester=r)
+        j = Job(
+            id="abc123",
+            status={"code": "Initialized"},
+            task={"type": JOB_TYPE_LR},
+            requester=r,
+            project_id="p_123",
+        )
         my_project.approve_job(j, org)

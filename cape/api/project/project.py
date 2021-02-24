@@ -1,17 +1,16 @@
 import io
 import sys
 from abc import ABC
-from typing import Dict
-from typing import List
-from typing import Optional
-
+from typing import Dict, List, Optional, Union
+import pandas as pd
 from tabulate import tabulate
 
+from urllib.parse import urlparse
+
 from ...network.requester import Requester
-from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..job.vertical_linear_regression_job import VerticalLinearRegressionJob
+from ..task.task import Task
 from ..organization.organization import Organization
 
 
@@ -32,6 +31,7 @@ class Project(ABC):
         owner: Optional[dict] = None,
         organizations: Optional[List[Dict]] = None,
         data_views: Optional[List[Dict]] = None,
+        jobs: Optional[List[Dict]] = None,
         requester: Optional[Requester] = None,
         out: Optional[io.StringIO] = None,
     ):
@@ -65,22 +65,20 @@ class Project(ABC):
         self.description: Optional[str] = description
 
         if organizations is not None:
-            self.organizations: List[Organization] = list(
-                map(lambda org_json: Organization(**org_json), organizations)
-            )
+            self.organizations: List[Organization] = [
+                Organization(**o) for o in organizations
+            ]
 
         if data_views is not None:
-            self.dataviews: List[DataView] = list(
-                map(lambda dv_json: DataView(**dv_json), data_views)
-            )
+            self.dataviews: List[DataView] = [DataView(**d) for d in data_views]
+
+        if jobs is not None:
+            self.jobs: List[Job] = [
+                Job(project_id=self.id, **j, requester=self._requester,) for j in jobs
+            ]
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
-
-    @staticmethod
-    def _get_job_class(job_type):
-        job_type_map = {JOB_TYPE_LR: VerticalLinearRegressionJob}
-        return job_type_map.get(job_type)
 
     def add_org(self, org_id: str):
         """
@@ -121,7 +119,6 @@ class Project(ABC):
             dv_locations.append(dv.location)
             dv_owner_label = dv._owner.get("label")
             if self._user_id in [x.get("id") for x in dv._owner.get("members")]:
-
                 dv_owners.append(f"{dv_owner_label} (You)")
             else:
                 dv_owners.append(dv_owner_label)
@@ -153,7 +150,14 @@ class Project(ABC):
 
         return DataView(user_id=self._user_id, **data_view[0]) if data_view else None
 
-    def create_dataview(self, dataview: DataView) -> DataView:
+    def create_dataview(
+        self,
+        name: str,
+        uri: str,
+        owner_id: Optional[str] = None,
+        owner_label: Optional[str] = None,
+        schema: Union[pd.Series, List, None] = None,
+    ) -> DataView:
         """
         Calls GQL `mutation addDataView`
 
@@ -162,14 +166,33 @@ class Project(ABC):
         Returns:
             A `DataView` instance.
         """
-        # TODO: validate get_input
-        data_view_input = dataview._get_input()
-        data_view = self._requester.create_dataview(
-            project_id=self.id, data_view_input=data_view_input
-        )
-        return DataView(user_id=self._user_id, **data_view)
+        parse_schema = DataView._validate_schema(schema)
 
-    def _create_job(self, job: Job, timeout: float = 600) -> Job:
+        if not parse_schema and urlparse(uri).scheme in [
+            "http",
+            "https",
+        ]:
+            parse_schema = DataView._get_schema_from_uri(uri)
+        elif not parse_schema:
+            raise Exception("DataView schema must be specified.")
+
+        data_view_dict = self._requester.create_dataview(
+            project_id=self.id,
+            name=name,
+            uri=uri,
+            owner_id=owner_id,
+            owner_label=owner_label,
+            schema=parse_schema,
+        )
+        data_view = DataView(user_id=self._user_id, **data_view_dict)
+
+        if hasattr(self, "dataviews"):
+            self.dataviews.append(data_view)
+        else:
+            self.dataviews = [data_view]
+        return data_view
+
+    def _create_task(self, task: Task, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -179,16 +202,14 @@ class Project(ABC):
             A `Job` instance.
         """
 
-        job_instance = {k: v for k, v in job.__dict__.items()}
+        task_config = {k: v for k, v in task.__dict__.items()}
 
-        created_job = job.__class__(
-            **job_instance, requester=self._requester,
-        )._create_job(project_id=self.id, timeout=timeout)
-        return job.__class__(
-            job_type=job.job_type, **created_job, requester=self._requester,
+        created_task = task.__class__(**task_config)._create_task(
+            project_id=self.id, timeout=timeout, requester=self._requester
         )
+        return task.__class__(**created_task)
 
-    def submit_job(self, job: Job, timeout: float = 600) -> Job:
+    def submit_job(self, task: Task, timeout: float = 600) -> Job:
         """
         Calls GQL `mutation createTask`
 
@@ -197,25 +218,17 @@ class Project(ABC):
         Returns:
             A `Job` instance.
         """
-        created_job = self._create_job(job, timeout=timeout)
+        created_job = self._create_task(task=task, timeout=timeout)
 
-        submitted_job = created_job._submit_job()
+        submitted_job = created_job._submit_job(requester=self._requester)
 
-        return job.__class__(
-            job_type=job.job_type,
-            project_id=self.id,
-            **submitted_job,
-            requester=self._requester,
-        )
+        return Job(project_id=self.id, **submitted_job, requester=self._requester)
 
     def approve_job(self, job: Job, org: Organization) -> Job:
         approved_job = job._approve_job(org.id)
 
         return job.__class__(
-            job_type=job.job_type,
-            project_id=self.id,
-            **approved_job,
-            requester=self._requester,
+            project_id=self.id, **approved_job, requester=self._requester,
         )
 
     def get_job(self, id: str) -> Job:
@@ -227,17 +240,9 @@ class Project(ABC):
         Returns:
             A `Job` instance.
         """
-        job = self._requester.get_job(
-            project_id=self.id, job_id=id, return_params="status { code } task { type }"
-        )
+        job = self._requester.get_job(project_id=self.id, job_id=id, return_params="")
 
-        job_type = job.get("task", {}).get("type")
-
-        job_class = self._get_job_class(job_type=job_type)
-
-        return job_class(
-            job_type=job_type, **job, project_id=self.id, requester=self._requester,
-        )
+        return Job(**job, project_id=self.id, requester=self._requester)
 
     def delete_dataview(self, id: str) -> str:
         """
@@ -249,4 +254,9 @@ class Project(ABC):
             A success messsage write out.
         """
         self._requester.delete_dataview(id=id)
-        return self._out.write(f"DataView ({id}) deleted" + "\n")
+
+        if hasattr(self, "dataviews"):
+            self.dataviews = [x for x in self.dataviews if id != x.id]
+
+        self._out.write(f"DataView ({id}) deleted" + "\n")
+        return
