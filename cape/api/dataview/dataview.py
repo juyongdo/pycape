@@ -19,12 +19,12 @@ class DataView(ABC):
     An attribute on: [`Project`](##capeproject).
 
     Arguments:
-        id: ID of `DataView`
-        name: name of `DataView`.
-        schema: schema of the data that `DataView` points to.
-        location: URI of `DataView`.
-        owner: Dictionary of fields related to the `DataView` owner.
-        user_id: User ID of requester.
+        id (str): ID of `DataView`
+        name (str): name of `DataView`.
+        schema (list): schema of the data that `DataView` points to.
+        location (str): URI of `DataView`.
+        owner (dict): Dictionary of fields related to the `DataView` owner.
+        user_id (str): User ID of requester.
     """
 
     def __init__(

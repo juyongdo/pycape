@@ -21,16 +21,13 @@ class Project(ABC):
     Multiple organizations can collaborate on one Project.
 
     Arguments:
-        user_id: User ID of requester.
-        id: ID of `Project`.
-        name: name of `Project`.
-        label: label of `Project`.
-        description: description of `Project`.
-        owner: Returned dictionary of fields related to the `Project` owner.
-        organizations: Returned list of fields related to the organizations associated with the `Project`.
-        data_views: Returned list of `DataViews` added to the `Project`.
-        requester: Instance of `Requester` class so that we can chain methods on `Project` class instantiations.
-        out: Function to use to write to the interpreter.
+        id (str): ID of `Project`.
+        name (str): name of `Project`.
+        label (str): label of `Project`.
+        description (str): description of `Project`.
+        owner (dict): Returned dictionary of fields related to the `Project` owner.
+        organizations (list): Returned list of fields related to the organizations associated with the `Project`.
+        data_views (list): Returned list of `DataViews` added to the `Project`.
     """
 
     def __init__(

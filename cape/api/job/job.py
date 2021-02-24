@@ -12,6 +12,11 @@ from ...network.requester import Requester
 class Job(ABC):
     """
     Jobs track the status and eventually report the results of computation sessions run on Cape workers.
+
+    Arguments:
+        id (str): ID of `Job`
+        status (str): name of `Job`.
+        project_id (str): ID of `Project`.
     """
 
     def __init__(

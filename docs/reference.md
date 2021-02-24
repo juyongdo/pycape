@@ -37,7 +37,7 @@
     handler: python
     selection:
         members:
-            - "!"  # exlude all members
+            - schema
     rendering:
         heading_level: 4
         show_root_heading: false
