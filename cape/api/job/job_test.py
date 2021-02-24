@@ -6,11 +6,11 @@ import responses
 from tests.fake import FAKE_HOST
 
 from ...network.requester import Requester
-from ...vars import JOB_STATUS_CREATED, JOB_TYPE_LR
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..project.project import Project
+from ..task.vertical_linear_regression_task import VerticallyPartitionedLinearRegression
 from .job import Job
-from .vertical_linear_regression_job import VerticallyPartitionedLinearRegression
 
 
 @contextlib.contextmanager
@@ -22,26 +22,50 @@ class TestJob:
     def test__repr__(self):
         id = "abc123"
 
-        j = Job(id=id, job_type=JOB_TYPE_LR, status={"code": JOB_STATUS_CREATED})
-        r = f"{j.__class__.__name__}(id={id}, job_type={JOB_TYPE_LR}, status={JOB_STATUS_CREATED})"
-        assert repr(j) == r
+        r = Requester(endpoint=FAKE_HOST)
+        j = Job(
+            id=id,
+            task={"type": JOB_TYPE_LR},
+            status={"code": "Initialized"},
+            requester=r,
+            project_id="p_123",
+        )
+        rep = f"Job(id={id}, job_type={JOB_TYPE_LR}, status=Initialized)"
+
+        assert repr(j) == rep
 
     @responses.activate
     @pytest.mark.parametrize(
         "json,dataview_x,dataview_y,dataview_col_x,dataview_col_y,exception",
         [
             (
-                {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                {
+                    "data": {
+                        "initializeSession": {
+                            "id": "session_123",
+                            "status": {"code": "Initialized"},
+                            "task": {"type": "LINEAR_REGRESSION"},
+                        }
+                    }
+                },
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 notraising(),
             ),
             (
-                {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(name="my-data", uri="s3://my-data.csv"),
-                DataView(name="my-data_1", uri="s3://my-data-2.csv"),
+                {
+                    "data": {
+                        "initializeSession": {
+                            "id": "session_123",
+                            "status": {"code": "Initialized"},
+                            "task": {"type": "LINEAR_REGRESSION"},
+                        }
+                    }
+                },
+                DataView(name="my-data", location="s3://my-data.csv"),
+                DataView(name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 pytest.raises(
@@ -50,9 +74,17 @@ class TestJob:
                 ),
             ),
             (
-                {"data": {"initializeSession": {"id": "session_123"}}},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                {
+                    "data": {
+                        "initializeSession": {
+                            "id": "session_123",
+                            "status": {"code": "Initialized"},
+                            "task": {"type": "LINEAR_REGRESSION"},
+                        }
+                    }
+                },
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 None,
                 None,
                 pytest.raises(
@@ -62,24 +94,32 @@ class TestJob:
             ),
             (
                 {"errors": [{"message": "something went wrong"}]},
-                DataView(id="dv_1", name="my-data", uri="s3://my-data.csv"),
-                DataView(id="dv_2", name="my-data_1", uri="s3://my-data-2.csv"),
+                DataView(id="dv_1", name="my-data", location="s3://my-data.csv"),
+                DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
             (
-                {"data": {"initializeSession": {"id": "session_123"}}},
+                {
+                    "data": {
+                        "initializeSession": {
+                            "id": "session_123",
+                            "status": {"code": "Initialized"},
+                            "task": {"type": "LINEAR_REGRESSION"},
+                        }
+                    }
+                },
                 DataView(
                     id="dv_1",
                     name="my-data",
-                    uri="s3://my-data.csv",
+                    location="s3://my-data.csv",
                     schema=[{"name": "123", "schema_type": "string"}],
                 ),
                 DataView(
                     id="dv_2",
                     name="my-data_1",
-                    uri="s3://my-data-2.csv",
+                    location="s3://my-data-2.csv",
                     schema=[{"name": "123", "schema_type": "string"}],
                 ),
                 None,
@@ -115,12 +155,12 @@ class TestJob:
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
             }
-            my_job = VerticallyPartitionedLinearRegression(**task_config)
+            vlr = VerticallyPartitionedLinearRegression(**task_config)
 
-            submitted_job = my_project.submit_job(my_job)
+            submitted_job = my_project.submit_job(vlr)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(submitted_job, VerticallyPartitionedLinearRegression)
+            assert isinstance(submitted_job, Job)
             assert submitted_job.id == "session_123"
 
     @responses.activate
@@ -150,11 +190,15 @@ class TestJob:
             )
             r = Requester(endpoint=FAKE_HOST)
 
-            my_job = VerticallyPartitionedLinearRegression(
-                id="abc_123", project_id="123", requester=r
+            created_job = Job(
+                id="abc_123",
+                status={"code": "Initialized"},
+                task={"type": JOB_TYPE_LR},
+                requester=r,
+                project_id="p_123",
             )
 
-            get_status = my_job.get_status()
+            get_status = created_job.get_status()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(get_status, str)
@@ -189,8 +233,12 @@ class TestJob:
             )
             r = Requester(endpoint=FAKE_HOST)
 
-            my_job = VerticallyPartitionedLinearRegression(
-                id="abc_123", project_id="123", requester=r
+            my_job = Job(
+                id="abc_123",
+                status={"code": "Initialized"},
+                task={"type": JOB_TYPE_LR},
+                requester=r,
+                project_id="p_123",
             )
 
             weights, metrics = my_job.get_results()

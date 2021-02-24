@@ -1,16 +1,16 @@
 from typing import Optional
 
-from ...vars import JOB_STATUS_CREATED
 from ...vars import JOB_TYPE_LR
+from ...network.requester import Requester
 from ..dataview.dataview import DataView
-from .job import Job
+from .task import Task
 
 
-class VerticallyPartitionedLinearRegression(Job):
+class VerticallyPartitionedLinearRegression(Task):
     """
-    Inherits from: `Job`.
+    Inherits from: `Task`.
 
-    Tracks jobs that contain instructions for training linear regression models using \
+    Contains instructions for training linear regression models using \
     verically-partioned datasets.
 
     Verically-partioned datasets refer to the joining of columns (i.e. features) from \
@@ -23,13 +23,18 @@ class VerticallyPartitionedLinearRegression(Job):
         to a dataset that contains target values.
     """
 
+    id: Optional[str] = None
+    job_type: Optional[str] = JOB_TYPE_LR
     x_train_dataview: DataView = None
     y_train_dataview: DataView = None
-    job_type: str = JOB_TYPE_LR
-    status: dict = {"code": JOB_STATUS_CREATED}
-    id: Optional[str] = None
 
-    def _create_job(self, project_id: str, timeout: float = 600):
+    def __repr__(self):
+        return " ".join(
+            f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
+        y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''})".split()
+        )
+
+    def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
         def validate_params(dataview_x, dataview_y):
             missing_params = []
             x_cols = dataview_x._cols
@@ -74,6 +79,9 @@ class VerticallyPartitionedLinearRegression(Job):
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
         }
-        return super()._create_job(
-            project_id=project_id, timeout=timeout, task_config=task_config
+        return super()._create_task(
+            project_id=project_id,
+            requester=requester,
+            timeout=timeout,
+            task_config=task_config,
         )

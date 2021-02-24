@@ -11,6 +11,7 @@ from tests.fake import FAKE_TOKEN
 from ...exceptions import GQLException
 from ...network import NotAUserException
 from ..project.project import Project
+from ..job.job import Job
 from .cape import Cape
 
 
@@ -88,6 +89,13 @@ class TestCape:
                                 "label": "my-project",
                                 "name": "my-project",
                                 "description": "we are here to do some data science",
+                                "jobs": [
+                                    {
+                                        "id": "job_123",
+                                        "status": {"code": "Initialized"},
+                                        "task": {"type": "LINEAR_REGRESSION"},
+                                    }
+                                ],
                             }
                         ]
                     }
@@ -119,6 +127,8 @@ class TestCape:
             assert len(projects) == 1
             assert isinstance(projects[0], Project)
             assert projects[0].id == "abc123"
+            assert isinstance(projects[0].jobs[0], Job)
+            assert projects[0].jobs[0].id == "job_123"
 
     @responses.activate
     @pytest.mark.parametrize(
