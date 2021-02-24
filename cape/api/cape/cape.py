@@ -28,7 +28,7 @@ class Cape(ABC):
         if out is None:
             self._out = sys.stdout
 
-    def login(self, token: Optional[str] = None) -> str:
+    def login(self, token: Optional[str] = None) -> None:
         """
         Calls `POST /v1/login`. Authenticate with Cape Cloud in order to make subsequent requests.
 

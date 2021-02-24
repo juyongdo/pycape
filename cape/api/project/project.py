@@ -201,7 +201,8 @@ class Project(ABC):
         Calls GQL `mutation createTask`
 
         Arguments:
-            dataview: Instance of class `Job`.
+            task: Instance of class that inherits from `Task`.
+            timeout: How long (in ms) a Cape Worker should run before canceling the `Job`.
         Returns:
             A `Job` instance.
         """
@@ -219,7 +220,8 @@ class Project(ABC):
         collaboration with other organizations in your `Project`.
 
         Arguments:
-            job: Instance of class `Job`.
+            task: Instance of class that inherits from `Task`.
+            timeout: How long (in ms) a Cape Worker should run before canceling the `Job`.
         Returns:
             A `Job` instance.
         """
