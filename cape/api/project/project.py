@@ -16,9 +16,7 @@ from ..organization.organization import Organization
 
 class Project(ABC):
     """
-    Projects are business contexts in which we can add DataViews and submit Jobs.
-
-    Multiple organizations can collaborate on one Project.
+    Projects are the business contexts in which you collaborate with other organizations or Cape users to train models.
 
     Arguments:
         id (str): ID of `Project`.
@@ -27,7 +25,8 @@ class Project(ABC):
         description (str): description of `Project`.
         owner (dict): Returned dictionary of fields related to the `Project` owner.
         organizations (list): Returned list of fields related to the organizations associated with the `Project`.
-        data_views (list): Returned list of `DataViews` added to the `Project`.
+        dataviews (list): Returned list of `DataViews` added to the `Project`.
+        jobs (list) Returned list of `Jobs` submitted on the `Project`.
     """
 
     def __init__(

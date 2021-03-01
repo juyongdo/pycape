@@ -14,9 +14,7 @@ from ...vars import PANDAS_TO_JSON_DATATYPES
 
 class DataView(ABC):
     """
-    Dataview objects keep track of the business logic around datasets.
-
-    An attribute on: [`Project`](##capeproject).
+    Dataviews store metadata around datasets, including namely a pointer to the dataset's location.
 
     Arguments:
         id (str): ID of `DataView`
