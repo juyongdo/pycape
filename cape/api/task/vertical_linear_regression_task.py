@@ -8,11 +8,19 @@ from .task import Task
 
 class VerticallyPartitionedLinearRegression(Task):
     """
-    Intializes a Job that can be submitted to Cape to train a Linear Regression Model.
+    Inherits from: `Task`.
+
+    Contains instructions for training linear regression models using \
+    verically-partioned datasets.
+
+    Verically-partioned datasets refer to the joining of columns (i.e. features) from \
+    serveral parties.
 
     Arguments:
-        x_train_dataview: `DataView` that points to dataset that contains training set values.
-        y_train_dataview: `DataView` that points to dataset that contains target values.
+        x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
+        to a dataset that contains training set values.
+        y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
+        to a dataset that contains target values.
     """
 
     id: Optional[str] = None

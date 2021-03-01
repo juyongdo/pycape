@@ -12,12 +12,12 @@ from ..project.project import Project
 class Cape(ABC):
     """
     This is the main class you instantiate to access the Cape DS API.
+
+    Use to authenticate with the Cape Cloud and manage top-level resources such as `Project`.
     """
 
     def __init__(self, out: io.StringIO = None, endpoint: Optional[str] = None) -> None:
         """
-        Initialize the object.
-
         Arguments:
             out: The interpreter to be written to.
             endpoint: Coordinator endoint to point to.
@@ -28,9 +28,9 @@ class Cape(ABC):
         if out is None:
             self._out = sys.stdout
 
-    def login(self, token: Optional[str] = None) -> str:
+    def login(self, token: Optional[str] = None) -> None:
         """
-        Calls `POST /v1/login`
+        Calls `POST /v1/login`. Authenticate with Cape Cloud in order to make subsequent requests.
 
         Arguments:
             token:  User authentication token.
@@ -43,7 +43,7 @@ class Cape(ABC):
 
     def list_projects(self) -> str:
         """
-        Calls GQL `query projects`
+        Returns all list of projects that requesting user is a contributor of.
 
         Returns:
             A list of `Project` instances.
@@ -65,7 +65,10 @@ class Cape(ABC):
         self, id: Optional[str] = None, label: Optional[str] = None
     ) -> Project:
         """
-        Calls GQL `query project`
+        Query a `Project` by either ID or label.
+
+        Returns:
+            A list of `Project` instances.
 
         Arguments:
             id: ID of `Project`.
@@ -96,7 +99,7 @@ class Cape(ABC):
 
     def delete_project(self, id: str) -> str:
         """
-        Calls GQL `mutation archiveProject`
+        Delete a `Job` by ID.
 
         Arguments:
             id: ID of `Project`.

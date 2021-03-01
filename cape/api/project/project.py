@@ -16,9 +16,17 @@ from ..organization.organization import Organization
 
 class Project(ABC):
     """
-    Projects are business contexts in which we can add DataViews and submit Jobs.
+    Projects are the business contexts in which you collaborate with other organizations or Cape users to train models.
 
-    Multiple organizations can collaborate on one Project.
+    Arguments:
+        id (str): ID of `Project`.
+        name (str): name of `Project`.
+        label (str): label of `Project`.
+        description (str): description of `Project`.
+        owner (dict): Returned dictionary of fields related to the `Project` owner.
+        organizations (list): Returned list of fields related to the organizations associated with the `Project`.
+        dataviews (list): Returned list of `DataViews` added to the `Project`.
+        jobs (list) Returned list of `Jobs` submitted on the `Project`.
     """
 
     def __init__(
@@ -35,21 +43,6 @@ class Project(ABC):
         requester: Optional[Requester] = None,
         out: Optional[io.StringIO] = None,
     ):
-        """
-        Initialize the object.
-
-        Arguments:
-            user_id: User ID of requester.
-            id: ID of `Project`.
-            name: name of `Project`.
-            label: label of `Project`.
-            description: description of `Project`.
-            owner: Returned dictionary of fields related to the `Project` owner.
-            organizations: Returned list of fields related to the organizations associated with the `Project`.
-            data_views: Returned list of `DataViews` added to the `Project`.
-            requester: Instance of `Requester` class so that we can chain methods on `Project` class instantiations.
-            out: Function to use to write to the interpreter.
-        """
         self._requester: Requester = requester
         self._user_id: str = user_id
         self._out: io.StringIO = out
@@ -98,7 +91,7 @@ class Project(ABC):
 
     def list_dataviews(self) -> List[DataView]:
         """
-        Calls GQL `query project.dataviews`
+        Returns a list of dataviews for the scoped `Project`.
 
         Returns:
             A list of `DataView` instances.
@@ -136,7 +129,8 @@ class Project(ABC):
         self, id: Optional[str] = None, uri: Optional[str] = None
     ) -> DataView:
         """
-        Calls GQL `query project.dataview`
+        Query a `DataView` for the scoped `Project` by `DataView` \
+        ID or URI.
 
         Arguments:
             id: ID of `DataView`.
@@ -159,10 +153,19 @@ class Project(ABC):
         schema: Union[pd.Series, List, None] = None,
     ) -> DataView:
         """
-        Calls GQL `mutation addDataView`
+        Creates a `DataView` in Cape Cloud. Returns created `Dataview`
 
         Arguments:
-            dataview: Instance of class `DataView`.
+            name: a name for the `DataView`.
+            uri: URI location of the dataset.
+            owner_id: The ID of the organization that owns this dataset.
+            owner_label: The label of the organization that owns this dataset.
+            schema: The schema of the data that `DataView` points to.
+                A string value for each column's datatype. Possible datatypes:
+                    string
+                    integer
+                    number
+                    datetime
         Returns:
             A `DataView` instance.
         """
@@ -197,7 +200,8 @@ class Project(ABC):
         Calls GQL `mutation createTask`
 
         Arguments:
-            dataview: Instance of class `Job`.
+            task: Instance of class that inherits from `Task`.
+            timeout: How long (in ms) a Cape Worker should run before canceling the `Job`.
         Returns:
             A `Job` instance.
         """
@@ -211,10 +215,12 @@ class Project(ABC):
 
     def submit_job(self, task: Task, timeout: float = 600) -> Job:
         """
-        Calls GQL `mutation createTask`
+        Submits a `Job` to be run by your Cape worker in \
+        collaboration with other organizations in your `Project`.
 
         Arguments:
-            job: Instance of class `Job`.
+            task: Instance of class that inherits from `Task`.
+            timeout: How long (in ms) a Cape Worker should run before canceling the `Job`.
         Returns:
             A `Job` instance.
         """
@@ -233,7 +239,7 @@ class Project(ABC):
 
     def get_job(self, id: str) -> Job:
         """
-        Calls GQL `query project.job`
+        Returns a `Job` given an ID.
 
         Arguments:
             id: ID of `Job`.
@@ -244,14 +250,12 @@ class Project(ABC):
 
         return Job(**job, project_id=self.id, requester=self._requester)
 
-    def delete_dataview(self, id: str) -> str:
+    def delete_dataview(self, id: str) -> None:
         """
-        Calls GQL `mutation removeDataView`
+        Remove a `DataView` by ID.
 
         Arguments:
             id: ID of `DataView`.
-        Returns:
-            A success messsage write out.
         """
         self._requester.delete_dataview(id=id)
 

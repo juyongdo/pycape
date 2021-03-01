@@ -11,7 +11,12 @@ from ...network.requester import Requester
 
 class Job(ABC):
     """
-    Job objects keep track of jobs that will be/have been submitted to cape workers.
+    Jobs track the status and eventually report the results of computation sessions run on Cape workers.
+
+    Arguments:
+        id (str): ID of `Job`
+        status (str): name of `Job`.
+        project_id (str): ID of `Project`.
     """
 
     def __init__(
@@ -38,10 +43,23 @@ class Job(ABC):
 
     def get_status(self) -> str:
         """
-        Calls GQL `query project.job`.
+        Query the current status of the Cape `Job`.
 
         Returns:
             A `Job` status string.
+
+        ** Status Types:**
+
+        Status | Desciption
+        ------ | ----------
+        **`Initialized`** | Job has been intialized.
+        **`NeedsApproval`** | Job is awaiting approval by at least one party.
+        **`Approved`** | Job has been approved, the computation will commence.
+        **`Rejected`** | Job has been rejected, the computation will not run.
+        **`Started`** | Job has started.
+        **`Completed`** | Job has completed.
+        **`Stopped`** | Job has been stopped.
+        **`Error`** | Error in running Job.
         """
         job = self._requester.get_job(
             project_id=self.project_id, job_id=self.id, return_params=""
