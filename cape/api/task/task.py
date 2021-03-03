@@ -1,17 +1,23 @@
 import json
 from abc import ABC
-
+from typing import Optional
 from ...network.requester import Requester
 
 
 class Task(ABC):
     """
     Tasks contain the instructions for how a Cape worker should run a job.
+
+    Arguments:
+        model_output (str): ID of `Project`.
+        kwargs (any): 	Keyword arguments to construct a layer.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, model_output: Optional[str] = None, **kwargs):
         for k, v in kwargs.items():
             self.__dict__[k] = v
+
+        self._model_output = model_output
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
