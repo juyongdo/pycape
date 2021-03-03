@@ -111,6 +111,16 @@ class Job(ABC):
         return np.loadtxt(weights_tmp.name), metrics
 
     def approve(self, org_id: str) -> "Job":
+        """
+        Approve the Job on behalf of your organizations. Once all organizations \
+        approve a job, the computation will run.
+
+        Arguments:
+            org_id: ID of `Organization`.
+
+        Returns:
+            A `Job` instance.
+        """
         approved_job = self._requester.approve_job(job_id=self.id, org_id=org_id)
 
         return Job(
