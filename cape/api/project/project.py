@@ -1,17 +1,20 @@
 import io
 import sys
 from abc import ABC
-from typing import Dict, List, Optional, Union
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
+from urllib.parse import urlparse
+
 import pandas as pd
 from tabulate import tabulate
-
-from urllib.parse import urlparse
 
 from ...network.requester import Requester
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..task.task import Task
 from ..organization.organization import Organization
+from ..task.task import Task
 
 
 class Project(ABC):
@@ -72,22 +75,6 @@ class Project(ABC):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
-
-    def add_org(self, org_id: str):
-        """
-        Calls GQL `mutation addProjectOrganization`
-
-        Arguments:
-            org_id: ID of `Organization`.
-        Returns:
-            A list of `Project` instances.
-        """
-        project_org = self._requester.add_project_org(project_id=self.id, org_id=org_id)
-        return Project(
-            requester=self._requester,
-            user_id=self._user_id,
-            **project_org.get("Project"),
-        )
 
     def list_dataviews(self) -> List[DataView]:
         """
@@ -229,13 +216,6 @@ class Project(ABC):
         submitted_job = created_job._submit_job(requester=self._requester)
 
         return Job(project_id=self.id, **submitted_job, requester=self._requester)
-
-    def approve_job(self, job: Job, org: Organization) -> Job:
-        approved_job = job._approve_job(org.id)
-
-        return job.__class__(
-            project_id=self.id, **approved_job, requester=self._requester,
-        )
 
     def get_job(self, id: str) -> Job:
         """

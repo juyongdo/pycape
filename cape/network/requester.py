@@ -106,6 +106,7 @@ class Requester:
                     organizations {{
                         id
                         name
+                        label
                     }}
                     data_views {{
                         {self.dataview_fragment}
@@ -193,21 +194,6 @@ class Requester:
             """,
             variables={"id": id},
         ).get("archiveProject")
-
-    def add_project_org(self, project_id: str, org_id: str) -> Optional[dict]:
-        return self._gql_req(
-            query="""
-            mutation AddProjectOrganization (
-              $project_id: String!,
-              $organization_id: String!,
-            ) {
-              addProjectOrganization(project_id: $project_id, organization_id: $organization_id) {
-                Project { id }
-              }
-            }
-            """,
-            variables={"project_id": project_id, "organization_id": org_id},
-        ).get("addProjectOrganization")
 
     def create_dataview(
         self,

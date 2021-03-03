@@ -246,3 +246,28 @@ class TestJob:
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(metrics, dict)
             assert metrics["r_squared"] == [0.1]
+
+    @responses.activate
+    def test_approve_job(self):
+        responses.add(
+            responses.POST,
+            f"{FAKE_HOST}/v1/query",
+            json={
+                "data": {
+                    "approveJob": {
+                        "id": "abc123",
+                        "status": {"code": "Initialized"},
+                        "task": {"type": JOB_TYPE_LR},
+                    }
+                }
+            },
+        )
+        r = Requester(endpoint=FAKE_HOST)
+        j = Job(
+            id="abc123",
+            status={"code": "Initialized"},
+            task={"type": JOB_TYPE_LR},
+            requester=r,
+            project_id="p_123",
+        )
+        j.approve(org_id="o_123")

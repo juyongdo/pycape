@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ...vars import JOB_TYPE_LR
 from ...network.requester import Requester
+from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from .task import Task
 

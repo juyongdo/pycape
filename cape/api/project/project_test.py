@@ -12,7 +12,6 @@ from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..organization.organization import Organization
 from ..project.project import Project
 
 
@@ -449,32 +448,3 @@ class TestProject:
             assert isinstance(output, str)
             assert output == "DataView (dv_123) deleted"
             assert len(my_project.dataviews) == len(dvs) - 1
-
-    @responses.activate
-    def test_approve_job(self):
-        responses.add(
-            responses.POST,
-            f"{FAKE_HOST}/v1/query",
-            json={
-                "data": {
-                    "approveJob": {
-                        "id": "abc123",
-                        "status": {"code": "Initialized"},
-                        "task": {"type": JOB_TYPE_LR},
-                    }
-                }
-            },
-        )
-        r = Requester(endpoint=FAKE_HOST)
-        my_project = Project(
-            requester=r, user_id=None, id="123", name="my project", label="my-project",
-        )
-        org = Organization(id="org123")
-        j = Job(
-            id="abc123",
-            status={"code": "Initialized"},
-            task={"type": JOB_TYPE_LR},
-            requester=r,
-            project_id="p_123",
-        )
-        my_project.approve_job(j, org)

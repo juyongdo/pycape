@@ -10,8 +10,8 @@ from tests.fake import FAKE_TOKEN
 
 from ...exceptions import GQLException
 from ...network import NotAUserException
-from ..project.project import Project
 from ..job.job import Job
+from ..project.project import Project
 from .cape import Cape
 
 

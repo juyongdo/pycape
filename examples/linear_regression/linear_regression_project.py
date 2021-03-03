@@ -82,7 +82,7 @@ def make_job():
 
     job = project.submit_job(job, timeout=60)
     for o in project.organizations:
-        project.approve_job(job, o)
+        job.approve(org_id=o.id)
 
     print(f'\nSubmitted job {job} to run')
 

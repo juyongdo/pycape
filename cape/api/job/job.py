@@ -38,9 +38,6 @@ class Job(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status})"
 
-    def _approve_job(self, org_id: str) -> dict:
-        return self._requester.approve_job(job_id=self.id, org_id=org_id)
-
     def get_status(self) -> str:
         """
         Query the current status of the Cape `Job`.
@@ -112,3 +109,20 @@ class Job(ABC):
 
         # return the weights (decoded to np) & metrics
         return np.loadtxt(weights_tmp.name), metrics
+
+    def approve(self, org_id: str) -> "Job":
+        """
+        Approve the Job on behalf of your organizations. Once all organizations \
+        approve a job, the computation will run.
+
+        Arguments:
+            org_id: ID of `Organization`.
+
+        Returns:
+            A `Job` instance.
+        """
+        approved_job = self._requester.approve_job(job_id=self.id, org_id=org_id)
+
+        return Job(
+            project_id=self.project_id, **approved_job, requester=self._requester,
+        )
