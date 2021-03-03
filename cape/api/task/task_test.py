@@ -1,6 +1,6 @@
 from ..dataview.dataview import DataView
-from .vertical_linear_regression_task import VerticallyPartitionedLinearRegression
 from .task import Task
+from .vertical_linear_regression_task import VerticallyPartitionedLinearRegression
 
 
 class TestTask:
