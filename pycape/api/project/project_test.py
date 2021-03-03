@@ -102,7 +102,8 @@ class TestProject:
     def test_create_dataview(self, json, uri_type, schema, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+                "pycape.api.dataview.dataview.pd.read_csv",
+                return_value=fake_dataframe(),
             )
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -217,7 +218,8 @@ class TestProject:
     def test_list_dataviews(self, user_id, json, out_expect, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+                "pycape.api.dataview.dataview.pd.read_csv",
+                return_value=fake_dataframe(),
             )
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -305,7 +307,8 @@ class TestProject:
     def test_get_dataview(self, args, json, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+                "pycape.api.dataview.dataview.pd.read_csv",
+                return_value=fake_dataframe(),
             )
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -355,7 +358,8 @@ class TestProject:
     def test_get_job(self, id, json, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.dataview.pd.read_csv", return_value=fake_dataframe()
+                "pycape.api.dataview.dataview.pd.read_csv",
+                return_value=fake_dataframe(),
             )
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,

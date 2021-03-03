@@ -3,9 +3,9 @@ import os
 
 import pandas as pd
 
-from cape.api.dataview import DataView
-from cape.api.job import VerticalLinearRegressionJob
-from cape.cape import Cape
+from pycape.api.dataview import DataView
+from pycape.api.job import VerticalLinearRegressionJob
+from pycape.cape import Cape
 
 parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")
 parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))

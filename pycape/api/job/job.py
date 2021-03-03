@@ -14,7 +14,7 @@ from ...vars import JOB_TYPES
 
 class Job(ABC):
     """
-    Job objects keep track of jobs that will be/have been submitted to cape workers.
+    Job objects keep track of jobs that will be/have been submitted to Cape workers.
     """
 
     job_type: str

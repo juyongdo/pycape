@@ -51,7 +51,7 @@ Install the library from and it's dependencies from git:
 
 ```sh
 $ git clone https://github.com/capeprivacy/cape-ds.git
-$ cd cape-ds
+$ cd pycape
 $ make bootstrap
 ```
 

@@ -2,13 +2,13 @@
 
 [![codecov](https://codecov.io/gh/capeprivacy/cape-ds/branch/main/graph/badge.svg?token=nimecXcQzo)](https://codecov.io/gh/capeprivacy/cape-ds)
 
-**cape-ds** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
+**pycape** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
 
 - Create and query dataviews, or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
 - Submit and track jobs.
 
 ## Short Tutorial
-Access your Cape projects by creating a instance of the main `Cape` class:
+Access your Cape projects by creating an instance of the main `Cape` class:
 ``` 
     from cape import Cape
 
@@ -35,6 +35,7 @@ Add dataviews to your project, review dataviews added by other organizations wor
 
     my_project.submit_job(vlr_job)
 ```
+See our example [usage](/libraries/cape-ds/usage/) or a more in-depth [tutorial](/libraries/cape-ds/tutorials/submit_linear_regression_job/).
 
 ## Installation
 
@@ -42,20 +43,5 @@ Add dataviews to your project, review dataviews added by other organizations wor
 
 * Python 3.6 or above, and pip
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
-
-
-### Download from source
-
-Install the library from and it's dependencies from git: 
-
-```sh
-git clone https://github.com/capeprivacy/cape-ds.git
-cd cape-ds
-make bootstrap
-```
-
-## Licensing
-
-TODO
-
+    
 
