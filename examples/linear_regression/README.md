@@ -32,16 +32,16 @@ Copy the project id from the URL and save it for later.
 
 ### Get a User Token
 
-Finally, we will need a user token to use with cape-ds. From the home page, ensure you are
+Finally, we will need a user token to use with pycape. From the home page, ensure you are
 working within your user context and navigate to settings to create a token.
 
 ![](../img/create_user_token.gif)
 
 Take note of this value as you cannot recover it after you reload the page.
 
-That is it for the UI. We can use cape-ds for the rest of the tutorial.
+That is it for the UI. We can use pycape for the rest of the tutorial.
 
-### cape-ds
+### pycape
 
 [`liner_regression_project.py`](linear_regression_project.py). Provides the functionality needed
 to create a linear regression task within your project.

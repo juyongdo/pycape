@@ -1,14 +1,14 @@
-# cape-ds
+# pycape
 
 [![codecov](https://codecov.io/gh/capeprivacy/cape-ds/branch/main/graph/badge.svg?token=nimecXcQzo)](https://codecov.io/gh/capeprivacy/cape-ds)
 
-**pycape** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
+**pycape** is a set of Python modules for interacting with your Cape data. Using `pycape`, you can:
 
-- Create and query [dataviews](/libraries/cape-ds/reference#capedataview), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
-- Submit and track [jobs](/libraries/cape-ds/reference#capedataview), which are computational sessions which contain instructions for how to train your model.
+- Create and query [dataviews](/libraries/pytest/reference#capedataview), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
+- Submit and track [jobs](/libraries/pytest/reference#capedataview), which are computational sessions which contain instructions for how to train your model.
 
 ## Short Tutorial
-Access your Cape projects by creating a instance of the main [`Cape`](/libraries/cape-ds/reference#capecape) class:
+Access your Cape projects by creating a instance of the main [`Cape`](/libraries/pytest/reference#capecape) class:
 
 ``` 
     from pycape import Cape
@@ -36,7 +36,7 @@ Add dataviews to your project, review dataviews added by other organizations col
 
     my_project.submit_job(vlr_job)
 ```
-See our example [usage](/libraries/cape-ds/usage/) or a more in-depth [tutorial](/libraries/cape-ds/tutorials/submit_linear_regression_job/).
+See our example [usage](/libraries/pytest/usage/) or a more in-depth [tutorial](/libraries/pytest/tutorials/submit_linear_regression_job/).
 
 ## Installation
 

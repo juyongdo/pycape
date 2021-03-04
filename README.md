@@ -1,13 +1,13 @@
-# cape-ds
+# pycape
 
 [![codecov](https://codecov.io/gh/capeprivacy/cape-ds/branch/main/graph/badge.svg?token=nimecXcQzo)](https://codecov.io/gh/capeprivacy/cape-ds)
 
-**cape-ds** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
+**pycape** is a set of Python modules for interacting with your Cape data. Using pycape, you can:
 
-- Create and query [dataviews](https://docs.capeprivacy.com/libraries/cape-ds/reference#dataviews), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
-- Submit and track [jobs](https://docs.capeprivacy.com/libraries/cape-ds/reference#dataviews), which are computational sessions which contain instructions for how to train your model.
+- Create and query [dataviews](https://docs.capeprivacy.com/libraries/pycape/reference#dataviews), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
+- Submit and track [jobs](https://docs.capeprivacy.com/libraries/pycape/reference#dataviews), which are computational sessions which contain instructions for how to train your model.
 
-Learn more: https://docs.capeprivacy.com/libraries/cape-ds
+Learn more: https://docs.capeprivacy.com/libraries/pycape
 
 ## Short Tutorial
 Access your Cape projects by creating a instance of the main `Cape` class:
