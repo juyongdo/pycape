@@ -13,9 +13,7 @@ test:
 	pytest
 
 bootstrap:
-	pip install -U pip setuptools
-	pip install -r requirements.txt
-	pip install -e .
+	poetry install
 
 coverage:
 	pytest --cov-report=xml --cov=pycape ${CI_FILES}

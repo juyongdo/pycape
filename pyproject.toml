@@ -6,10 +6,10 @@ authors = ["Your Name <you@example.com>"]
 license = "Apache License 2.0"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 requests = "~2.25.0"
 responses = "~0.10.15"
-marshmellow = "~3.9.1"
+marshmallow = "~3.9.1"
 pandas = "~1.1.5"
 tabulate = "0.8.7"
 boto3 = "~1.16"
