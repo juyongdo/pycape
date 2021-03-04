@@ -13,7 +13,6 @@ test:
 	pytest
 
 bootstrap:
-	pip install poetry
 	poetry install
 
 coverage:
