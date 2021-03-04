@@ -13,7 +13,7 @@ test:
 	pytest
 
 bootstrap:
-    pip install poetry==1.0.0
+	pip install poetry
 	poetry install
 
 coverage:
