@@ -20,7 +20,7 @@ Access your Cape projects by creating a instance of the main [`Cape`](/libraries
 ```
 
 Add dataviews to your project, review dataviews added by other organizations collaborating with you in the project, and submit your job.
-```    
+```python    
     from pycape import VerticallyPartitionedLinearRegression
 
     my_project = c.get_project("project_123")
@@ -38,11 +38,21 @@ Add dataviews to your project, review dataviews added by other organizations col
 ```
 See our example [usage](/libraries/pytest/usage/) or a more in-depth [tutorial](/libraries/pytest/tutorials/submit_linear_regression_job/).
 
-## Installation
+## Installation 
 
 ### Prerequisites
 
 * Python 3.6 or above, and pip
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
-    
+
+### Install via pip
+```shell
+    pip install pycape
+```
+
+## License
+Licensed under Apache License, Version 2.0.
+
+See [LICENSE](https://github.com/capeprivacy/cape-python/blob/master/LICENSE) or [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
 
