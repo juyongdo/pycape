@@ -9,7 +9,7 @@ This tutorial will walk you through the process of training an encrypted linear 
 
 We'll use the [Cape UI](https://demo.capeprivacy.com) to set up and review activity in the project. 
 
-We'll also use the [`pytest`](https://github.com/capeprivacy/pytest) Python library to create and review pointers to datasets or [`DataViews`](/libraries/pycape/reference#capedataview), create [`Tasks`](/libraries/pycape/reference#capetask), which are Cape Python objects that contain instructions on how to train a model using the data provided, and review [`Jobs`](/libraries/pycape/reference#capejob) in order to track the status of the training, and view the results of the trained model.
+We'll also use the [`pytest`](https://github.com/capeprivacy/pytest) Python library to create and review pointers to datasets or [`DataViews`](/libraries/pycape/reference#pycapedataview), create [`Tasks`](/libraries/pycape/reference#pycapetask), which are Cape Python objects that contain instructions on how to train a model using the data provided, and review [`Jobs`](/libraries/pycape/reference#pycapejob) in order to track the status of the training, and view the results of the trained model.
 
 ## Project Setup
 
@@ -27,7 +27,7 @@ Take note of this value as you cannot recover it after you reload the page.
 
 ### Create a Project
 
-Next, create a [`Project`](/libraries/pycape/reference#capeproject) within one of the organizations you just created.
+Next, create a [`Project`](/libraries/pycape/reference#pycapeproject) within one of the organizations you just created.
 
 `Projects` serve as the context in which you can define and review `Jobs` with other organizations.
 
@@ -78,7 +78,7 @@ Use the `list_projects` method defined on the main `Cape` class to query a list 
 	[Project(id=project_123, name=Default Risk Assessment, label=default-risk-assessment)]
 ```
 
-To create a [`DataView`](/libraries/pycape/reference#capedataview) and add it to your project, simply call the `create_dataview` method defined on the `Project` class.
+To create a [`DataView`](/libraries/pycape/reference#pycapedataview) and add it to your project, simply call the `create_dataview` method defined on the `Project` class.
 
 ```python
     >>> my_project = c.get_project(id="project_123")
@@ -146,7 +146,7 @@ Pass the `DataView` that contains training data to `x_train_dataview`, and the `
     >>> my_project.submit_job(job=vlr)
 ```
 
-You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/pycape/reference#capeverticallypartitionedlinearregression) class like so:
+You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/pycape/reference#pycapeverticallypartitionedlinearregression) class like so:
 
 ```python
     >>> VerticallyPartitionedLinearRegression(
