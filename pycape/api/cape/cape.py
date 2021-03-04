@@ -11,7 +11,7 @@ from ..project.project import Project
 
 class Cape(ABC):
     """
-    This is the main class you instantiate to access the Cape DS API.
+    This is the main class you instantiate to access the PyCape API.
 
     Use to authenticate with the Cape Cloud and manage top-level resources such as `Project`.
     """

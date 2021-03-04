@@ -1,4 +1,4 @@
-site_name: Cape DS
+site_name: PyCape
 dev_addr: '127.0.0.1:7334'
 copyright: Cape Privacy, Inc.
 theme:
@@ -22,7 +22,7 @@ extra:
       link: https://github.com/capeprivacy
 nav:
     - Libraries:
-        - Cape DS:
+        - PyCape:
             - Overview: index.md
             - Usage:
                 - Login: usage/login.md
