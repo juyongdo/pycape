@@ -44,9 +44,14 @@ Add dataviews to your project, review dataviews added by other organizations wor
 * Python 3.6 or above, and pip
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
 
+### Install via pip
+```shell
+    pip install pycape
+```
+
 ### Download from source
 
-Install the library from and it's dependencies from git: 
+Install the library and it's dependencies from git: 
 
 ```sh
 $ git clone https://github.com/capeprivacy/cape-ds.git
@@ -64,8 +69,10 @@ $ make coverage # to see the code coverage report
 
 See [this tutorial](./examples/linear_regression/README.md) for a better tutorial.
 
-## Licensing
 
-TODO
+## License
+Licensed under Apache License, Version 2.0.
+
+See [LICENSE](https://github.com/capeprivacy/cape-python/blob/master/LICENSE) or [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 
