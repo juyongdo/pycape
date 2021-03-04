@@ -29,6 +29,10 @@ mkdocs-material = "5.5.3"
 mkdocstrings = "0.14.0"
 pydoc-markdown = "3.2.0"
 
+[tool.isort]
+line_length = 120
+force_single_line = true
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
