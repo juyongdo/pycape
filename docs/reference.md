@@ -1,7 +1,7 @@
 # API Reference
 
-## cape.Cape 
-::: cape.Cape
+## pycape.Cape 
+::: pycape.Cape
     handler: python
     selection:
         members:
@@ -15,8 +15,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.Project
-::: cape.Project
+## pycape.Project
+::: pycape.Project
     handler: python
     selection:
         members:
@@ -32,8 +32,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.Organization
-::: cape.api.organization.organization.Organization
+## pycape.Organization
+::: pycape.api.organization.organization.Organization
     handler: python
     rendering:
         heading_level: 4
@@ -41,8 +41,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.DataView
-::: cape.DataView
+## pycape.DataView
+::: pycape.DataView
     handler: python
     selection:
         members:
@@ -53,8 +53,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.Job
-::: cape.Job
+## pycape.Job
+::: pycape.Job
     handler: python
     rendering:
         heading_level: 4
@@ -62,8 +62,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.Task
-::: cape.api.task.task.Task
+## pycape.Task
+::: pycape.api.task.task.Task
     handler: python
     rendering:
         heading_level: 4
@@ -71,8 +71,8 @@
         show_source: false
         show_root_toc_entry: false
 
-## cape.VerticallyPartitionedLinearRegression
-::: cape.VerticallyPartitionedLinearRegression
+## pycape.VerticallyPartitionedLinearRegression
+::: pycape.VerticallyPartitionedLinearRegression
     handler: python
     selection:
         filters:

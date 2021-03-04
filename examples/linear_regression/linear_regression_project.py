@@ -4,7 +4,9 @@ import sys
 
 import pandas as pd
 
-from cape import Cape, DataView, VerticallyPartitionedLinearRegression
+from pycape import Cape
+from pycape import DataView
+from pycape import VerticallyPartitionedLinearRegression
 
 parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")
 parser.add_argument("--token", default=os.environ.get("CAPE_TOKEN"))

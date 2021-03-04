@@ -9,7 +9,7 @@ This tutorial will walk you through the process of training an encrypted linear 
 
 We'll use the [Cape UI](https://demo.capeprivacy.com) to set up and review activity in the project. 
 
-We'll also use the [`cape-ds`](https://github.com/capeprivacy/cape-ds) Python library to create and review pointers to datasets or [`DataViews`](/libraries/cape-ds/reference#capedataview), create [`Tasks`](/libraries/cape-ds/reference#capetask), which are Cape Python objects that contain instructions on how to train a model using the data provided, and review [`Jobs`](/libraries/cape-ds/reference#capejob) in order to track the status of the training, and view the results of the trained model.
+We'll also use the [`pytest`](https://github.com/capeprivacy/pytest) Python library to create and review pointers to datasets or [`DataViews`](/libraries/pycape/reference#pycapedataview), create [`Tasks`](/libraries/pycape/reference#pycapetask), which are Cape Python objects that contain instructions on how to train a model using the data provided, and review [`Jobs`](/libraries/pycape/reference#pycapejob) in order to track the status of the training, and view the results of the trained model.
 
 ## Project Setup
 
@@ -27,7 +27,7 @@ Take note of this value as you cannot recover it after you reload the page.
 
 ### Create a Project
 
-Next, create a [`Project`](/libraries/cape-ds/reference#capeproject) within one of the organizations you just created.
+Next, create a [`Project`](/libraries/pycape/reference#pycapeproject) within one of the organizations you just created.
 
 `Projects` serve as the context in which you can define and review `Jobs` with other organizations.
 
@@ -39,7 +39,7 @@ Add organizations to your project in order to begin collaborating with them on t
 
 ### Get a User Token
 
-Finally, we will need a [user token](/understand/features/tokens/) to authenticate against `cape-ds`. Ensure you are
+Finally, we will need a [user token](/understand/features/tokens/) to authenticate against `pycape`. Ensure you are
 working within your user context and navigate to _Account Settings_ to create a token.
 
 ![](../img/user-token.gif)
@@ -48,12 +48,12 @@ Take note of this value as, like the user token, you cannot recover it after you
 
 That is it for the UI for now! We'll return later to review `DataViews` and approve `Jobs`. 
 
-Next we will set up these `DataViews` and `Jobs` in `cape-ds`.
+Next we will set up these `DataViews` and `Jobs` in `pycape`.
 
 ## Working with the Cape DS Python Library
 ### Login to Cape DS
 
-Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/libraries/cape-ds/usage/login) with our API using `cape-ds`. Once you've logged in successfully, you should see a success message.
+Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/libraries/pycape/usage/login) with our API using `pycape`. Once you've logged in successfully, you should see a success message.
 
 ```python
 	>>> c = Cape()
@@ -78,7 +78,7 @@ Use the `list_projects` method defined on the main `Cape` class to query a list 
 	[Project(id=project_123, name=Default Risk Assessment, label=default-risk-assessment)]
 ```
 
-To create a [`DataView`](/libraries/cape-ds/reference#capedataview) and add it to your project, simply call the `create_dataview` method defined on the `Project` class.
+To create a [`DataView`](/libraries/pycape/reference#pycapedataview) and add it to your project, simply call the `create_dataview` method defined on the `Project` class.
 
 ```python
     >>> my_project = c.get_project(id="project_123")
@@ -91,7 +91,7 @@ All `DataViews` must be associated with an organization. This association can be
     Use the `organization` attribute on your `Project` class instance to verify the metadata of organizations that are contributing to the project.
 
 !!! note
-    Unless your dataset is accessible via HTTP, you'll need to [specify your schema](/libraries/cape-ds/usage/dataview#specifying-a-schema-for-your-dataview).
+    Unless your dataset is accessible via HTTP, you'll need to [specify your schema](/libraries/pycape/usage/dataview#specifying-a-schema-for-your-dataview).
 
 ### Review Your Collaborator's DataView
 
@@ -146,7 +146,7 @@ Pass the `DataView` that contains training data to `x_train_dataview`, and the `
     >>> my_project.submit_job(job=vlr)
 ```
 
-You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/cape-ds/reference#capeverticallypartitionedlinearregression) class like so:
+You can also specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/pycape/reference#pycapeverticallypartitionedlinearregression) class like so:
 
 ```python
     >>> VerticallyPartitionedLinearRegression(
@@ -191,7 +191,7 @@ Once your job has successfully completed, you can view the results of the traine
 
 Whether you can view the weights or metrics of the trained model (or both!) depends on the role you and your organization play in the project.
 
-To view the weights and metrics of a job, use the [`get_results`](/libraries/cape-ds/reference/#cape.api.job.job.Job.get_results) method:
+To view the weights and metrics of a job, use the [`get_results`](/libraries/pycape/reference/#cape.api.job.job.Job.get_results) method:
 
 ```python
     >>> lr_job = my_project.get_job(id="abc_123")
@@ -208,4 +208,4 @@ To view the weights and metrics of a job, use the [`get_results`](/libraries/cap
 If you are the model owner, the first value in the returned tuple will be populated with a numpy array of weights from your trained model.
 
 !!!note
-    To access model weights you'll need to [inform **cape-ds** about your AWS IAM authentication credentials](/libraries/cape-ds/usage/job#accessing-weights-as-a-model-owner-in-cape).
+    To access model weights you'll need to [inform **pycape** about your AWS IAM authentication credentials](/libraries/pycape/usage/job#accessing-weights-as-a-model-owner-in-cape).

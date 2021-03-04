@@ -1,4 +1,4 @@
-from cape.api.organization.organization import Organization
+from pycape.api.organization.organization import Organization
 
 
 class TestOrganization:

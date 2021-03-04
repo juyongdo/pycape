@@ -1,22 +1,20 @@
-CI_FILES=cape
+CI_FILES=pycape
 
 ci: lint test coverage
 
 fmt:
-	isort --atomic ${CI_FILES}
-	black ${CI_FILES}
+	poetry run isort --atomic ${CI_FILES}
+	poetry run black ${CI_FILES}
 
 lint:
-	flake8 ${CI_FILES}
+	poetry run flake8 ${CI_FILES}
 
 test:
-	pytest
+	poetry run pytest
 
 bootstrap:
-	pip install -U pip setuptools
-	pip install -r requirements.txt
-	pip install -e .
+	poetry install
 
 coverage:
-	pytest --cov-report=xml --cov=cape ${CI_FILES}
-	coverage report
+	poetry run pytest --cov-report=xml --cov=pycape ${CI_FILES}
+	poetry run coverage report

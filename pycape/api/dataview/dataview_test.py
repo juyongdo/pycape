@@ -80,7 +80,7 @@ class TestDataView:
     def test_get_schema_from_uri(self, side_effect, exception, mocker):
         with exception:
             mocker.patch(
-                "cape.api.dataview.dataview.pd.read_csv",
+                "pycape.api.dataview.dataview.pd.read_csv",
                 side_effect=side_effect,
                 return_value=fake_csv_dob_date_field(),
             )

@@ -1,7 +1,3 @@
-[tool:isort]
-line_length=120
-force_single_line=True
-
 [flake8]
 max-line-length=120
 extend-ignore=
