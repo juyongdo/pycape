@@ -1,7 +1,5 @@
-import json
 import tempfile
 from abc import ABC
-from typing import Optional
 from typing import Tuple
 from urllib.parse import urlparse
 
@@ -9,58 +7,59 @@ import boto3
 import numpy as np
 
 from ...network.requester import Requester
-from ...vars import JOB_TYPES
 
 
 class Job(ABC):
     """
-    Job objects keep track of jobs that will be/have been submitted to Cape workers.
+    Jobs track the status and eventually report the results of computation sessions run on Cape workers.
+
+    Arguments:
+        id (str): ID of `Job`
+        status (str): name of `Job`.
+        project_id (str): ID of `Project`.
     """
 
-    job_type: str
-    id: Optional[str]
+    def __init__(
+        self, id: str, status: dict, task: dict, project_id: str, requester: Requester
+    ):
+        self.id = id
+        self.status = status
+        self.project_id = project_id
 
-    def __init__(self, requester: Requester = None, **kwargs):
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
+        if task:
+            self.job_type = task.get("type", {})
+
+        if status:
+            self.status = status.get("code")
 
         if requester:
             self._requester = requester
 
-        if not self.job_type:
-            raise Exception("Jobs cannot be initialized without a job type")
-        elif self.job_type not in JOB_TYPES:
-            raise Exception("Job initialized with invalid job type")
-
     def __repr__(self):
-        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status.get('code')})"
-
-    def _create_job(
-        self, project_id: str, timeout: float = 600, task_config: dict = None
-    ) -> dict:
-        task_config["timeout"] = timeout
-
-        return self._requester.create_job(
-            project_id=project_id,
-            job_type=self.job_type,
-            task_config=json.dumps(task_config) if task_config else None,
-        )
-
-    def _submit_job(self) -> dict:
-        return self._requester.submit_job(job_id=self.id)
-
-    def _approve_job(self, org_id: str) -> dict:
-        return self._requester.approve_job(job_id=self.id, org_id=org_id)
+        return f"{self.__class__.__name__}(id={self.id}, job_type={self.job_type}, status={self.status})"
 
     def get_status(self) -> str:
         """
-        Calls GQL `query project.job`.
+        Query the current status of the Cape `Job`.
 
         Returns:
             A `Job` status string.
+
+        ** Status Types:**
+
+        Status | Desciption
+        ------ | ----------
+        **`Initialized`** | Job has been intialized.
+        **`NeedsApproval`** | Job is awaiting approval by at least one party.
+        **`Approved`** | Job has been approved, the computation will commence.
+        **`Rejected`** | Job has been rejected, the computation will not run.
+        **`Started`** | Job has started.
+        **`Completed`** | Job has completed.
+        **`Stopped`** | Job has been stopped.
+        **`Error`** | Error in running Job.
         """
         job = self._requester.get_job(
-            project_id=self.project_id, job_id=self.id, return_params="status { code }"
+            project_id=self.project_id, job_id=self.id, return_params=""
         )
         return job.get("status", {}).get("code")
 
@@ -110,3 +109,20 @@ class Job(ABC):
 
         # return the weights (decoded to np) & metrics
         return np.loadtxt(weights_tmp.name), metrics
+
+    def approve(self, org_id: str) -> "Job":
+        """
+        Approve the Job on behalf of your organizations. Once all organizations \
+        approve a job, the computation will run.
+
+        Arguments:
+            org_id: ID of `Organization`.
+
+        Returns:
+            A `Job` instance.
+        """
+        approved_job = self._requester.approve_job(job_id=self.id, org_id=org_id)
+
+        return Job(
+            project_id=self.project_id, **approved_job, requester=self._requester,
+        )

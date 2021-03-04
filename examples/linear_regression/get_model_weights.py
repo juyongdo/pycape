@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 from pycape.api.dataview import DataView
-from pycape.api.job import VerticalLinearRegressionJob
+from pycape.api.job import VerticallyPartitionedLinearRegression
 from pycape.cape import Cape
 
 parser = argparse.ArgumentParser(description="Create Job for a given project ID plus other utilities")

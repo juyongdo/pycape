@@ -31,6 +31,12 @@ class Requester:
             schema_type
         }"""
 
+    job_fragment = """
+        id
+        status { code }
+        task { type }
+    """
+
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
@@ -90,19 +96,26 @@ class Requester:
 
     def list_projects(self) -> Optional[list]:
         return self._gql_req(
-            query="""
-            query ListProjects {
-                projects {
+            query=f"""
+            query ListProjects {{
+                projects {{
                     id
                     name
                     label
                     description
-                    organizations {
+                    organizations {{
                         id
                         name
-                    }
-                }
-            }
+                        label
+                    }}
+                    data_views {{
+                        {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
+                    }}
+                }}
+            }}
             """,
             variables=None,
         ).get("projects")
@@ -122,6 +135,9 @@ class Requester:
                     }}
                     data_views {{
                         {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
                     }}
                 }}
             }}
@@ -154,6 +170,9 @@ class Requester:
                 data_views {{
                     {self.dataview_fragment}
                 }}
+                jobs {{
+                    {self.job_fragment}
+                }}
               }}
             }}
             """,
@@ -176,22 +195,15 @@ class Requester:
             variables={"id": id},
         ).get("archiveProject")
 
-    def add_project_org(self, project_id: str, org_id: str) -> Optional[dict]:
-        return self._gql_req(
-            query="""
-            mutation AddProjectOrganization (
-              $project_id: String!,
-              $organization_id: String!,
-            ) {
-              addProjectOrganization(project_id: $project_id, organization_id: $organization_id) {
-                Project { id }
-              }
-            }
-            """,
-            variables={"project_id": project_id, "organization_id": org_id},
-        ).get("addProjectOrganization")
-
-    def create_dataview(self, project_id: str, data_view_input: dict) -> Optional[dict]:
+    def create_dataview(
+        self,
+        project_id: str,
+        name: str,
+        uri: str,
+        owner_id: Optional[str],
+        owner_label: Optional[str],
+        schema: list,
+    ) -> Optional[dict]:
         return self._gql_req(
             query=f"""
             mutation AddDataView (
@@ -203,7 +215,16 @@ class Requester:
               }}
             }}
             """,
-            variables={"project_id": project_id, "data_view_input": data_view_input},
+            variables={
+                "project_id": project_id,
+                "data_view_input": {
+                    "name": name,
+                    "uri": uri,
+                    "owner_id": owner_id,
+                    "owner_label": owner_label,
+                    "schema": schema,
+                },
+            },
         ).get("addDataView")
 
     def list_dataviews(self, project_id: str) -> Optional[list]:
@@ -214,6 +235,9 @@ class Requester:
                 project(id: $id) {{
                     data_views {{
                       {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
                     }}
                 }}
             }}
@@ -236,6 +260,9 @@ class Requester:
                 project(id: $project_id) {{
                     data_views(id: $id, uri: $uri) {{
                       {self.dataview_fragment}
+                    }}
+                    jobs {{
+                        {self.job_fragment}
                     }}
                 }}
             }}
@@ -276,26 +303,24 @@ class Requester:
 
     def approve_job(self, job_id: str, org_id: str) -> dict:
         return self._gql_req(
-            query="""
-            mutation ApproveJob($job_id: String!, $organization_id: String!) {
-                approveJob(job_id: $job_id, organization_id: $organization_id) {
-                  id
-                  status { code }
-                }
-            }
+            query=f"""
+            mutation ApproveJob($job_id: String!, $organization_id: String!) {{
+                approveJob(job_id: $job_id, organization_id: $organization_id) {{
+                    {self.job_fragment}
+                }}
+            }}
             """,
             variables={"job_id": job_id, "organization_id": org_id},
         ).get("approveJob", {})
 
     def submit_job(self, job_id: str) -> dict:
         return self._gql_req(
-            query="""
-                    mutation InitializeSession($task_id: String!) {
-                        initializeSession(task_id: $task_id) {
-                          id
-                          status { code }
-                        }
-                    }
+            query=f"""
+                    mutation InitializeSession($task_id: String!) {{
+                        initializeSession(task_id: $task_id) {{
+                            {self.job_fragment}
+                        }}
+                    }}
                     """,
             variables={"task_id": job_id},
         ).get("initializeSession", {})
@@ -309,7 +334,7 @@ class Requester:
             query GetJob($project_id: String! $job_id: String!) {{
                 project(id: $project_id) {{
                   job(id: $job_id) {{
-                    id
+                    {self.job_fragment}
                     {return_params}
                   }}
                 }}

@@ -1,17 +1,16 @@
 class Organization:
     """
     Organization represents an organization in Cape.
+
+    Arguments:
+        id (str): ID of `Organization`
+        name (str): name of `Organization`.
+        label (str): label of `Organization`.
     """
 
     def __init__(
         self, id: str = None, name: str = None, label: str = None,
     ):
-        """
-        :param id: str
-        :param name: str
-        :param label: str
-        """
-
         self.id: str = id
         self.name: str = name
         self.label: str = label

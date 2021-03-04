@@ -1,8 +1,5 @@
 JOB_TYPE_LR = "LINEAR_REGRESSION"
 
-JOB_TYPES = [JOB_TYPE_LR]
-
-JOB_STATUS_CREATED = "Created"
 # Mapping of pandas datatypes to json datatypes
 # dtypes object -> string
 # dtypes int64 -> integer

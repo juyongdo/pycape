@@ -1,7 +1,6 @@
 import contextlib
 
 import pytest
-import responses
 
 from tests.fake import fake_csv_dob_date_field
 from tests.fake import fake_dataframe
@@ -25,10 +24,10 @@ class TestDataView:
         assert repr(dv) == expect
 
     def test__get_item__(self):
-        dv_1 = DataView(name="my-data", uri="s3://my-data.csv")
+        dv_1 = DataView(name="my-data", location="s3://my-data.csv")
         dv_with_col = dv_1["col_1"]
 
-        dv_2 = DataView(name="my-data", uri="s3://my-data.csv")
+        dv_2 = DataView(name="my-data", location="s3://my-data.csv")
         dv_with_cols = dv_2["col_1", "col_2"]
 
         assert isinstance(dv_with_col, DataView)
@@ -37,24 +36,12 @@ class TestDataView:
         assert isinstance(dv_with_cols, DataView)
         assert dv_with_cols._cols == ["col_1", "col_2"]
 
-    @responses.activate
-    @pytest.mark.parametrize(
-        "owner_id,user_id,expectation",
-        [("main_user", "main_user", "s3://my-data.csv")],
-    )
-    def test_location_property(self, owner_id, user_id, expectation, mocker):
-        dv = DataView(
-            name="my-data", uri="s3://my-data.csv", owner_id=owner_id, user_id=user_id
-        )
-
-        assert dv.location == expectation
-
     @pytest.mark.parametrize(
         "schema,expectation,exception",
         [
             (None, type(None), notraising()),
-            (fake_dataframe().dtypes, dict, notraising()),
-            ([{"name": "col_1", "schema_type": "string"}], dict, notraising()),
+            (fake_dataframe().dtypes, list, notraising()),
+            ([{"name": "col_1", "schema_type": "string"}], list, notraising()),
             (
                 fake_dataframe()["col1"],
                 None,
@@ -73,12 +60,12 @@ class TestDataView:
             ),
         ],
     )
-    def test_schema_property(self, schema, expectation, exception):
+    def test_validate_schema(self, schema, expectation, exception):
         with exception:
-            dv = DataView(name="my-data", schema=schema, uri="s3://my-data.csv")
+            parse_schema = DataView._validate_schema(schema=schema)
 
         if isinstance(exception, contextlib._GeneratorContextManager):
-            assert isinstance(dv.schema, expectation)
+            assert isinstance(parse_schema, expectation)
 
     @pytest.mark.parametrize(
         "side_effect,exception",
@@ -97,8 +84,7 @@ class TestDataView:
                 side_effect=side_effect,
                 return_value=fake_csv_dob_date_field(),
             )
-            dv = DataView(name="my-data", uri="s3://my-data.csv")
-            schema = dv._get_schema_from_uri()
+            schema = DataView._get_schema_from_uri(uri="s3://my-data.csv")
 
             if isinstance(exception, contextlib._GeneratorContextManager):
                 assert [s for s in schema if s.get("name") == "dob"][0].get(

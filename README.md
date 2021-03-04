@@ -4,8 +4,8 @@
 
 **cape-ds** is a set of Python modules for interacting with your Cape data. Using cape-ds, you can:
 
-- Create and query dataviews, or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
-- Submit and track jobs.
+- Create and query [dataviews](https://docs.capeprivacy.com/libraries/cape-ds/reference#dataviews), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
+- Submit and track [jobs](https://docs.capeprivacy.com/libraries/cape-ds/reference#dataviews), which are computational sessions which contain instructions for how to train your model.
 
 Learn more: https://docs.capeprivacy.com/libraries/cape-ds
 
@@ -22,15 +22,14 @@ Access your Cape projects by creating a instance of the main `Cape` class:
 
 Add dataviews to your project, review dataviews added by other organizations working in the project, and submit your job.
 ```    
-    from cape import DataView, VerticalLinearRegressionJob
+    from cape import VerticallyPartitionedLinearRegression
 
-    data_view = DataView(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
     my_project = c.get_project("project_123")
-    my_project.create_dataview(data_view)
+    my_project.create_dataview(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
 
     dvs = my_project.list_dataviews()
 
-    vlr_job = VerticalLinearRegressionJob(
+    vlr_job = VerticallyPartitionedLinearRegression(
         train_dataview_x=dvs[0],
         train_dataview_y=dvs[1]
     )

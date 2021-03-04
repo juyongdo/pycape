@@ -1,19 +1,22 @@
 # API Reference
 
-## Cape
-::: cape.api.cape.cape.Cape
+## cape.Cape 
+::: cape.Cape
     handler: python
     selection:
-        filters:
-            - "!^_"  # exlude all members starting with _
-            - "^__init__$"  # but always include __init__ modules and methods
+        members:
+            - login
+            - list_projects
+            - get_project
+            - delete_project
     rendering:
-      show_root_heading: false
-      show_source: false
-      show_root_toc_entry: false
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
 
-## Project
-::: cape.api.project.project.Project
+## cape.Project
+::: cape.Project
     handler: python
     selection:
         members:
@@ -24,41 +27,58 @@
             - submit_job
             - delete_dataview
     rendering:
-      show_root_heading: false
-      show_source: false
-      show_root_toc_entry: false
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
 
-## DataView
-::: cape.api.dataview.dataview.DataView
+## cape.Organization
+::: cape.api.organization.organization.Organization
+    handler: python
+    rendering:
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
+
+## cape.DataView
+::: cape.DataView
     handler: python
     selection:
         members:
-            - __init__
+            - schema
     rendering:
-      show_root_heading: false
-      show_source: false
-      show_root_toc_entry: false
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
 
-## Job
-::: cape.api.job.job.Job
+## cape.Job
+::: cape.Job
     handler: python
-    selection:
-        members:
-            - get_status
-            - get_results
     rendering:
-      show_root_heading: false
-      show_source: false
-      show_root_toc_entry: false
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
 
-## VerticalLinearRegressionJob
-::: cape.api.job.vertical_linear_regression_job.VerticalLinearRegressionJob
+## cape.Task
+::: cape.api.task.task.Task
+    handler: python
+    rendering:
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false
+
+## cape.VerticallyPartitionedLinearRegression
+::: cape.VerticallyPartitionedLinearRegression
     handler: python
     selection:
         filters:
             - "!^_"  # exlude all members starting with _
-            - "^__init__$"  # but always include __init__ modules and methods
     rendering:
-      show_root_heading: false
-      show_source: false
-      show_root_toc_entry: false
+        heading_level: 4
+        show_root_heading: false
+        show_source: false
+        show_root_toc_entry: false

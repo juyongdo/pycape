@@ -21,15 +21,17 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/capeprivacy
 nav:
-    - Home: index.md
-    - Usage:
-        - Login: usage/login.md
-        - Projects: usage/project.md
-        - DataViews: usage/dataview.md
-        - Jobs: usage/job.md
-    - Tutorials:
-        - Train Linear Regression Model: tutorials/submit_linear_regression_job.md
-    - Reference: reference.md
+    - Libraries:
+        - Cape DS:
+            - Overview: index.md
+            - Usage:
+                - Login: usage/login.md
+                - Projects: usage/project.md
+                - DataViews: usage/dataview.md
+                - Jobs: usage/job.md
+            - Tutorials:
+                - Train Linear Regression Model: tutorials/submit_linear_regression_job.md
+            - Reference: reference.md
 plugins:
     - search
     - mkdocstrings
