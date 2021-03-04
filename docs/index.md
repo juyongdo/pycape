@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/capeprivacy/cape-ds/branch/main/graph/badge.svg?token=nimecXcQzo)](https://codecov.io/gh/capeprivacy/cape-ds)
 
-**pycape** is a set of Python modules for interacting with your Cape data. Using `pycape`, you can:
+**pycape** is a set of Python modules for interacting with your Cape Privacy data. Using `pycape`, you can:
 
 - Create and query [dataviews](/libraries/pytest/reference#capedataview), or pointers to the data that you want to use to train a model using Cape's encrypted learning protocol.
 - Submit and track [jobs](/libraries/pytest/reference#capedataview), which are computational sessions which contain instructions for how to train your model.
