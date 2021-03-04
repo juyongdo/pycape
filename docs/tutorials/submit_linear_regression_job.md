@@ -50,8 +50,8 @@ That is it for the UI for now! We'll return later to review `DataViews` and appr
 
 Next we will set up these `DataViews` and `Jobs` in `pycape`.
 
-## Working with the Cape DS Python Library
-### Login to Cape DS
+## Working with the PyCape Python Library
+### Login to PyCape
 
 Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/libraries/pycape/usage/login) with our API using `pycape`. Once you've logged in successfully, you should see a success message.
 
@@ -166,7 +166,7 @@ After submitting your job, you should be able to see the status and details of y
 
 ![](../img/job-details.gif)
 
-To check the status of your submitted linear regression job using Cape DS, use the [`get_status`](/reference/#cape.api.job.job.Job.get_status) method:
+To check the status of your submitted linear regression job using `pycape`, use the [`get_status`](/reference/#pycape.api.job.job.Job.get_status) method:
 ```python
     >>> lr_job = my_project.get_job(id="abc_123")
 
@@ -191,7 +191,7 @@ Once your job has successfully completed, you can view the results of the traine
 
 Whether you can view the weights or metrics of the trained model (or both!) depends on the role you and your organization play in the project.
 
-To view the weights and metrics of a job, use the [`get_results`](/libraries/pycape/reference/#cape.api.job.job.Job.get_results) method:
+To view the weights and metrics of a job, use the [`get_results`](/libraries/pycape/reference/#pycape.api.job.job.Job.get_results) method:
 
 ```python
     >>> lr_job = my_project.get_job(id="abc_123")

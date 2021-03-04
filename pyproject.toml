@@ -6,8 +6,8 @@ authors = ["Cape Privacy <contact@capeprivacy.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://capeprivacy.com/"
-repository = "https://github.com/capeprivacy/cape-ds"
-documentation = "https://docs.capeprivacy.com/libraries/"
+repository = "https://github.com/capeprivacy/pycape"
+documentation = "https://docs.capeprivacy.com/libraries/pycape"
 
 [tool.poetry.dependencies]
 python = "^3.6.1"

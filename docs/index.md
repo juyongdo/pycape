@@ -8,7 +8,7 @@
 - Submit and track [jobs](/libraries/pycape/reference#pycapedataview), which are computational sessions which contain instructions for how to train your model.
 
 ## Short Tutorial
-Access your Cape projects by creating a instance of the main [`Cape`](/libraries/pycape/reference#pycapecape) class:
+Access your Cape projects by creating an instance of the main [`Cape`](/libraries/pycape/reference#pycapecape) class:
 
 ``` 
     from pycape import Cape

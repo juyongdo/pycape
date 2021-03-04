@@ -54,7 +54,7 @@ Add `DataViews` to your project, review `DataViews` added by other organizations
 Install the library and it's dependencies from git: 
 
 ```sh
-$ git clone https://github.com/capeprivacy/cape-ds.git
+$ git clone https://github.com/capeprivacy/pycape.git
 $ cd pycape
 $ make bootstrap
 ```
