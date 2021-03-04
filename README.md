@@ -11,30 +11,30 @@ Learn more: https://docs.capeprivacy.com/libraries/pycape
 
 ## Short Tutorial
 Access your Cape projects by creating an instance of the main [`Cape`](https://docs.capeprivacy.com/libraries/pycape/reference#pycapecape) class:
-``` 
-    from pycape import Cape
+```python
+from pycape import Cape
 
-    c = Cape()
-    c.login()
+c = Cape()
+c.login()
 
-    my_projects = c.list_projects()
+my_projects = c.list_projects()
 ```
 
 Add `DataViews` to your project, review `DataViews` added by other organizations working in the project, and submit your `Job`.
-```    
-    from pycape import VerticallyPartitionedLinearRegression
+```python  
+from pycape import VerticallyPartitionedLinearRegression
 
-    my_project = c.get_project("project_123")
-    my_project.create_dataview(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
+my_project = c.get_project("project_123")
+my_project.create_dataview(name="my-data", uri="s3://my-data.csv" owner_label="my-org")
 
-    dvs = my_project.list_dataviews()
+dvs = my_project.list_dataviews()
 
-    vlr_job = VerticallyPartitionedLinearRegression(
-        train_dataview_x=dvs[0],
-        train_dataview_y=dvs[1]
-    )
+vlr_job = VerticallyPartitionedLinearRegression(
+    train_dataview_x=dvs[0],
+    train_dataview_y=dvs[1]
+)
 
-    my_project.submit_job(vlr_job)
+my_project.submit_job(vlr_job)
 ```
 
 ## Installation
@@ -45,8 +45,8 @@ Add `DataViews` to your project, review `DataViews` added by other organizations
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
 
 ### Install via pip
-```shell
-    pip install pycape
+```sh
+$ pip install pycape
 ```
 
 ### Download from source
