@@ -108,7 +108,7 @@ class Job(ABC):
         b.download_file(f"{self.id}/regression_weights.csv", weights_tmp.name)
 
         # return the weights (decoded to np) & metrics
-        return np.loadtxt(weights_tmp.name, delimiter=','), metrics
+        return np.loadtxt(weights_tmp.name, delimiter=","), metrics
 
     def approve(self, org_id: str) -> "Job":
         """
