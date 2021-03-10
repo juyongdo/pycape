@@ -105,10 +105,10 @@ class Job(ABC):
         weights_tmp = tempfile.NamedTemporaryFile()
 
         # save the weights for this job in a temp file
-        b.download_file(f"{self.id}/regression_weights", weights_tmp.name)
+        b.download_file(f"{self.id}/regression_weights.csv", weights_tmp.name)
 
         # return the weights (decoded to np) & metrics
-        return np.loadtxt(weights_tmp.name), metrics
+        return np.loadtxt(weights_tmp.name, delimiter=","), metrics
 
     def approve(self, org_id: str) -> "Job":
         """
