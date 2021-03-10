@@ -452,3 +452,58 @@ class TestProject:
             assert isinstance(output, str)
             assert output == "DataView (dv_123) deleted"
             assert len(my_project.dataviews) == len(dvs) - 1
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "json,out_expect,exception",
+        [
+            (
+                {
+                    "data": {
+                        "project": {
+                            "jobs": [
+                                {
+                                    "id": "def123",
+                                    "status": {"code": "NeedsApproval"},
+                                    "task": {"type": "LINEAR_REGRESSION"},
+                                }
+                            ],
+                        },
+                    },
+                },
+                (
+                    "JOB ID    TYPE               STATUS"
+                    "\n--------  -----------------  -------------\n"
+                    "def123    LINEAR_REGRESSION  NeedsApproval"
+                ),
+                notraising(),
+            ),
+            (
+                {"errors": [{"message": "something went wrong"}]},
+                None,
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_list_jobs(self, json, out_expect, exception, mocker):
+        with exception:
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            r = Requester(endpoint=FAKE_HOST)
+            out = StringIO()
+            my_project = Project(
+                requester=r,
+                out=out,
+                id="123",
+                user_id="user_123",
+                name="my project",
+                label="my project",
+            )
+            jobs = my_project.list_jobs()
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            output = out.getvalue().strip()
+            assert output == out_expect
+            assert isinstance(jobs, list)
+            assert jobs[0].id == "def123"

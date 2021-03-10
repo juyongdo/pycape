@@ -346,6 +346,24 @@ class Requester:
             .get("job")
         )
 
+    def list_jobs(self, project_id: str) -> Optional[dict]:
+        return (
+            self._gql_req(
+                query=f"""
+            query ListJobs($project_id: String!) {{
+                project(id: $project_id) {{
+                  jobs {{
+                    {self.job_fragment}
+                  }}
+                }}
+            }}
+            """,
+                variables={"project_id": project_id},
+            )
+            .get("project", {})
+            .get("jobs")
+        )
+
     def me(self):
         return self._gql_req(
             query="""
