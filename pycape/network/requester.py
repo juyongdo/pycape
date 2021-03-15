@@ -40,8 +40,9 @@ class Requester:
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
-        )
-        self.gql_endpoint = self.endpoint.rstrip("/") + "/v1/query"
+        ).rstrip("/")
+        self.gql_endpoint = self.endpoint + "/v1/query"
+
         self.session = requests.Session()
 
     def login(self, token: Optional[str] = None) -> str:
@@ -57,6 +58,7 @@ class Requester:
             self.endpoint + "/v1/login",
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
+
 
         resp.raise_for_status()
         json = resp.json()
