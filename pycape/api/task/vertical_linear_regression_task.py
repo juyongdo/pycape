@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import urlparse
 
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
@@ -21,21 +22,24 @@ class VerticallyPartitionedLinearRegression(Task):
         to a dataset that contains training set values.
         y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains target values.
+        model_location: The AWS S3 bucket name to which we will write the output of the model training.
     """
 
     id: Optional[str] = None
     job_type: Optional[str] = JOB_TYPE_LR
+    model_location: str = None
     x_train_dataview: DataView = None
     y_train_dataview: DataView = None
 
     def __repr__(self):
         return " ".join(
             f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
-        y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''})".split()
+        y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
+        model_location={self.model_location})".split()
         )
 
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
-        def validate_params(dataview_x, dataview_y):
+        def validate_dataview_params(dataview_x, dataview_y):
             missing_params = []
             x_cols = dataview_x._cols
             y_cols = dataview_y._cols
@@ -66,18 +70,30 @@ class VerticallyPartitionedLinearRegression(Task):
                 missing_params,
             )
 
-        values, err = validate_params(
+        def validate_s3_location(uri: str):
+            parsed_uri = urlparse(uri)
+            if parsed_uri.scheme != "s3":
+                raise Exception(
+                    f"Model location with incorrect scheme supplied. Expecting S3 bucket location."
+                )
+
+            return uri
+
+        values, err = validate_dataview_params(
             dataview_x=self.x_train_dataview, dataview_y=self.y_train_dataview
         )
 
         if err:
             raise Exception(f"DataView Missing Properties: {', '.join(err)}")
 
+        model_location = validate_s3_location(uri=self.model_location)
+
         task_config = {
             "dataview_x_id": values.get("x_id"),
             "dataview_y_id": values.get("y_id"),
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
+            "model_location": model_location,
         }
         return super()._create_task(
             project_id=project_id,
