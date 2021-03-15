@@ -40,8 +40,9 @@ class Requester:
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
-        )
-        self.gql_endpoint = self.endpoint.rstrip("/") + "/v1/query"
+        ).rstrip("/")
+        self.gql_endpoint = self.endpoint + "/v1/query"
+
         self.session = requests.Session()
 
     def login(self, token: Optional[str] = None) -> str:
@@ -344,6 +345,24 @@ class Requester:
             )
             .get("project", {})
             .get("job")
+        )
+
+    def list_jobs(self, project_id: str) -> Optional[dict]:
+        return (
+            self._gql_req(
+                query=f"""
+            query ListJobs($project_id: String!) {{
+                project(id: $project_id) {{
+                  jobs {{
+                    {self.job_fragment}
+                  }}
+                }}
+            }}
+            """,
+                variables={"project_id": project_id},
+            )
+            .get("project", {})
+            .get("jobs")
         )
 
     def me(self):

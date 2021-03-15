@@ -217,7 +217,7 @@ class Project(ABC):
 
         return Job(project_id=self.id, **submitted_job, requester=self._requester)
 
-    def get_job(self, id: str) -> Job:
+    def get_job(self, id: str) -> List[Job]:
         """
         Returns a `Job` given an ID.
 
@@ -229,6 +229,34 @@ class Project(ABC):
         job = self._requester.get_job(project_id=self.id, job_id=id, return_params="")
 
         return Job(**job, project_id=self.id, requester=self._requester)
+
+    def list_jobs(self) -> Job:
+        """
+        Returns a list of `Jobs` for the scoped `Project`.
+
+        Returns:
+            A list of `Job` instances.
+        """
+        jobs = self._requester.list_jobs(project_id=self.id)
+        get_job_values = [
+            Job(project_id=self.id, requester=self._requester, **j) for j in jobs
+        ]
+        j_ids = []
+        j_type = []
+        j_status = []
+
+        for j in get_job_values:
+            j_ids.append(j.id)
+            j_type.append(j.job_type)
+            j_status.append(j.status)
+
+        format_jobs = {
+            "JOB ID": j_ids,
+            "TYPE": j_type,
+            "STATUS": j_status,
+        }
+        self._out.write(tabulate(format_jobs, headers="keys") + "\n")
+        return get_job_values
 
     def delete_dataview(self, id: str) -> None:
         """
