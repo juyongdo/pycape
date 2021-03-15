@@ -59,7 +59,6 @@ class Requester:
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
 
-
         resp.raise_for_status()
         json = resp.json()
 
