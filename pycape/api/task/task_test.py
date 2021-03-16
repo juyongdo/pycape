@@ -26,13 +26,18 @@ class TestTask:
             schema=[{"name": "b", "schema_type": "string"}],
         )
         t = VerticallyPartitionedLinearRegression(
+            x_train_dataview=dataview_x, y_train_dataview=dataview_y["b"],
+        )
+        t_with_model_location = VerticallyPartitionedLinearRegression(
             x_train_dataview=dataview_x,
             y_train_dataview=dataview_y["b"],
             model_location="s3://my-location",
         )
-        rep = (
+        rep = "VerticallyPartitionedLinearRegression(x_train_dataview=my-data-x, y_train_dataview=my-data-y['b'])"
+        rep_with_model_location = (
             "VerticallyPartitionedLinearRegression(x_train_dataview=my-data-x, y_train_dataview=my-data-y['b'], "
             "model_location=s3://my-location)"
         )
 
         assert repr(t) == rep
+        assert repr(t_with_model_location) == rep_with_model_location

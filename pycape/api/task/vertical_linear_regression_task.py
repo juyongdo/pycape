@@ -33,11 +33,14 @@ class VerticallyPartitionedLinearRegression(Task):
     y_train_dataview: DataView = None
 
     def __repr__(self):
-        return " ".join(
+        repr_str = " ".join(
             f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
-        y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
-        model_location={self.model_location})".split()
+            y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''})".split()
         )
+        if self.model_location:
+            repr_str = repr_str[:-1] + f", model_location={self.model_location})"
+
+        return repr_str
 
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
         def validate_dataview_params(dataview_x, dataview_y):
@@ -85,7 +88,9 @@ class VerticallyPartitionedLinearRegression(Task):
         if err:
             raise Exception(f"DataView Missing Properties: {', '.join(err)}")
 
-        model_location = validate_s3_location(uri=self.model_location)
+        model_location = ""
+        if self.model_location:
+            model_location = validate_s3_location(uri=self.model_location)
 
         task_config = {
             "dataview_x_id": values.get("x_id"),
