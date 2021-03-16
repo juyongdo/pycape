@@ -1,7 +1,5 @@
 from typing import Optional
-from urllib.parse import urlparse
 
-from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
@@ -33,14 +31,19 @@ class VerticallyPartitionedLinearRegression(Task):
     y_train_dataview: DataView = None
 
     def __repr__(self):
-        repr_str = " ".join(
+        return " ".join(
             f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
-            y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''})".split()
+            y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
+            model_location={self.model_location})".split()
         )
-        if self.model_location:
-            repr_str = repr_str[:-1] + f", model_location={self.model_location})"
 
-        return repr_str
+    @property
+    def model_location(self):
+        return super(Task, self).model_location
+
+    @Task.model_location.setter
+    def model_location(self, location):  # noqa: F811
+        Task.model_location.fset(self, location)
 
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
         def validate_dataview_params(dataview_x, dataview_y):
@@ -74,13 +77,6 @@ class VerticallyPartitionedLinearRegression(Task):
                 missing_params,
             )
 
-        def validate_s3_location(uri: str):
-            parsed_uri = urlparse(uri)
-            if parsed_uri.scheme != "s3":
-                raise StorageSchemeException(scheme=parsed_uri.scheme)
-
-            return uri
-
         values, err = validate_dataview_params(
             dataview_x=self.x_train_dataview, dataview_y=self.y_train_dataview
         )
@@ -88,16 +84,12 @@ class VerticallyPartitionedLinearRegression(Task):
         if err:
             raise Exception(f"DataView Missing Properties: {', '.join(err)}")
 
-        model_location = ""
-        if self.model_location:
-            model_location = validate_s3_location(uri=self.model_location)
-
         task_config = {
             "dataview_x_id": values.get("x_id"),
             "dataview_y_id": values.get("y_id"),
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
-            "model_location": model_location,
+            "model_location": self.model_location,
         }
         return super()._create_task(
             project_id=project_id,

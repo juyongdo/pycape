@@ -89,7 +89,7 @@ class TestJob:
                 DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 None,
                 None,
-                None,
+                "s3://my-bucket",
                 pytest.raises(
                     Exception,
                     match="DataView Missing Properties: X DataView columns, Y DataView columns",
@@ -101,7 +101,7 @@ class TestJob:
                 DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
-                None,
+                "s3://my-bucket",
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
             (
@@ -128,7 +128,7 @@ class TestJob:
                 ),
                 None,
                 None,
-                None,
+                "s3://my-bucket",
                 notraising(),
             ),
         ],
