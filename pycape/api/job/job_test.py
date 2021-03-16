@@ -154,6 +154,7 @@ class TestJob:
             task_config = {
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
+                "model_location": "s3://my-bucket",
             }
             vlr = VerticallyPartitionedLinearRegression(**task_config)
 

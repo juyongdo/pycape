@@ -1,6 +1,7 @@
 from typing import Optional
 from urllib.parse import urlparse
 
+from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
@@ -73,9 +74,7 @@ class VerticallyPartitionedLinearRegression(Task):
         def validate_s3_location(uri: str):
             parsed_uri = urlparse(uri)
             if parsed_uri.scheme != "s3":
-                raise Exception(
-                    f"Model location with incorrect scheme supplied. Expecting S3 bucket location."
-                )
+                raise StorageSchemeException(scheme=parsed_uri.scheme)
 
             return uri
 
