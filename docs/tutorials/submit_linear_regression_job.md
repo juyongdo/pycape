@@ -157,6 +157,16 @@ You can also specify which data columns the model should be trained on or evalua
 VerticallyPartitionedLinearRegression(x_train_dataview=Orgacle Dataview['debt equity ratio'], y_train_dataview=Atlas Dataview['debt equity ratio'])
 ```
 
+It is also possible to send the [S3 Bucket location that you would like Cape to save your model results to](/usage/job/#setting-the-storage-location-as-a-model-owner-in-cape), with your job submission:
+```python
+>>> VerticallyPartitionedLinearRegression(
+>>>     x_train_dataview=dataview_1["debt equity ratio"],
+>>>     y_train_dataview=dataview_2["debt equity ratio"],
+>>>     model_location="s3://my-bucket",
+>>> )
+
+VerticallyPartitionedLinearRegression(x_train_dataview=Orgacle Dataview['debt equity ratio'], y_train_dataview=Atlas Dataview['debt equity ratio'], model_location=s3://my-bucket)
+```
 !!!note
     In order for your linear regression job to train a model using Cape's encrypted learning protocol, you'll need to run your own Cape workers. Read [our documentation to get set up with Cape workers](/understand/architecture/cape-workers).
 

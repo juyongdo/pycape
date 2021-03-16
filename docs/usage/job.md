@@ -21,6 +21,21 @@ Default response:
 Job(id=abc_123, job_type=LINEAR_REGRESSION, status=Created)
 ```
 
+### Setting the Storage Location as a Model Owner in Cape
+The results of the trained model will be saved to an S3 bucket location that you notify Cape about. This can be done in two ways:
+
+- Pass the S3 Bucket URI [via an environment variable to your Cape Worker Docker image](/understand/architecture/cape-workers/#cape_bucket)
+- Pass the S3 Bucket URI via the `model_location` parameter on the `VerticallyPartitionedLinearRegression` instance that is used to submit the job:
+
+```python
+vlr = VerticallyPartitionedLinearRegression(
+    x_train_dataview=dataview_1,
+    y_train_dataview=dataview_2,
+    model_location="s3://my-bucket"
+)
+my_project.submit_job(job=vlr)
+```
+
 ## Get a Job's Status
 
 ```python

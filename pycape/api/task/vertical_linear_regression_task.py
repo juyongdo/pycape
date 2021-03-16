@@ -13,17 +13,17 @@ class VerticallyPartitionedLinearRegression(Task):
     Inherits from: `Task`.
 
     Contains instructions for training linear regression models using \
-    verically-partioned datasets.
+    vertically-partitioned datasets.
 
-    Verically-partioned datasets refer to the joining of columns (i.e. features) from \
-    serveral parties.
+    Vertically-partitioned datasets refer to the joining of columns (i.e. features) from \
+    several parties.
 
     Arguments:
         x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains training set values.
         y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains target values.
-        model_location: The AWS S3 bucket name to which we will write the output of the model training.
+        model_location: The AWS S3 bucket name to which Cape will write the output of the model training.
     """
 
     id: Optional[str] = None
