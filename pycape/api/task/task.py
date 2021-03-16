@@ -9,6 +9,9 @@ from ...network.requester import Requester
 class Task(ABC):
     """
     Tasks contain the instructions for how a Cape worker should run a job.
+
+    Arguments:
+        model_location (str): The AWS S3 bucket name to which Cape will write the output of the model training.
     """
 
     def __init__(self, model_location: str = None, **kwargs):
