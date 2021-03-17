@@ -41,8 +41,8 @@ class VerticallyPartitionedLinearRegression(Task):
     def model_location(self):
         return super(Task, self).model_location
 
-    @Task.model_location.setter # noqa: F811
-    def model_location(self, location):
+    @Task.model_location.setter  # noqa: F811
+    def model_location(self, location):  # noqa: F811
         Task.model_location.fset(self, location)
 
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
