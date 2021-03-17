@@ -11,31 +11,42 @@ class VerticallyPartitionedLinearRegression(Task):
     Inherits from: `Task`.
 
     Contains instructions for training linear regression models using \
-    verically-partioned datasets.
+    vertically-partitioned datasets.
 
-    Verically-partioned datasets refer to the joining of columns (i.e. features) from \
-    serveral parties.
+    Vertically-partitioned datasets refer to the joining of columns (i.e. features) from \
+    several parties.
 
     Arguments:
         x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains training set values.
         y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains target values.
+        model_location (str): The AWS S3 bucket name to which Cape will write the output of the model training.
     """
 
     id: Optional[str] = None
     job_type: Optional[str] = JOB_TYPE_LR
+    model_location: str = None
     x_train_dataview: DataView = None
     y_train_dataview: DataView = None
 
     def __repr__(self):
         return " ".join(
             f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
-        y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''})".split()
+            y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
+            model_location={self.model_location})".split()
         )
 
+    @property
+    def model_location(self):
+        return super(Task, self).model_location
+
+    @Task.model_location.setter  # noqa: F811
+    def model_location(self, location):  # noqa: F811
+        Task.model_location.fset(self, location)
+
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
-        def validate_params(dataview_x, dataview_y):
+        def validate_dataview_params(dataview_x, dataview_y):
             missing_params = []
             x_cols = dataview_x._cols
             y_cols = dataview_y._cols
@@ -66,7 +77,7 @@ class VerticallyPartitionedLinearRegression(Task):
                 missing_params,
             )
 
-        values, err = validate_params(
+        values, err = validate_dataview_params(
             dataview_x=self.x_train_dataview, dataview_y=self.y_train_dataview
         )
 
@@ -78,6 +89,7 @@ class VerticallyPartitionedLinearRegression(Task):
             "dataview_y_id": values.get("y_id"),
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
+            "model_location": self.model_location,
         }
         return super()._create_task(
             project_id=project_id,

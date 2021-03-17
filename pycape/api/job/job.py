@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import boto3
 import numpy as np
 
+from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
 
 
@@ -98,7 +99,7 @@ class Job(ABC):
         # location will look like s3://my-bucket/<job_id>
         p = urlparse(location)
         if p.scheme != "s3":
-            raise Exception(f"only s3 locations supported, got {p.scheme}")
+            raise StorageSchemeException(scheme=p.scheme)
 
         # tell boto3 we are pulling from s3, p.netloc will be the bucket
         b = boto3.resource(p.scheme).Bucket(p.netloc)

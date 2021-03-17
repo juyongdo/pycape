@@ -36,7 +36,7 @@ class TestJob:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,dataview_x,dataview_y,dataview_col_x,dataview_col_y,exception",
+        "json,dataview_x,dataview_y,dataview_col_x,dataview_col_y,model_location,exception",
         [
             (
                 {
@@ -52,6 +52,7 @@ class TestJob:
                 DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
+                "s3://my-bucket",
                 notraising(),
             ),
             (
@@ -68,6 +69,7 @@ class TestJob:
                 DataView(name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
+                "s3://my-bucket",
                 pytest.raises(
                     Exception,
                     match="DataView Missing Properties: X DataView ID, Y DataView ID",
@@ -87,6 +89,7 @@ class TestJob:
                 DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 None,
                 None,
+                "s3://my-bucket",
                 pytest.raises(
                     Exception,
                     match="DataView Missing Properties: X DataView columns, Y DataView columns",
@@ -98,6 +101,7 @@ class TestJob:
                 DataView(id="dv_2", name="my-data_1", location="s3://my-data-2.csv"),
                 "123",
                 "123",
+                "s3://my-bucket",
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
             (
@@ -124,6 +128,7 @@ class TestJob:
                 ),
                 None,
                 None,
+                "s3://my-bucket",
                 notraising(),
             ),
         ],
@@ -135,6 +140,7 @@ class TestJob:
         dataview_y,
         dataview_col_x,
         dataview_col_y,
+        model_location,
         exception,
         mocker,
     ):
@@ -154,6 +160,7 @@ class TestJob:
             task_config = {
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
+                "model_location": model_location,
             }
             vlr = VerticallyPartitionedLinearRegression(**task_config)
 
