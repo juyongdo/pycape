@@ -134,7 +134,7 @@ Now that we've added our own `DataView` to the project, and vetted the `DataView
 
 Pass the `DataView` that contains training data to `x_train_dataview`, and the `DataView` that contains the target values to `y_train_dataview`.
 
-You'll also need to specify the [S3 Bucket location that you would like Cape to save your model results to](/usage/job/#setting-the-storage-location-as-a-model-owner-in-cape).
+You'll also need to specify the [S3 Bucket location that you would like Cape to save your model results to](/libraries/pycape/usage/job/#setting-the-storage-location-as-a-model-owner-in-cape).
 
 ```python
 >>> dataview_1 = my_project.get_dataview(id="01EY48")
