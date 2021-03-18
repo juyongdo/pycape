@@ -10,11 +10,31 @@ class VerticallyPartitionedLinearRegression(Task):
     """
     Inherits from: `Task`.
 
-    Contains instructions for training linear regression models using \
+    Contains instructions for encrypted training of linear regression models using \
     vertically-partitioned datasets.
 
     Vertically-partitioned datasets refer to the joining of columns (i.e. features) from \
     several parties.
+
+    !!!note
+        This task expects `DataView` with floating-point inputs. Internally, values will be \
+        re-encoded by the Cape Worker into the \
+        [fixed-point numbers](https://en.wikipedia.org/wiki/Fixed-point_arithmetic) necessary \
+        for encrypted computation.
+
+    !!!note
+        This task expects its input `DataViews` to be aligned by index (although indexing \
+        columns need not be present in either of the DataViews or their underlying datasets).
+
+    !!!note
+        This task expects its input `DataViews` to have max values scaled between 1.0 and 10.0.
+
+    Currently, input data must be scaled to single digits; for any floating-point vector `c` in \
+    the input data views `x` and `y`, `c` must be scaled such that `1.0 <= max(c) < 10.0.` \
+    This bound allows the Cape Worker to allocate all of its precision for significant digits \
+    throughout the linear regression computation, while still maintaining the guarantee that \
+    fixed-point numbers won't overflow. For logarithimically-distributed vectors, we recommend \
+    applying a log-transform before scaling to this bound.
 
     Arguments:
         x_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
