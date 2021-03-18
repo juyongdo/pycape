@@ -2,8 +2,8 @@
 
 This tutorial will walk you through the process of training an encrypted linear regression model in collaboration with another organization using Cape Privacy. You'll learn how to:
 
-- Send datasets securely to Cape Cloud.
-- Review the dataset schemas of other organizations in your project.
+- Register dataset pointers (i.e. DataViews) with Cape Cloud.
+- Review datasets from other organizations in your project.
 - Approve and reject model computation jobs.
 - View the metrics or weights of the trained model, depending on your role in the project.
 
@@ -209,7 +209,7 @@ array([12.14955139,  1.96560669])
 {'r_squared_result': [0.8804865768463074], 'mse_result': [37.94773864746094]}
 ```
 
-If you are the model owner, the first value in the returned tuple will be populated with a numpy array of weights from your trained model.
+If you are the model owner, the first value in the returned tuple will be populated with a numpy array of weights from your trained model. The first element in the `weights` array is the intercept of the linear model, and subsequent elements are its feature coefficients.
 
 !!!note
     To access model weights you'll need to [inform **pycape** about your AWS IAM authentication credentials](/libraries/pycape/usage/job#accessing-weights-as-a-model-owner-in-cape).
