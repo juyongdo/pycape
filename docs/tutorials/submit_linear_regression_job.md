@@ -3,7 +3,7 @@
 This tutorial will walk you through the process of training an encrypted linear regression model in collaboration with another organization using Cape Privacy. You'll learn how to:
 
 - Register dataset pointers (i.e. DataViews) with Cape Cloud.
-- Review datasets from other organizations in your project.
+- Review DataViews from other organizations in your project.
 - Approve and reject model computation jobs.
 - View the metrics or weights of the trained model, depending on your role in the project.
 
