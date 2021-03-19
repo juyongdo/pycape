@@ -17,7 +17,7 @@ class VerticallyPartitionedLinearRegression(Task):
     several parties.
 
     !!!note
-        This task expects `DataView` with floating-point inputs. Internally, values will be \
+        This task expects `DataViews` with floating-point inputs. Internally, values will be \
         re-encoded by the Cape Worker into the \
         [fixed-point numbers](https://en.wikipedia.org/wiki/Fixed-point_arithmetic) necessary \
         for encrypted computation.
