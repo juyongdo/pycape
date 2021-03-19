@@ -164,6 +164,12 @@ VerticallyPartitionedLinearRegression(x_train_dataview=Orgacle Dataview['debt eq
 !!!note
     In order for your linear regression job to train a model using Cape's encrypted learning protocol, you'll need to run your own Cape workers. Read [our documentation to get set up with Cape workers](/understand/architecture/cape-workers).
 
+!!!note
+    `VerticallyPartitionedLinearRegression` currently expects a bound on its input data in order to avoid precision loss during model training. See [its reference documentation](/reference/#pycapeverticallypartitionedlinearregression) for more details.
+
+!!! note
+    `DataView` indices must be aligned across parties before being used for a `VerticallyPartitionedLinearRegression`.
+
 ### Tracking Job Status
 
 After submitting your job, you should be able to see the status and details of your `Job` in the UI.

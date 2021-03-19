@@ -76,7 +76,7 @@
     handler: python
     selection:
         filters:
-            - "!^_"  # exlude all members starting with _
+            - "!^_"  # exclude all members starting with _
     rendering:
         heading_level: 4
         show_root_heading: false
