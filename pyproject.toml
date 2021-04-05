@@ -29,7 +29,7 @@ flake8 = "~3.8.3"
 flake8-black = "~0.2.0"
 isort = "~5.1.4"
 mkdocs-material = "5.5.3"
-mkdocstrings = "0.14.0"
+mkdocstrings = "0.15.0"
 pydoc-markdown = "3.2.0"
 
 [tool.isort]
