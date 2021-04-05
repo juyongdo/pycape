@@ -198,12 +198,15 @@ class Project(ABC):
 
         task_config = {k: v for k, v in task.__dict__.items()}
         model_location = task_config.get("_Task__model_location")
-        task_config.update(model_location=model_location)
+        model_owner = task_config.get("_Task__model_owner")
+        task_config.update(model_location=model_location, model_owner=model_owner)
 
         created_task = task.__class__(**task_config)._create_task(
             project_id=self.id, timeout=timeout, requester=self._requester
         )
-        return task.__class__(**created_task, model_location=model_location)
+        return task.__class__(
+            **created_task, model_location=model_location, model_owner=model_owner
+        )
 
     def submit_job(self, task: Task, timeout: float = 600) -> Job:
         """

@@ -17,8 +17,9 @@ class TestTask:
     def test_task__repr__(self):
         id = "abc123"
         model_location = "s3://my-bucket"
-        t = Task(id=id, model_location=model_location)
-        rep = f"Task(id={id})"
+        model_owner = "org123"
+        t = Task(id=id, model_location=model_location, model_owner=model_owner)
+        rep = f"Task(id={id}, model_owner={model_owner})"
 
         assert repr(t) == rep
 
@@ -39,10 +40,11 @@ class TestTask:
             x_train_dataview=dataview_x,
             y_train_dataview=dataview_y["b"],
             model_location="s3://my-location",
+            model_owner="org123",
         )
         rep = (
             "VerticallyPartitionedLinearRegression(x_train_dataview=my-data-x, y_train_dataview=my-data-y['b'], "
-            "model_location=s3://my-location)"
+            "model_location=s3://my-location, model_owner=org123)"
         )
 
         assert repr(t) == rep
@@ -78,7 +80,39 @@ class TestTask:
                 x_train_dataview=dataview_x,
                 y_train_dataview=dataview_y["b"],
                 model_location=model_location,
+                model_owner="org123",
             )
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert t.model_location == model_location
+
+    @pytest.mark.parametrize(
+        "model_owner,exception",
+        [
+            ("org123", notraising()),
+            (None, pytest.raises(Exception, match="no model owner provided")),
+        ],
+    )
+    def test_model_owner(self, model_owner, exception):
+        with exception:
+            dataview_x = DataView(
+                id="dv_x",
+                name="my-data-x",
+                location="s3://my-data.csv",
+                schema=[{"name": "a", "schema_type": "string"}],
+            )
+            dataview_y = DataView(
+                id="dv_y",
+                name="my-data-y",
+                location="s3://my-data.csv",
+                schema=[{"name": "b", "schema_type": "string"}],
+            )
+            t = VerticallyPartitionedLinearRegression(
+                x_train_dataview=dataview_x,
+                y_train_dataview=dataview_y["b"],
+                model_location="s3://my-location",
+                model_owner=model_owner,
+            )
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            assert t.model_owner == model_owner

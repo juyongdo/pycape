@@ -116,6 +116,7 @@ def make_job():
         x_train_dataview=project.dataviews[0]["x_1"],
         y_train_dataview=project.dataviews[1]["y"],
         model_location="s3://cape-worker",
+        model_owner=project.organizations[0].id
     )
 
     job = project.submit_job(job, timeout=120)
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     while status != "Completed" and status != "Error":
         status = job.get_status()
 
-    print(f"Received status {status}. Exitting...")
+    print(f"Received status {status}. Exiting...")
     if status == "Completed":
         sys.exit()
     else:

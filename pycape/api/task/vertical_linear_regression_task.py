@@ -42,11 +42,14 @@ class VerticallyPartitionedLinearRegression(Task):
         y_train_dataview (Union[`DataView`, `DataView`List[str]]): `DataView` that points \
         to a dataset that contains target values.
         model_location (str): The AWS S3 bucket name to which Cape will write the output of the model training.
+        model_owner (str): The ID of the organization participating in the computation that will own the
+        trained model and it's outputs.
     """
 
     id: Optional[str] = None
     job_type: Optional[str] = JOB_TYPE_LR
     model_location: str = None
+    model_owner: str = None
     x_train_dataview: DataView = None
     y_train_dataview: DataView = None
 
@@ -54,7 +57,7 @@ class VerticallyPartitionedLinearRegression(Task):
         return " ".join(
             f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
             y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
-            model_location={self.model_location})".split()
+            model_location={self.model_location}, model_owner={self.model_owner})".split()
         )
 
     @property
@@ -65,7 +68,16 @@ class VerticallyPartitionedLinearRegression(Task):
     def model_location(self, location):  # noqa: F811
         Task.model_location.fset(self, location)
 
+    @property
+    def model_owner(self):
+        return super(Task, self).model_owner
+
+    @Task.model_owner.setter  # noqa: F811
+    def model_owner(self, owner):  # noqa: F811
+        Task.model_owner.fset(self, owner)
+
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
+        # TODO: validate dataview params on class initialization
         def validate_dataview_params(dataview_x, dataview_y):
             missing_params = []
             x_cols = dataview_x._cols
@@ -110,6 +122,7 @@ class VerticallyPartitionedLinearRegression(Task):
             "dataview_x_col": values.get("x_cols"),
             "dataview_y_col": values.get("y_cols"),
             "model_location": self.model_location,
+            "model_owner": self.model_owner,
         }
         return super()._create_task(
             project_id=project_id,
