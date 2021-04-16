@@ -134,7 +134,7 @@ Now that we've added our own `DataView` to the project, and vetted the `DataView
 
 Pass the `DataView` that contains training data to `x_train_dataview`, and the `DataView` that contains the target values to `y_train_dataview`.
 
-To specify which organization participating in the computation will own the results of the trained model, pass the ID of the intended organization to the `model_owner` parameter. You can view the IDs of organizations collaborating on the project that you are a member of by using the [`list_organizations`](/libraries/pycape/reference#pycape.api.project.project.Project.list_organizations) method defined on the `Project` class.
+To specify which organization participating in the computation will own the results of the trained model, pass the ID of the intended organization to the `model_owner` parameter. You can view the IDs of organizations collaborating on the project using the [`list_organizations`](/libraries/pycape/reference#pycape.api.project.project.Project.list_organizations) method defined on the `Project` class. You must be a member of the organization to specify them as the `model_owner`.
 
 You'll also need to specify the [S3 Bucket location that you would like Cape to save your model results to](/libraries/pycape/usage/job/#setting-the-storage-location-as-a-model-owner-in-cape).
 
