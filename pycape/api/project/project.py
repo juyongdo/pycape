@@ -84,8 +84,7 @@ class Project(ABC):
             A list of `Organization` instances.
         """
         orgs = self._requester.get_project(id=self.id).get("organizations")
-        get_org_values = [
-            Organization(**o) for o in orgs] 
+        get_org_values = [Organization(**o) for o in orgs]
 
         format_orgs = {
             "ORGANIZATION ID": [x.id for x in get_org_values],
@@ -94,7 +93,7 @@ class Project(ABC):
         }
         self._out.write(tabulate(format_orgs, headers="keys") + "\n")
         return get_org_values
-        
+
     def list_dataviews(self) -> List[DataView]:
         """
         Returns a list of dataviews for the scoped `Project`.
