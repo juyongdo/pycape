@@ -190,7 +190,7 @@ class TestProject:
                                     "label": "alice-org",
                                     "name": "Alice org",
                                 },
-                                {"id": "org_2", "label": "bob-org", "name": "Bob org",},
+                                {"id": "org_2", "label": "bob-org", "name": "Bob org"},
                                 {
                                     "id": "org_3",
                                     "label": "carol-org",
