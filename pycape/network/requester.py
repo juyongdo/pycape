@@ -134,6 +134,7 @@ class Requester:
                     organizations {{
                         id
                         name
+                        label
                     }}
                     data_views {{
                         {self.dataview_fragment}

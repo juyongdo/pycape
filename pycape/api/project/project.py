@@ -76,6 +76,25 @@ class Project(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
 
+    def list_organizations(self) -> str:
+        """
+        Returns all list of organizations that requesting user is a contributor of.
+
+        Returns:
+            A list of `Organization` instances.
+        """
+        orgs = self._requester.get_project(id=self.id).get("organizations")
+        get_org_values = [
+            Organization(**o) for o in orgs] 
+
+        format_orgs = {
+            "ORGANIZATION ID": [x.id for x in get_org_values],
+            "NAME": [x.name for x in get_org_values],
+            "LABEL": [x.label for x in get_org_values],
+        }
+        self._out.write(tabulate(format_orgs, headers="keys") + "\n")
+        return get_org_values
+        
     def list_dataviews(self) -> List[DataView]:
         """
         Returns a list of dataviews for the scoped `Project`.

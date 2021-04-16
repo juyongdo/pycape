@@ -13,6 +13,7 @@ from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
 from ..project.project import Project
+from ..organization.organization import Organization
 
 
 @contextlib.contextmanager
@@ -174,6 +175,72 @@ class TestProject:
             assert isinstance(my_project.dataviews[len(dvs) - 1], DataView)
             assert dataview.id == "abc123"
             assert dataview.development == development
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "json,exception",
+        [
+            (
+                {
+                    "data": {
+                        "project": {
+                            "organizations": [
+                                {
+                                    "id": "org_1",
+                                    "label": "alice-org",
+                                    "name": "Alice org",
+                                },
+                                {
+                                    "id": "org_2",
+                                    "label": "bob-org",
+                                    "name": "Bob org",
+                                },
+                                {
+                                    "id": "org_3",
+                                    "label": "carol-org",
+                                    "name": "Carol org",
+                                },
+                            ]
+                        },
+                    }
+                },
+                notraising(),
+            ),
+            (
+                {"errors": [{"message": "something went wrong"}]},
+                pytest.raises(GQLException, match="An error occurred: .*"),
+            ),
+        ],
+    )
+    def test_list_orgs(self, json, exception):
+        with exception:
+            responses.add(
+                responses.POST, f"{FAKE_HOST}/v1/query", json=json,
+            )
+            r = Requester(endpoint=FAKE_HOST)
+            out = StringIO()
+            my_project = Project(
+                requester=r,
+                out=out,
+                user_id="user_123",
+                id="123",
+                name="my project",
+                label="my project",
+            )
+            orgs = my_project.list_organizations()
+
+        if isinstance(exception, contextlib._GeneratorContextManager):
+            output = out.getvalue().strip()
+            assert output == (
+                "ORGANIZATION ID    NAME       LABEL"
+                "\n-----------------  ---------  ---------"
+                "\norg_1              Alice org  alice-org"
+                "\norg_2              Bob org    bob-org\n"
+                "org_3              Carol org  carol-org"
+            )
+            assert len(orgs) == 3
+            assert isinstance(orgs[0], Organization)
+            assert orgs[0].id == "org_1"
 
     @responses.activate
     @pytest.mark.parametrize(
