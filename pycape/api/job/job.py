@@ -48,9 +48,9 @@ class Job(ABC):
 
         ** Status Types:**
 
-        Status | Desciption
+        Status | Description
         ------ | ----------
-        **`Initialized`** | Job has been intialized.
+        **`Initialized`** | Job has been initialized.
         **`NeedsApproval`** | Job is awaiting approval by at least one party.
         **`Approved`** | Job has been approved, the computation will commence.
         **`Rejected`** | Job has been rejected, the computation will not run.
@@ -66,7 +66,7 @@ class Job(ABC):
 
     def get_results(self) -> Tuple[np.ndarray, dict]:
         """
-        Given the requester's project role and authorization level, returns the trained model's weights and metrics.
+        Given the requesters project role and authorization level, returns the trained model's weights and metrics.
 
         Returns:
             weights: A numpy array.
@@ -86,9 +86,9 @@ class Job(ABC):
         #   "r_squared": [1.0],
         # }
 
-        gqlMetrics = job_results.get("model_metrics", [])
+        gql_metrics = job_results.get("model_metrics", [])
         metrics = {}
-        for m in gqlMetrics:
+        for m in gql_metrics:
             metrics[m["name"]] = m["value"]
 
         location = job_results.get("model_location", None)
@@ -113,7 +113,7 @@ class Job(ABC):
 
     def approve(self, org_id: str) -> "Job":
         """
-        Approve the Job on behalf of your organizations. Once all organizations \
+        Approve the Job on behalf of your organization. Once all organizations \
         approve a job, the computation will run.
 
         Arguments:

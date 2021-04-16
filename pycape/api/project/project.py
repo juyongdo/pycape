@@ -76,6 +76,24 @@ class Project(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name}, label={self.label})"
 
+    def list_organizations(self) -> str:
+        """
+        Returns all list of organizations that requesting user is a contributor of.
+
+        Returns:
+            A list of `Organization` instances.
+        """
+        orgs = self._requester.get_project(id=self.id).get("organizations")
+        get_org_values = [Organization(**o) for o in orgs]
+
+        format_orgs = {
+            "ORGANIZATION ID": [x.id for x in get_org_values],
+            "NAME": [x.name for x in get_org_values],
+            "LABEL": [x.label for x in get_org_values],
+        }
+        self._out.write(tabulate(format_orgs, headers="keys") + "\n")
+        return get_org_values
+
     def list_dataviews(self) -> List[DataView]:
         """
         Returns a list of dataviews for the scoped `Project`.
@@ -198,12 +216,15 @@ class Project(ABC):
 
         task_config = {k: v for k, v in task.__dict__.items()}
         model_location = task_config.get("_Task__model_location")
-        task_config.update(model_location=model_location)
+        model_owner = task_config.get("_Task__model_owner")
+        task_config.update(model_location=model_location, model_owner=model_owner)
 
         created_task = task.__class__(**task_config)._create_task(
             project_id=self.id, timeout=timeout, requester=self._requester
         )
-        return task.__class__(**created_task, model_location=model_location)
+        return task.__class__(
+            **created_task, model_location=model_location, model_owner=model_owner
+        )
 
     def submit_job(self, task: Task, timeout: float = 600) -> Job:
         """

@@ -161,6 +161,7 @@ class TestJob:
                 "x_train_dataview": dataview_x[dataview_col_x],
                 "y_train_dataview": dataview_y[dataview_col_y],
                 "model_location": model_location,
+                "model_owner": "org123",
             }
             vlr = VerticallyPartitionedLinearRegression(**task_config)
 
