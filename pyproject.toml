@@ -31,6 +31,7 @@ isort = "~5.1.4"
 mkdocs-material = "7.1.0"
 mkdocstrings = "0.15.0"
 pydoc-markdown = "3.2.0"
+moto = "^2.0.5"
 
 [tool.isort]
 line_length = 120

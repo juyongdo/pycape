@@ -7,7 +7,7 @@ import responses
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
-from ...exceptions import GQLException
+from ...exceptions import GQLException, DataviewAccessException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
@@ -91,7 +91,7 @@ class TestProject:
                         "addDataView": {
                             "id": "abc123",
                             "name": "my-data",
-                            "location": "s3://my-data.csv",
+                            "location": "s3://my-data/data.csv",
                             "development": False,
                         }
                     }
@@ -109,7 +109,7 @@ class TestProject:
                         },
                     }
                 ],
-                "s3",
+                "blob",
                 [{"name": "col_1", "schema_type": "integer"}],
                 False,
                 notraising(),
@@ -120,16 +120,19 @@ class TestProject:
                         "addDataView": {
                             "id": "abc123",
                             "name": "my-data",
-                            "location": "s3://my-data.csv",
+                            "location": "s3://my-data/data.csv",
                             "development": False,
                         }
                     }
                 },
                 [],
-                "s3",
+                "blob",
                 None,
                 False,
-                pytest.raises(Exception, match="DataView schema must be specified."),
+                pytest.raises(
+                    DataviewAccessException,
+                    match="Resource not accessible, please specify the data's schema.",
+                ),
             ),
             (
                 {"errors": [{"message": "something went wrong"}]},
@@ -142,7 +145,7 @@ class TestProject:
         ],
     )
     def test_create_dataview(
-        self, json, dvs, uri_type, schema, development, exception, mocker
+        self, json, dvs, uri_type, schema, development, exception, mocker,
     ):
         with exception:
             mocker.patch(
@@ -161,9 +164,10 @@ class TestProject:
                 label="my project",
                 data_views=dvs,
             )
+
             dataview = my_project.create_dataview(
                 name="my-data",
-                uri=f"{uri_type}://my-data.csv",
+                uri=f"{uri_type}://my-data/data.csv",
                 owner_id="fsda",
                 schema=schema,
                 development=development,

@@ -4,7 +4,18 @@ class GQLException(Exception):
 
 class StorageSchemeException(Exception):
     def __init__(self, scheme: str, message: str = None, payload: str = None):
-        self.message = message or f"only s3 locations supported, got {scheme}"
+        self.message = message or f"Only s3 locations supported, got {scheme}"
+        self.payload = payload
+
+    def __str__(self):
+        return str(self.message)
+
+
+class DataviewAccessException(Exception):
+    def __init__(self, message: str = None, payload: str = None):
+        self.message = (
+            message or "Resource not accessible, please specify the data's schema."
+        )
         self.payload = payload
 
     def __str__(self):

@@ -1,16 +1,37 @@
 import contextlib
+import os
 
 import pytest
-
+from moto import mock_s3
+import boto3
+import tempfile
+from urllib.parse import urlparse
 from tests.fake import fake_csv_dob_date_field
 from tests.fake import fake_dataframe
 
 from .dataview import DataView
 
+bucket_name = "my-data"
+
 
 @contextlib.contextmanager
 def notraising():
     yield
+
+
+@pytest.fixture(scope="session", autouse=True)
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def s3_client(aws_credentials):
+    with mock_s3():
+        conn = boto3.resource("s3", region_name="us-east-1")
+        conn.create_bucket(Bucket=bucket_name)
+        yield conn
 
 
 class TestDataView:
@@ -68,23 +89,36 @@ class TestDataView:
             assert isinstance(parse_schema, expectation)
 
     @pytest.mark.parametrize(
-        "side_effect,exception",
+        "uri,side_effect,exception",
         [
-            (None, notraising()),
+            ("http://my-data.csv", None, notraising()),
+            (f"s3://{bucket_name}/123/data.csv", None, notraising()),
             (
+                "http://my-data.csv",
                 FileNotFoundError,
-                pytest.raises(Exception, match="Cannot access data resourc"),
+                pytest.raises(
+                    Exception,
+                    match="Resource not accessible, please specify the data's schema.",
+                ),
             ),
         ],
     )
-    def test_get_schema_from_uri(self, side_effect, exception, mocker):
+    def test_get_schema_from_uri(
+        self, uri, side_effect, exception, mocker, s3_client,
+    ):
         with exception:
             mocker.patch(
                 "pycape.api.dataview.dataview.pd.read_csv",
                 side_effect=side_effect,
                 return_value=fake_csv_dob_date_field(),
             )
-            schema = DataView._get_schema_from_uri(uri="s3://my-data.csv")
+            if urlparse(uri).scheme == "s3":
+                tf = tempfile.NamedTemporaryFile(suffix=".csv")
+                boto3.resource("s3").Bucket(bucket_name).upload_file(
+                    tf.name, urlparse(uri).path.lstrip("/")
+                )
+
+            schema = DataView._get_schema_from_uri(uri=uri)
 
             if isinstance(exception, contextlib._GeneratorContextManager):
                 assert [s for s in schema if s.get("name") == "dob"][0].get(

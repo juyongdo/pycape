@@ -56,7 +56,7 @@ class TestTask:
             (
                 "not a uri",
                 pytest.raises(
-                    StorageSchemeException, match="only s3 locations supported, got"
+                    StorageSchemeException, match="Only s3 locations supported, got"
                 ),
             ),
             (None, pytest.raises(Exception, match="no model location provided")),

@@ -1,16 +1,19 @@
 import json
+import tempfile
 from abc import ABC
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
 from urllib.error import HTTPError
+from urllib.parse import urlparse
 
 import pandas as pd
 from marshmallow import Schema
 from marshmallow import fields
 
-from ...utils import filter_date
+from ...exceptions import DataviewAccessException
+from ...utils import filter_date, setup_boto_file
 from ...vars import PANDAS_TO_JSON_DATATYPES
 
 
@@ -106,7 +109,7 @@ class DataView(ABC):
                 except Exception as e:
                     raise Exception(f"Invalid schema pd.Series: {e}")
 
-        raise Exception("Schema is not of type pd.Series")
+        raise Exception("Schema is not of type pd.Series.")
 
     @staticmethod
     def _get_schema_from_uri(uri) -> list:
@@ -133,10 +136,24 @@ class DataView(ABC):
 
             return date_cols
 
+        df = None
+        parsed_uri = urlparse(uri)
+        if parsed_uri.scheme in [
+            "http",
+            "https",
+        ]:
+            file_name = uri
+        elif parsed_uri.scheme == "s3":
+            tf = tempfile.NamedTemporaryFile()
+            file_name = setup_boto_file(uri=parsed_uri, temp_file_name=tf.name)
+            print("file name:", file_name)
+        else:
+            raise DataviewAccessException()
+
         try:
-            df = pd.read_csv(uri, nrows=1)
-        except (HTTPError, FileNotFoundError):
-            raise Exception("Cannot access data resource")
+            df = pd.read_csv(file_name, nrows=1)
+        except (HTTPError, FileNotFoundError, ValueError):
+            raise DataviewAccessException()
 
         date_cols = _get_date_cols(df)
         for date_col in date_cols:
