@@ -3,7 +3,9 @@ from io import StringIO
 
 import pytest
 import responses
-
+import boto3
+import tempfile
+from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
@@ -135,6 +137,23 @@ class TestProject:
                 ),
             ),
             (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "s3://my-data/data.csv",
+                            "development": False,
+                        }
+                    }
+                },
+                [],
+                "s3",
+                None,
+                False,
+                notraising(),
+            ),
+            (
                 {"errors": [{"message": "something went wrong"}]},
                 [],
                 "http",
@@ -165,9 +184,15 @@ class TestProject:
                 data_views=dvs,
             )
 
+            if uri_type == "s3":
+                tf = tempfile.NamedTemporaryFile(suffix=".csv")
+                boto3.resource("s3").Bucket(BUCKET_NAME).upload_file(
+                    tf.name, "data.csv"
+                )
+
             dataview = my_project.create_dataview(
                 name="my-data",
-                uri=f"{uri_type}://my-data/data.csv",
+                uri=f"{uri_type}://{BUCKET_NAME}/data.csv",
                 owner_id="fsda",
                 schema=schema,
                 development=development,

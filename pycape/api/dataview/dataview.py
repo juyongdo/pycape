@@ -146,7 +146,7 @@ class DataView(ABC):
         elif parsed_uri.scheme == "s3":
             tf = tempfile.NamedTemporaryFile()
             file_name = setup_boto_file(uri=parsed_uri, temp_file_name=tf.name)
-            print("file name:", file_name)
+
         else:
             raise DataviewAccessException()
 
@@ -173,7 +173,7 @@ class DataView(ABC):
             for s in json.loads(df.to_json(orient="table"))
             .get("schema", {})
             .get("fields")
-            if s["name"] != "index"
+            if s["name"] != "index" and s["name"] != "Unnamed: 0"
         ]
 
 

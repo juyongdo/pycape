@@ -4,7 +4,7 @@ class GQLException(Exception):
 
 class StorageSchemeException(Exception):
     def __init__(self, scheme: str, message: str = None, payload: str = None):
-        self.message = message or f"Only s3 locations supported, got {scheme}"
+        self.message = message or f"Only s3 locations supported, got {scheme or 'None'}"
         self.payload = payload
 
     def __str__(self):

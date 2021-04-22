@@ -1,37 +1,22 @@
 import contextlib
-import os
+
 
 import pytest
-from moto import mock_s3
 import boto3
 import tempfile
+import numpy as np
+import pandas as pd
 from urllib.parse import urlparse
 from tests.fake import fake_csv_dob_date_field
-from tests.fake import fake_dataframe
+from tests.fake import fake_dataframe, FAKE_COLUMNS
 
 from .dataview import DataView
-
-bucket_name = "my-data"
+from conftest import BUCKET_NAME
 
 
 @contextlib.contextmanager
 def notraising():
     yield
-
-
-@pytest.fixture(scope="session", autouse=True)
-def aws_credentials():
-    """Mocked AWS Credentials for moto."""
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def s3_client(aws_credentials):
-    with mock_s3():
-        conn = boto3.resource("s3", region_name="us-east-1")
-        conn.create_bucket(Bucket=bucket_name)
-        yield conn
 
 
 class TestDataView:
@@ -89,13 +74,24 @@ class TestDataView:
             assert isinstance(parse_schema, expectation)
 
     @pytest.mark.parametrize(
-        "uri,side_effect,exception",
+        "uri,side_effect,data,cols,exception",
         [
-            ("http://my-data.csv", None, notraising()),
-            (f"s3://{bucket_name}/123/data.csv", None, notraising()),
+            # do not pass data or columns here because mocker returns faked csv data for http
+            ("http://my-data.csv", None, None, None, notraising()),
+            (
+                f"s3://{BUCKET_NAME}/123/data.csv",
+                None,
+                np.array(
+                    [[1.0, 22, "alice", "2006-01-13"], [3.0, 21, "bob", "2006-01-13"]]
+                ),
+                FAKE_COLUMNS,
+                notraising(),
+            ),
             (
                 "http://my-data.csv",
                 FileNotFoundError,
+                None,
+                None,
                 pytest.raises(
                     Exception,
                     match="Resource not accessible, please specify the data's schema.",
@@ -104,23 +100,34 @@ class TestDataView:
         ],
     )
     def test_get_schema_from_uri(
-        self, uri, side_effect, exception, mocker, s3_client,
+        self, uri, side_effect, data, cols, exception, mocker, s3_client,
     ):
         with exception:
-            mocker.patch(
-                "pycape.api.dataview.dataview.pd.read_csv",
-                side_effect=side_effect,
-                return_value=fake_csv_dob_date_field(),
-            )
+
             if urlparse(uri).scheme == "s3":
                 tf = tempfile.NamedTemporaryFile(suffix=".csv")
-                boto3.resource("s3").Bucket(bucket_name).upload_file(
-                    tf.name, urlparse(uri).path.lstrip("/")
+                b = boto3.resource("s3").Bucket(BUCKET_NAME)
+                pd.DataFrame(data, columns=cols).to_csv(tf.name, header=True)
+                b.upload_file(tf.name, urlparse(uri).path.lstrip("/"))
+            else:
+                mocker.patch(
+                    "pycape.api.dataview.dataview.pd.read_csv",
+                    side_effect=side_effect,
+                    return_value=fake_csv_dob_date_field(),
                 )
-
             schema = DataView._get_schema_from_uri(uri=uri)
 
             if isinstance(exception, contextlib._GeneratorContextManager):
+                assert len(schema) == 4
+                assert [s for s in schema if s.get("name") == "first_name"][0].get(
+                    "schema_type"
+                ) == "string"
+                assert [s for s in schema if s.get("name") == "height"][0].get(
+                    "schema_type"
+                ) == "number"
                 assert [s for s in schema if s.get("name") == "dob"][0].get(
                     "schema_type"
                 ) == "datetime"
+                assert [s for s in schema if s.get("name") == "age"][0].get(
+                    "schema_type"
+                ) == "integer"
