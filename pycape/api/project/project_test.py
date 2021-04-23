@@ -3,11 +3,13 @@ from io import StringIO
 
 import pytest
 import responses
-
+import boto3
+import tempfile
+from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
-from ...exceptions import GQLException
+from ...exceptions import GQLException, DataviewAccessException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
@@ -91,7 +93,7 @@ class TestProject:
                         "addDataView": {
                             "id": "abc123",
                             "name": "my-data",
-                            "location": "s3://my-data.csv",
+                            "location": "s3://my-data/data.csv",
                             "development": False,
                         }
                     }
@@ -109,7 +111,7 @@ class TestProject:
                         },
                     }
                 ],
-                "s3",
+                "blob",
                 [{"name": "col_1", "schema_type": "integer"}],
                 False,
                 notraising(),
@@ -120,7 +122,27 @@ class TestProject:
                         "addDataView": {
                             "id": "abc123",
                             "name": "my-data",
-                            "location": "s3://my-data.csv",
+                            "location": "s3://my-data/data.csv",
+                            "development": False,
+                        }
+                    }
+                },
+                [],
+                "blob",
+                None,
+                False,
+                pytest.raises(
+                    DataviewAccessException,
+                    match="Resource not accessible, please specify the data's schema.",
+                ),
+            ),
+            (
+                {
+                    "data": {
+                        "addDataView": {
+                            "id": "abc123",
+                            "name": "my-data",
+                            "location": "s3://my-data/data.csv",
                             "development": False,
                         }
                     }
@@ -129,7 +151,7 @@ class TestProject:
                 "s3",
                 None,
                 False,
-                pytest.raises(Exception, match="DataView schema must be specified."),
+                notraising(),
             ),
             (
                 {"errors": [{"message": "something went wrong"}]},
@@ -142,7 +164,7 @@ class TestProject:
         ],
     )
     def test_create_dataview(
-        self, json, dvs, uri_type, schema, development, exception, mocker
+        self, json, dvs, uri_type, schema, development, exception, mocker,
     ):
         with exception:
             mocker.patch(
@@ -161,9 +183,16 @@ class TestProject:
                 label="my project",
                 data_views=dvs,
             )
+
+            if uri_type == "s3":
+                tf = tempfile.NamedTemporaryFile(suffix=".csv")
+                boto3.resource("s3").Bucket(BUCKET_NAME).upload_file(
+                    tf.name, "data.csv"
+                )
+
             dataview = my_project.create_dataview(
                 name="my-data",
-                uri=f"{uri_type}://my-data.csv",
+                uri=f"{uri_type}://{BUCKET_NAME}/data.csv",
                 owner_id="fsda",
                 schema=schema,
                 development=development,

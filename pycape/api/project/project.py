@@ -5,7 +5,6 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
-from urllib.parse import urlparse
 
 import pandas as pd
 from tabulate import tabulate
@@ -177,14 +176,8 @@ class Project(ABC):
             A `DataView` instance.
         """
         parse_schema = DataView._validate_schema(schema)
-
-        if not parse_schema and urlparse(uri).scheme in [
-            "http",
-            "https",
-        ]:
+        if not parse_schema:
             parse_schema = DataView._get_schema_from_uri(uri)
-        elif not parse_schema:
-            raise Exception("DataView schema must be specified.")
 
         data_view_dict = self._requester.create_dataview(
             project_id=self.id,

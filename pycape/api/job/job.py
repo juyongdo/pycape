@@ -3,11 +3,11 @@ from abc import ABC
 from typing import Tuple
 from urllib.parse import urlparse
 
-import boto3
 import numpy as np
 
 from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
+from ...utils import setup_boto_file
 
 
 class Job(ABC):
@@ -101,15 +101,11 @@ class Job(ABC):
         if p.scheme != "s3":
             raise StorageSchemeException(scheme=p.scheme)
 
-        # tell boto3 we are pulling from s3, p.netloc will be the bucket
-        b = boto3.resource(p.scheme).Bucket(p.netloc)
-        weights_tmp = tempfile.NamedTemporaryFile()
-
-        # save the weights for this job in a temp file
-        b.download_file(f"{self.id}/regression_weights.csv", weights_tmp.name)
+        tf = tempfile.NamedTemporaryFile()
+        file_name = setup_boto_file(uri=p, temp_file_name=tf.name)
 
         # return the weights (decoded to np) & metrics
-        return np.loadtxt(weights_tmp.name, delimiter=","), metrics
+        return np.loadtxt(file_name, delimiter=","), metrics
 
     def approve(self, org_id: str) -> "Job":
         """

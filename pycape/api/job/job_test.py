@@ -1,11 +1,16 @@
 import contextlib
 
+import boto3
 import pytest
 import responses
+import tempfile
+import numpy as np
 
+from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 
 from ...network.requester import Requester
+from ...exceptions import StorageSchemeException
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..project.project import Project
@@ -214,8 +219,24 @@ class TestJob:
 
     @responses.activate
     @pytest.mark.parametrize(
-        "json,exception",
+        "json,weights_result,exception",
         [
+            (
+                {
+                    "data": {
+                        "project": {
+                            "job": {
+                                "model_metrics": [
+                                    {"name": "r_squared", "value": [0.1]}
+                                ],
+                                "model_location": f"s3://{BUCKET_NAME}/data.csv",
+                            }
+                        }
+                    }
+                },
+                np.array([[1.0, 2.0], [3.0, 4.0]]),
+                notraising(),
+            ),
             (
                 {
                     "data": {
@@ -226,15 +247,35 @@ class TestJob:
                         }
                     }
                 },
+                None,
                 notraising(),
             ),
             (
+                {
+                    "data": {
+                        "project": {
+                            "job": {
+                                "model_metrics": [
+                                    {"name": "r_squared", "value": [0.1]}
+                                ],
+                                "model_location": "invalid_location",
+                            }
+                        }
+                    }
+                },
+                None,
+                pytest.raises(
+                    StorageSchemeException, match="Only s3 locations supported, got"
+                ),
+            ),
+            (
                 {"errors": [{"message": "something went wrong"}]},
+                None,
                 pytest.raises(Exception, match="An error occurred: .*"),
             ),
         ],
     )
-    def test_get_job_results(self, json, exception, mocker):
+    def test_get_job_results(self, json, weights_result, exception, mocker):
         with exception:
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
@@ -248,12 +289,18 @@ class TestJob:
                 requester=r,
                 project_id="p_123",
             )
+            if weights_result is not None:
+                tf = tempfile.NamedTemporaryFile(suffix=".csv")
+                b = boto3.resource("s3").Bucket(BUCKET_NAME)
+                np.savetxt(tf.name, weights_result, delimiter=",")
+                b.upload_file(tf.name, "data.csv")
 
             weights, metrics = my_job.get_results()
 
         if isinstance(exception, contextlib._GeneratorContextManager):
             assert isinstance(metrics, dict)
             assert metrics["r_squared"] == [0.1]
+            np.testing.assert_array_equal(weights, weights_result)
 
     @responses.activate
     def test_approve_job(self):
