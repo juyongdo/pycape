@@ -30,7 +30,7 @@ flake8-black = "~0.2.0"
 isort = "~5.1.4"
 mkdocs-material = "7.1.0"
 mkdocstrings = "0.15.0"
-pydoc-markdown = "3.2.0"
+pydoc-markdown = "3.10.1"
 moto = "^2.0.5"
 
 [tool.isort]
