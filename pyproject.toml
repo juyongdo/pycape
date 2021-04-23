@@ -20,17 +20,17 @@ boto3 = ">=1.16,<1.18"
 
 [tool.poetry.dev-dependencies]
 pytest = "~6.2.0"
-coverage = "5.3"
+coverage = "5.5"
 black = "~19.10b0"
 pytest-cov = "~2.10.0"
 pytest-mock = "~3.5.1"
 pytest-httpserver = "~1.0.0"
 flake8 = "~3.8.3"
 flake8-black = "~0.2.0"
-isort = "~5.1.4"
+isort = "~5.8.0"
 mkdocs-material = "7.1.0"
 mkdocstrings = "0.15.0"
-pydoc-markdown = "3.2.0"
+pydoc-markdown = "3.10.1"
 moto = "^2.0.5"
 
 [tool.isort]
