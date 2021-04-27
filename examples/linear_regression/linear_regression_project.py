@@ -35,11 +35,15 @@ parser.add_argument(
 parser.add_argument(
     "--timeout", default=90, type=int, help="How long to wait for the computation to finish"
 )
+parser.add_argument(
+    "--bucket", default="cape-worker", type=str, help="Which S3 bucket to use"
+)
 args = parser.parse_args()
 
 token = args.token
 project_id = args.project
 coordinator_url = args.coordinator
+bucket = args.bucket
 
 
 def list_projects():
@@ -80,11 +84,11 @@ def setup_project():
     y_schema = [{"name": "y", "schema_type": "numeric"}]
     org_dv = {
         project.organizations[0].name: {
-            "uri": "s3://cape-worker/x_data_cape_demo.csv",
+            "uri": f"s3://{bucket}/x_data_cape_demo.csv",
             "schema": x_schema,
         },
         project.organizations[1].name: {
-            "uri": "s3://cape-worker/y_data_cape_demo.csv",
+            "uri": f"s3://{bucket}/y_data_cape_demo.csv",
             "schema": y_schema,
         },
     }
@@ -119,7 +123,7 @@ def make_job():
     job = VerticallyPartitionedLinearRegression(
         x_train_dataview=project.dataviews[0]["x_1"],
         y_train_dataview=project.dataviews[1]["y"],
-        model_location="s3://cape-worker",
+        model_location=f"s3://{bucket}",
         model_owner=project.organizations[0].id
     )
 
