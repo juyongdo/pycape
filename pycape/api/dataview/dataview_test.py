@@ -1,17 +1,18 @@
 import contextlib
-
-
-import pytest
-import boto3
 import tempfile
+from urllib.parse import urlparse
+
+import boto3
 import numpy as np
 import pandas as pd
-from urllib.parse import urlparse
+import pytest
+
+from conftest import BUCKET_NAME
+from tests.fake import FAKE_COLUMNS
 from tests.fake import fake_csv_dob_date_field
-from tests.fake import fake_dataframe, FAKE_COLUMNS
+from tests.fake import fake_dataframe
 
 from .dataview import DataView
-from conftest import BUCKET_NAME
 
 
 @contextlib.contextmanager

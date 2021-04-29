@@ -1,21 +1,23 @@
 import contextlib
+import tempfile
 from io import StringIO
 
+import boto3
 import pytest
 import responses
-import boto3
-import tempfile
+
 from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
-from ...exceptions import GQLException, DataviewAccessException
+from ...exceptions import DataviewAccessException
+from ...exceptions import GQLException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..job.job import Job
-from ..project.project import Project
 from ..organization.organization import Organization
+from ..project.project import Project
 
 
 @contextlib.contextmanager
