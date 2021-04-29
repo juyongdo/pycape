@@ -34,6 +34,6 @@ def setup_boto_file(uri: pathlib.PosixPath, temp_file_name: str) -> str:
     b = boto3.resource(uri.scheme).Bucket(uri.netloc)
 
     # save the weights for this job in a temp file
-    b.download_file(uri.path.lstrip("/"), temp_file_name)
+    b.download_file(uri.path.lstrip("/") + "/regression_weights.csv", temp_file_name)
 
     return temp_file_name
