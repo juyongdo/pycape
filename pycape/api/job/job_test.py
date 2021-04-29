@@ -1,16 +1,16 @@
 import contextlib
+import tempfile
 
 import boto3
+import numpy as np
 import pytest
 import responses
-import tempfile
-import numpy as np
 
 from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 
-from ...network.requester import Requester
 from ...exceptions import StorageSchemeException
+from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
 from ..dataview.dataview import DataView
 from ..project.project import Project
@@ -229,7 +229,7 @@ class TestJob:
                                 "model_metrics": [
                                     {"name": "r_squared", "value": [0.1]}
                                 ],
-                                "model_location": f"s3://{BUCKET_NAME}/data.csv",
+                                "model_location": f"s3://{BUCKET_NAME}/abc_123",
                             }
                         }
                     }
@@ -293,7 +293,7 @@ class TestJob:
                 tf = tempfile.NamedTemporaryFile(suffix=".csv")
                 b = boto3.resource("s3").Bucket(BUCKET_NAME)
                 np.savetxt(tf.name, weights_result, delimiter=",")
-                b.upload_file(tf.name, "data.csv")
+                b.upload_file(tf.name, "abc_123/regression_weights.csv")
 
             weights, metrics = my_job.get_results()
 

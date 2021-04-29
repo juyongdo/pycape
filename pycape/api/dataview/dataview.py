@@ -13,7 +13,8 @@ from marshmallow import Schema
 from marshmallow import fields
 
 from ...exceptions import DataviewAccessException
-from ...utils import filter_date, setup_boto_file
+from ...utils import filter_date
+from ...utils import setup_boto_file
 from ...vars import PANDAS_TO_JSON_DATATYPES
 
 
