@@ -51,6 +51,10 @@ That is it for the UI for now! We'll return later to review `DataViews` and appr
 Next we will set up these `DataViews` and `Jobs` in `pycape`.
 
 ## Working with the PyCape Python Library
+**pycape** is a set of Python modules for interacting with your Cape Privacy data.
+
+First, [install `pycape`](/libraries/pycape/#installation).
+
 ### Login to PyCape
 
 Before you can make requests to Cape Cloud, you'll need to authenticate with the API. Follow [these instructions to authenticate](/libraries/pycape/usage/login) with our API using `pycape`. Once you've logged in successfully, you should see a success message.
