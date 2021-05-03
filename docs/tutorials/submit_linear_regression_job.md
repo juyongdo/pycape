@@ -153,7 +153,7 @@ You'll also need to specify the [S3 Bucket location that you would like Cape to 
 >>>     model_owner="org_123",
 >>> )
 
->>> my_project.submit_job(job=vlr)
+>>> my_project.submit_job(vlr)
 ```
 
 You can specify which data columns the model should be trained on or evaluated against by passing the dataview to the [`VerticallyPartitionedLinearRegression`](/libraries/pycape/reference#pycapeverticallypartitionedlinearregression) class like so:
