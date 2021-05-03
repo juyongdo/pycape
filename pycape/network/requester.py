@@ -1,16 +1,12 @@
 import os
-from typing import Optional
-from urllib.parse import urlparse
+from typing import Optional, NoReturn
+from urllib.parse import urlparse, urlunparse
 
 import requests
 
-from ..exceptions import GQLException
+from ..exceptions import GQLException, NotAUserException, InvalidCoordinatorException
 from .api_token import APIToken
 from .base64 import from_string
-
-
-class NotAUserException(Exception):
-    pass
 
 
 class Requester:
@@ -43,9 +39,34 @@ class Requester:
         self.endpoint = endpoint or os.environ.get(
             "CAPE_COORDINATOR", "https://app.capeprivacy.com"
         )
-        self.gql_endpoint = f"{urlparse(self.endpoint).scheme}://{urlparse(self.endpoint).netloc}/v1/query"
+
+        self._check_endpoint(self.endpoint)
+
+        self.gql_endpoint = self._parse_coordinator_endpoint(self.endpoint, "/v1/query")
 
         self.session = requests.Session()
+
+    @staticmethod
+    def _check_endpoint(url: str) -> NoReturn:
+        p = urlparse(url)
+        if not p.scheme or not p.netloc:
+            raise InvalidCoordinatorException(
+                f"Provided Coordinator API endpoint ({url}) is invalid"
+            )
+
+    @staticmethod
+    def _parse_coordinator_endpoint(url: str, new_path: str) -> str:
+        p = urlparse(url)
+        p = p._replace(path=new_path)
+        return urlunparse(p)
+
+    def _check_user(self, token: str) -> NoReturn:
+        me = self.me()
+
+        if me["__typename"] != "MeResponse":
+            raise NotAUserException(
+                f"Token {token} is not a user token. Please navigate to User Settings on Cape to retrieve a user token"
+            )
 
     def login(self, token: Optional[str] = None) -> str:
         token = token or os.environ.get("CAPE_TOKEN")
@@ -57,7 +78,7 @@ class Requester:
         self.api_token = APIToken(self.token)
 
         resp = self.session.post(
-            self.endpoint + "/v1/login",
+            self._parse_coordinator_endpoint(self.endpoint, "/v1/login"),
             json={"token_id": self.api_token.token_id, "secret": self.api_token.secret},
         )
 
@@ -69,16 +90,6 @@ class Requester:
         self._check_user(token)
 
         return json["user_id"]
-
-    def _check_user(self, token):
-        me = self.me()
-
-        if me["__typename"] == "MeResponse":
-            return True
-        else:
-            raise NotAUserException(
-                f"Token {token} is not a user token. Please navigate to User Settings on Cape to retrieve a user token"
-            )
 
     def _gql_req(self, query: str, variables: Optional[dict]) -> dict:
         input_json = {"query": query, "variables": {}}

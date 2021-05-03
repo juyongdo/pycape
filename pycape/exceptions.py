@@ -2,6 +2,14 @@ class GQLException(Exception):
     pass
 
 
+class NotAUserException(Exception):
+    pass
+
+
+class InvalidCoordinatorException(Exception):
+    pass
+
+
 class StorageSchemeException(Exception):
     def __init__(self, scheme: str, message: str = None, payload: str = None):
         self.message = message or f"Only s3 locations supported, got {scheme or 'None'}"

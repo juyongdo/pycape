@@ -30,22 +30,15 @@ def filter_date(string: str) -> datetime:
     return date
 
 
-def setup_boto_file(uri: pathlib.PosixPath, temp_file_name: str) -> str:
+def setup_boto_file(
+    uri: pathlib.PosixPath, temp_file_name: str, download_path: str = None
+) -> str:
+    if not download_path:
+        download_path = uri.path.lstrip("/")
     # tell boto3 we are pulling from s3, p.netloc will be the bucket
     b = boto3.resource(uri.scheme).Bucket(uri.netloc)
 
     # save the weights for this job in a temp file
-    b.download_file(uri.path.lstrip("/"), temp_file_name)
-
-    return temp_file_name
-
-
-def setup_boto_file_weights(uri: pathlib.PosixPath, temp_file_name: str) -> str:
-    # tell boto3 we are pulling from s3, p.netloc will be the bucket
-    b = boto3.resource(uri.scheme).Bucket(uri.netloc)
-
-    print(uri.path.lstrip("/") + "/regression_weights.csv")
-    # save the weights for this job in a temp file
-    b.download_file(uri.path.lstrip("/") + "/regression_weights.csv", temp_file_name)
+    b.download_file(download_path, temp_file_name)
 
     return temp_file_name
