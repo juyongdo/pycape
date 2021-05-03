@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+from urllib.parse import urlparse
 
 import requests
 
@@ -40,9 +41,9 @@ class Requester:
 
     def __init__(self, endpoint: str = None):
         self.endpoint = endpoint or os.environ.get(
-            "CAPE_COORDINATOR", "https://demo.capeprivacy.com"
-        ).rstrip("/")
-        self.gql_endpoint = self.endpoint + "/v1/query"
+            "CAPE_COORDINATOR", "https://app.capeprivacy.com"
+        )
+        self.gql_endpoint = f"{urlparse(self.endpoint).scheme}://{urlparse(self.endpoint).netloc}/v1/query"
 
         self.session = requests.Session()
 
