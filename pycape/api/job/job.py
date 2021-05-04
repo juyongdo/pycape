@@ -7,7 +7,7 @@ import numpy as np
 
 from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
-from ...utils import setup_boto_file_weights
+from ...utils import setup_boto_file
 
 
 class Job(ABC):
@@ -102,7 +102,11 @@ class Job(ABC):
             raise StorageSchemeException(scheme=p.scheme)
 
         tf = tempfile.NamedTemporaryFile()
-        file_name = setup_boto_file_weights(uri=p, temp_file_name=tf.name)
+        file_name = setup_boto_file(
+            uri=p,
+            temp_file_name=tf.name,
+            download_path=p.path.lstrip("/") + "/regression_weights.csv",
+        )
 
         # return the weights (decoded to np) & metrics
         return np.loadtxt(file_name, delimiter=","), metrics

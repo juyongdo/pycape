@@ -9,7 +9,7 @@ the beginnings of your project.
 
 To run a linear regression task, you must have two orgs to partake in the computation.
 
-You can create an org using [cape-ui](https://github.com/capeprivacy/cape-ui) or your account on [demo.capeprivacy.com](https://demo.capeprivacy.com)
+You can create an org using [cape-ui](https://github.com/capeprivacy/cape-ui) or your account on [app.capeprivacy.com](https://app.capeprivacy.com)
 
 ![](../img/create_org.gif)
 

@@ -42,10 +42,17 @@ my_project.submit_job(vlr_job)
 
 ### Prerequisites
 
-* Python 3.6 or above, and pip
+* Python 3.6+
+* [pip](https://pip.pypa.io/en/stable/installing/)
 * [Make](https://www.gnu.org/software/make/) (if installing from source)
 
 ### Install via pip
+We recommend that you use a [Python "Virtual Environment"](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) when running applications with `pycape`.
+
+Also ensure that your developement enviroment can access the Python Package Index (PyPI) via https.
+
+Once you've activated your virtual enviroment, use pip
+
 ```sh
 $ pip install pycape
 ```
