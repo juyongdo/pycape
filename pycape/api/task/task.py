@@ -1,9 +1,8 @@
 import json
 from abc import ABC
-from urllib.parse import urlparse
 
-from ...exceptions import StorageSchemeException
 from ...network.requester import Requester
+from ...utils import validate_s3_location
 
 
 class Task(ABC):
@@ -20,8 +19,8 @@ class Task(ABC):
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
-        self.model_location = model_location
-        self.model_owner = model_owner
+        self.__model_location = validate_s3_location(uri=model_location)
+        self.__model_owner = model_owner
 
     def __repr__(self):
         return (
@@ -36,7 +35,7 @@ class Task(ABC):
     def model_location(self, model_location: str):
         if not model_location:
             raise Exception("no model location provided")
-        self.__model_location = self.validate_s3_location(uri=model_location)
+        self.__model_location = validate_s3_location(uri=model_location)
 
     @property
     def model_owner(self):
@@ -47,14 +46,6 @@ class Task(ABC):
         if not model_owner:
             raise Exception("no model owner provided")
         self.__model_owner = model_owner
-
-    @staticmethod
-    def validate_s3_location(uri: str):
-        parsed_uri = urlparse(uri)
-        if parsed_uri.scheme != "s3":
-            raise StorageSchemeException(scheme=parsed_uri.scheme)
-
-        return uri
 
     def _create_task(
         self,

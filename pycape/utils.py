@@ -1,7 +1,11 @@
 import pathlib
 from datetime import datetime
+from urllib.parse import urlparse
 
 import boto3
+import re
+
+from .exceptions import StorageException, StorageSchemeException
 
 
 def filter_date(string: str) -> datetime:
@@ -41,3 +45,17 @@ def setup_boto_file(
     b.download_file(download_path, temp_file_name)
 
     return temp_file_name
+
+
+def validate_s3_location(uri: str):
+    p = urlparse(uri)
+    # check bucket for special characters beyond
+    # periods and dashes, which are permitted.
+    regexp = re.compile("[^0-9a-zA-Z-.]+")
+
+    if not p.netloc or regexp.search(p.netloc):
+        raise StorageException(uri=uri)
+    elif p.scheme != "s3":
+        raise StorageSchemeException(scheme=p.scheme)
+
+    return uri
