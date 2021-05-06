@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, NoReturn
 
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
@@ -46,17 +46,30 @@ class VerticallyPartitionedLinearRegression(Task):
         trained model and it's outputs.
     """
 
-    id: Optional[str] = None
     job_type: Optional[str] = JOB_TYPE_LR
-    model_location: str = None
-    model_owner: str = None
-    x_train_dataview: DataView = None
-    y_train_dataview: DataView = None
+
+    def __init__(
+        self,
+        model_location: str,
+        model_owner: str,
+        x_train_dataview: DataView,
+        y_train_dataview: DataView,
+        id: Optional[str] = None,
+    ):
+        self.id: Optional[str] = id
+        self.model_location: str = model_location
+        self.model_owner: str = model_owner
+
+        self._validate_dataview_parse_cols(x_train_dataview, "x")
+        self._validate_dataview_parse_cols(y_train_dataview, "y")
+
+        self._x_train_dataview: DataView = x_train_dataview
+        self._y_train_dataview: DataView = y_train_dataview
 
     def __repr__(self):
         return " ".join(
-            f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self.x_train_dataview._cols or ''}, \
-            y_train_dataview={self.y_train_dataview.name}{self.y_train_dataview._cols or ''}, \
+            f"{self.__class__.__name__}(x_train_dataview={self.x_train_dataview.name}{self._x_train_dataview._cols or ''}, \
+            y_train_dataview={self._y_train_dataview.name}{self._y_train_dataview._cols or ''}, \
             model_location={self.model_location}, model_owner={self.model_owner})".split()
         )
 
@@ -65,7 +78,7 @@ class VerticallyPartitionedLinearRegression(Task):
         return super(Task, self).model_location
 
     @Task.model_location.setter  # noqa: F811
-    def model_location(self, location):  # noqa: F811
+    def model_location(self, location: str):  # noqa: F811
         Task.model_location.fset(self, location)
 
     @property
@@ -73,54 +86,64 @@ class VerticallyPartitionedLinearRegression(Task):
         return super(Task, self).model_owner
 
     @Task.model_owner.setter  # noqa: F811
-    def model_owner(self, owner):  # noqa: F811
+    def model_owner(self, owner: str):  # noqa: F811
         Task.model_owner.fset(self, owner)
 
+    @property
+    def x_train_dataview(self):
+        return self._x_train_dataview
+
+    @x_train_dataview.setter
+    def x_train_dataview(self, x_train_dataview: DataView):
+        self._validate_dataview_parse_cols(x_train_dataview, "x")
+        self._x_train_dataview = x_train_dataview
+
+    @property
+    def y_train_dataview(self):
+        return self._y_train_dataview
+
+    @y_train_dataview.setter
+    def y_train_dataview(self, y_train_dataview: DataView):
+        self._validate_dataview_parse_cols(y_train_dataview, "y")
+        self._y_train_dataview = y_train_dataview
+
+    @staticmethod
+    def _get_dataview_cols(dataview: DataView) -> Optional[List[str]]:
+        cols = dataview._cols
+
+        if not cols and dataview.schema:
+            cols = list(dataview.schema.keys())
+        elif not cols and not dataview.schema:
+            return None
+
+        return cols
+
+    def _validate_dataview_parse_cols(self, dataview, dataview_type: str) -> NoReturn:
+        missing_params = []
+
+        if not dataview:
+            raise Exception(f"{dataview_type} DataView missing")
+
+        if not dataview.id:
+            missing_params.append(f"{dataview_type} DataView ID")
+
+        cols = self._get_dataview_cols(dataview)
+
+        if not cols:
+            missing_params.append(f"{dataview_type} DataView columns")
+
+        if missing_params:
+            raise Exception(f"DataView Missing Properties: {', '.join(missing_params)}")
+
     def _create_task(self, project_id: str, requester: Requester, timeout: float = 600):
-        # TODO: validate dataview params on class initialization
-        def validate_dataview_params(dataview_x, dataview_y):
-            missing_params = []
-            x_cols = dataview_x._cols
-            y_cols = dataview_y._cols
-
-            if not dataview_x.id:
-                missing_params.append("X DataView ID")
-
-            if not dataview_y.id:
-                missing_params.append("Y DataView ID")
-
-            if not x_cols and dataview_x.schema:
-                x_cols = list(dataview_x.schema.keys())
-            elif not x_cols and not dataview_x.schema:
-                missing_params.append("X DataView columns")
-
-            if not y_cols and dataview_y.schema:
-                y_cols = list(dataview_y.schema.keys())
-            elif not y_cols and not dataview_y.schema:
-                missing_params.append("Y DataView columns")
-
-            return (
-                {
-                    "x_id": dataview_x.id,
-                    "y_id": dataview_y.id,
-                    "x_cols": x_cols,
-                    "y_cols": y_cols,
-                },
-                missing_params,
-            )
-
-        values, err = validate_dataview_params(
-            dataview_x=self.x_train_dataview, dataview_y=self.y_train_dataview
-        )
-
-        if err:
-            raise Exception(f"DataView Missing Properties: {', '.join(err)}")
+        x_cols = self._get_dataview_cols(self._x_train_dataview)
+        y_cols = self._get_dataview_cols(self._y_train_dataview)
 
         task_config = {
-            "dataview_x_id": values.get("x_id"),
-            "dataview_y_id": values.get("y_id"),
-            "dataview_x_col": values.get("x_cols"),
-            "dataview_y_col": values.get("y_cols"),
+            "dataview_x_id": self._x_train_dataview.id,
+            "dataview_y_id": self._y_train_dataview.id,
+            "dataview_x_col": x_cols,
+            "dataview_y_col": y_cols,
             "model_location": self.model_location,
             "model_owner": self.model_owner,
         }

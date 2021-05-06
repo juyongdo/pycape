@@ -76,8 +76,7 @@ class TestJob:
                 "123",
                 "s3://my-bucket",
                 pytest.raises(
-                    Exception,
-                    match="DataView Missing Properties: X DataView ID, Y DataView ID",
+                    Exception, match="DataView Missing Properties: x DataView ID",
                 ),
             ),
             (
@@ -96,8 +95,7 @@ class TestJob:
                 None,
                 "s3://my-bucket",
                 pytest.raises(
-                    Exception,
-                    match="DataView Missing Properties: X DataView columns, Y DataView columns",
+                    Exception, match="DataView Missing Properties: x DataView columns",
                 ),
             ),
             (
@@ -150,6 +148,11 @@ class TestJob:
         mocker,
     ):
         with exception:
+            responses.add(
+                responses.POST,
+                f"{FAKE_HOST}/v1/query",
+                json={"data": {"createTask": {"id": "session_123"}}},
+            )
             responses.add(
                 responses.POST, f"{FAKE_HOST}/v1/query", json=json,
             )
