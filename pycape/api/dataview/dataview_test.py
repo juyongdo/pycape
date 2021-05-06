@@ -12,6 +12,7 @@ from tests.fake import FAKE_COLUMNS
 from tests.fake import fake_csv_dob_date_field
 from tests.fake import fake_dataframe
 
+from ...exceptions import StorageAccessException
 from .dataview import DataView
 
 
@@ -77,8 +78,6 @@ class TestDataView:
     @pytest.mark.parametrize(
         "uri,side_effect,data,cols,exception",
         [
-            # do not pass data or columns here because mocker returns faked csv data for http
-            ("http://my-data.csv", None, None, None, notraising()),
             (
                 f"s3://{BUCKET_NAME}/123/data.csv",
                 None,
@@ -89,13 +88,12 @@ class TestDataView:
                 notraising(),
             ),
             (
-                "http://my-data.csv",
-                FileNotFoundError,
+                "s3://my-data/fsdf/df.csv",
+                ValueError,
                 None,
                 None,
                 pytest.raises(
-                    Exception,
-                    match="Resource not accessible, please specify the data's schema.",
+                    StorageAccessException, match="Resource not accessible.",
                 ),
             ),
         ],
@@ -104,18 +102,16 @@ class TestDataView:
         self, uri, side_effect, data, cols, exception, mocker, s3_client,
     ):
         with exception:
+            tf = tempfile.NamedTemporaryFile(suffix=".csv")
+            b = boto3.resource("s3").Bucket(BUCKET_NAME)
+            pd.DataFrame(data, columns=cols).to_csv(tf.name, header=True)
+            b.upload_file(tf.name, urlparse(uri).path.lstrip("/"))
 
-            if urlparse(uri).scheme == "s3":
-                tf = tempfile.NamedTemporaryFile(suffix=".csv")
-                b = boto3.resource("s3").Bucket(BUCKET_NAME)
-                pd.DataFrame(data, columns=cols).to_csv(tf.name, header=True)
-                b.upload_file(tf.name, urlparse(uri).path.lstrip("/"))
-            else:
-                mocker.patch(
-                    "pycape.api.dataview.dataview.pd.read_csv",
-                    side_effect=side_effect,
-                    return_value=fake_csv_dob_date_field(),
-                )
+            mocker.patch(
+                "pycape.api.dataview.dataview.pd.read_csv",
+                side_effect=side_effect,
+                return_value=fake_csv_dob_date_field(),
+            )
             schema = DataView._get_schema_from_uri(uri=uri)
 
             if isinstance(exception, contextlib._GeneratorContextManager):

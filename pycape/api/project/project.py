@@ -10,6 +10,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from ...network.requester import Requester
+from ...utils import validate_s3_location
 from ..dataview.dataview import DataView
 from ..job.job import Job
 from ..organization.organization import Organization
@@ -178,6 +179,8 @@ class Project(ABC):
         parse_schema = DataView._validate_schema(schema)
         if not parse_schema:
             parse_schema = DataView._get_schema_from_uri(uri)
+
+        validate_s3_location(uri)
 
         data_view_dict = self._requester.create_dataview(
             project_id=self.id,

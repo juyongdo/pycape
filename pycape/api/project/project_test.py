@@ -10,7 +10,7 @@ from conftest import BUCKET_NAME
 from tests.fake import FAKE_HOST
 from tests.fake import fake_dataframe
 
-from ...exceptions import DataviewAccessException
+from ...exceptions import StorageSchemeException
 from ...exceptions import GQLException
 from ...network.requester import Requester
 from ...vars import JOB_TYPE_LR
@@ -45,23 +45,6 @@ class TestProject:
                             "id": "abc123",
                             "name": "my-data",
                             "location": "http://my-data.csv",
-                            "development": False,
-                        }
-                    }
-                },
-                [],
-                "http",
-                None,
-                False,
-                notraising(),
-            ),
-            (
-                {
-                    "data": {
-                        "addDataView": {
-                            "id": "abc123",
-                            "name": "my-data",
-                            "location": "http://my-data.csv",
                             "development": True,
                         }
                     }
@@ -70,7 +53,10 @@ class TestProject:
                 "http",
                 None,
                 True,
-                notraising(),
+                pytest.raises(
+                    StorageSchemeException,
+                    match="Only s3 locations supported, got http",
+                ),
             ),
             (
                 {
@@ -87,7 +73,10 @@ class TestProject:
                 "https",
                 None,
                 False,
-                notraising(),
+                pytest.raises(
+                    StorageSchemeException,
+                    match="Only s3 locations supported, got https",
+                ),
             ),
             (
                 {
@@ -113,7 +102,7 @@ class TestProject:
                         },
                     }
                 ],
-                "blob",
+                "s3",
                 [{"name": "col_1", "schema_type": "integer"}],
                 False,
                 notraising(),
@@ -134,8 +123,8 @@ class TestProject:
                 None,
                 False,
                 pytest.raises(
-                    DataviewAccessException,
-                    match="Resource not accessible, please specify the data's schema.",
+                    StorageSchemeException,
+                    match="Only s3 locations supported, got blob",
                 ),
             ),
             (
@@ -158,7 +147,7 @@ class TestProject:
             (
                 {"errors": [{"message": "something went wrong"}]},
                 [],
-                "http",
+                "s3",
                 None,
                 False,
                 pytest.raises(GQLException, match="An error occurred: .*"),
