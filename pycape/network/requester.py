@@ -1,5 +1,5 @@
 import os
-from typing import Optional, NoReturn
+from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 import requests
@@ -45,9 +45,10 @@ class Requester:
         self.gql_endpoint = self._parse_coordinator_endpoint(self.endpoint, "/v1/query")
 
         self.session = requests.Session()
+        self.session.verify = os.environ.get("CAPE_CA_BUNDLE", True)
 
     @staticmethod
-    def _check_endpoint(url: str) -> NoReturn:
+    def _check_endpoint(url: str) -> None:
         p = urlparse(url)
         if not p.scheme or not p.netloc:
             raise InvalidCoordinatorException(
@@ -60,7 +61,7 @@ class Requester:
         p = p._replace(path=new_path)
         return urlunparse(p)
 
-    def _check_user(self, token: str) -> NoReturn:
+    def _check_user(self, token: str) -> None:
         me = self.me()
 
         if me["__typename"] != "MeResponse":
