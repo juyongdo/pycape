@@ -44,6 +44,14 @@ class TestDataView:
         assert isinstance(dv_with_cols, DataView)
         assert dv_with_cols._cols == ["col_1", "col_2"]
 
+        # set cols using explicit class parameter
+        dv_3 = DataView(
+            name="my-data", location="s3://my-data.csv", cols=["col_1", "col_2"]
+        )
+
+        assert isinstance(dv_3, DataView)
+        assert dv_3._cols == ["col_1", "col_2"]
+
     @pytest.mark.parametrize(
         "schema,expectation,exception",
         [

@@ -23,11 +23,12 @@ class DataView(ABC):
 
     Arguments:
         id (str): ID of `DataView`
-        name (str): name of `DataView`.
-        schema (list): schema of the data that `DataView` points to.
+        name (str): Name of `DataView`.
+        schema (list): Schema of the data that `DataView` points to.
         location (str): URI of `DataView`.
         owner (dict): Dictionary of fields related to the `DataView` owner.
         user_id (str): User ID of requester.
+        cols (list): List of column names that should be joined when training the model.
         development (bool): Whether this dataview is in development mode or not.
     """
 
@@ -40,6 +41,7 @@ class DataView(ABC):
         owner: dict = None,
         user_id: str = None,
         development: Optional[bool] = None,
+        cols: Optional[List] = None,
     ):
         self.id: Optional[str] = id
         self.name: Optional[str] = name
@@ -47,7 +49,7 @@ class DataView(ABC):
         self._schema: Union[pd.Series, List, None] = schema
         self._user_id: Optional[str] = user_id
         self._owner: Optional[Dict] = owner
-        self._cols = None
+        self._cols = cols
         self.development = development
 
     def __repr__(self):

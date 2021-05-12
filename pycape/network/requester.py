@@ -45,6 +45,10 @@ class Requester:
         self.gql_endpoint = self._parse_coordinator_endpoint(self.endpoint, "/v1/query")
 
         self.session = requests.Session()
+        self.session.verify = False
+        cert = ("./localhost+3.pem", "./localhost+3-key.pem")
+        self.session.cert = cert
+        print("self.session.cert", self.session.cert)
 
     @staticmethod
     def _check_endpoint(url: str) -> NoReturn:
@@ -96,7 +100,7 @@ class Requester:
         if variables is not None:
             input_json["variables"] = variables
 
-        r = self.session.post(self.gql_endpoint, json=input_json)
+        r = self.session.post(self.gql_endpoint, json=input_json, verify=False)
 
         j = {}
         try:
